@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>After Hours · v24</title>
+    <link rel="stylesheet" href="style.css?v=24" />
+  </head>
+  <body>
+    <canvas id="game" aria-label="First-person school environment"></canvas>
+    <div id="film"></div>
+    <div id="damage"></div>
+    <div id="sanityEffect"></div>
+    <div id="transition"></div>
+    <div id="scareFlash"></div>
+    <div id="ambush" class="hidden" role="status" aria-live="polite">
+      <strong id="ambushTitle">BREAK FREE</strong>
+      <p id="ambushInstruction"></p>
+      <div class="struggle-track"><i id="struggleFill"></i></div>
+      <span id="struggleTime"></span>
+    </div>
+    <div id="cinematic" class="hidden">
+      <div class="cinema-bar top"></div>
+      <div class="cinema-bar bottom"></div>
+      <span id="cinematicHint"></span>
+    </div>
+    <div id="hud" class="hidden">
+      <div class="chapter">
+        <span id="chapterNo">01</span
+        ><span id="chapterName">THE VOICEMAIL</span>
+      </div>
+      <div id="objective"></div>
+      <div id="secretProgress">THE SEALED WING · 0/5 ROOMS · J JOURNAL</div>
+      <div id="itemNotice" role="status" aria-live="polite"></div>
+      <div id="reticle">·</div>
+      <div id="prompt"></div>
+      <div id="subtitles" role="status" aria-live="polite">
+        <span id="speaker"></span>
+        <p id="line"></p>
+      </div>
+      <div id="status"></div>
+      <div id="resources">
+        <div class="meter" id="sanityMeter">
+          <span>SANITY</span>
+          <div class="track"><i id="sanityFill"></i></div>
+          <small id="sanityValue">100%</small>
+        </div>
+        <div class="meter" id="staminaMeter">
+          <span>STAMINA</span>
+          <div class="track"><i id="staminaFill"></i></div>
+          <small id="staminaValue">100%</small>
+        </div>
+        <div class="meter" id="flashlightMeter">
+          <span>FLASHLIGHT</span>
+          <div class="track"><i id="flashlightFill"></i></div>
+          <small id="flashlightValue">70%</small>
+        </div>
+        <div class="supplies">
+          SPARE BATTERIES <b id="batteryCount">0</b> · B REPLACE
+        </div>
+      </div>
+      <div id="inventory" class="hidden">
+        <span>POCKETS / TAB</span>
+        <p id="inventoryItems">No tools or keys</p>
+      </div>
+      <div id="pocketSlots" aria-label="Carried items"></div>
+      <div id="cheatIndicator" class="hidden">CHEATS ACTIVE</div>
+      <div id="breath" class="hidden" aria-label="Sprint breath remaining">
+        <span></span><small>BREATH</small>
+      </div>
+      <div class="controls">
+        WASD MOVE <b>·</b> MOUSE LOOK <b>·</b> E INTERACT <b>·</b> F LIGHT
+        <b>·</b> SHIFT RUN <b>·</b> SPACE JUMP <b>·</b> C CROUCH <b>·</b> B
+        BATTERY <b>·</b> H GROUNDING KIT <b>·</b> TAB POCKETS <b>·</b> J JOURNAL <b>·</b> F2 CHEATS <b>·</b> ESC PAUSE
+      </div>
+    </div>
+    <div id="title" class="overlay">
+      <div class="title-top">
+        <span>A NARRATIVE HORROR PROTOTYPE · V23</span
+        ><span>HEADPHONES RECOMMENDED</span>
+      </div>
+      <div class="title-content">
+        <div class="eyebrow">A SCHOOL. A PROMISE. EIGHT YEARS.</div>
+        <h1>AFTER<br /><em>HOURS</em><span class="title-dot">.</span></h1>
+        <p class="tagline">She never stopped waiting.</p>
+        <label class="preset-label" for="preset">EXPERIENCE</label
+        ><select id="preset">
+          <option value="story">Story</option>
+          <option value="easy">Easy</option>
+          <option value="normal" selected>Normal</option>
+          <option value="hard">Hard</option>
+          <option value="nightmare">Nightmare</option>
+        </select>
+        <p id="presetHint" class="small">
+          Listen, search, and conserve your light. Each preset uses a different
+          item layout.
+        </p>
+        <button id="begin">ENTER THE SCHOOL <span>↗</span></button
+        ><button id="continue" class="secondary hidden">
+          CONTINUE FROM CHECKPOINT
+        </button>
+        <button id="titleSettings" class="secondary">SETTINGS</button>
+        <div class="title-note">
+          First-person · No combat · Five hidden rooms<br />Keyboard & mouse
+          required. Contains grief, fire, jumpscares and pursuit.
+        </div>
+      </div>
+      <div class="title-bottom">
+        <span>01 / THE VOICEMAIL</span
+        ><span>“Eli… you said you’d come back.”</span>
+      </div>
+    </div>
+    <div id="pause" class="overlay hidden">
+      <div class="panel">
+        <div class="eyebrow">AFTER HOURS</div>
+        <h2>A moment to breathe.</h2>
+        <p id="pauseDetail">Clues, tools, and discoveries save as you find them. J opens your journal.</p>
+        <button id="resume">RETURN TO THE SCHOOL</button
+        ><button id="restartCheckpoint" class="secondary">
+          RESTORE CHECKPOINT</button
+        ><button id="settingsButton" class="secondary">SETTINGS</button
+        ><button id="tuningButton" class="secondary">DIRECTOR / TUNING</button
+        ><button id="cheatsButton" class="secondary">CHEATS / F2</button
+        ><label class="option"
+          ><input id="voiceToggle" type="checkbox" checked /> Spoken
+          dialogue</label
+        ><label class="option"
+          >Sound
+          <input
+            id="volume"
+            type="range"
+            min="0"
+            max="1"
+            step="0.05"
+            value="0.7"
+        /></label>
+        <p class="small">
+          Tap E repeatedly to escape room ambushes. SPACE jumps; Q advances
+          subtitles. Arrow keys also turn the camera. Drag to look if pointer
+          lock is unavailable.
+        </p>
+      </div>
+    </div>
+    <div id="settings" class="overlay hidden">
+      <div class="panel wide settings-panel">
+        <div class="eyebrow">AFTER HOURS</div>
+        <h2>Settings</h2>
+        <p class="small">
+          Adjust speech, atmosphere, effects and scare intensity. Changes save
+          automatically.
+        </p>
+        <div id="settingsFields"></div>
+        <div class="settings-tests">
+          <button id="testMara" class="secondary">TEST MARA VOICE</button>
+          <button id="testIntercom" class="secondary">TEST INTERCOM</button
+          ><button id="testScare" class="secondary">TEST SCARE SOUND</button>
+        </div>
+        <button id="closeSettings">BACK</button
+        ><button id="resetSettings" class="secondary">RESET SETTINGS</button>
+      </div>
+    </div>
+    <div id="reader" class="overlay hidden">
+      <article class="paper">
+        <div id="readType" class="eyebrow"></div>
+        <h2 id="readTitle"></h2>
+        <img id="readImage" class="hidden" alt="" />
+        <div id="readBody"></div>
+        <div id="keypad" class="hidden">
+          <output id="pinDisplay" aria-live="polite" aria-label="Vault code">_ _ _</output>
+          <div class="keypad-grid">
+            <button data-digit="1">1</button><button data-digit="2">2</button><button data-digit="3">3</button>
+            <button data-digit="4">4</button><button data-digit="5">5</button><button data-digit="6">6</button>
+            <button data-digit="7">7</button><button data-digit="8">8</button><button data-digit="9">9</button>
+            <button data-digit="clear" aria-label="Clear code">CLR</button><button data-digit="0">0</button><button data-digit="enter">↵</button>
+          </div>
+        </div>
+        <button id="closeReader">PUT IT DOWN <span>E / ESC</span></button>
+      </article>
+    </div>
+    <div id="tuning" class="overlay hidden">
+      <div class="panel wide">
+        <div class="eyebrow">DIRECTOR'S DESK</div>
+        <h2>Shape the experience.</h2>
+        <div id="tuningFields"></div>
+        <button id="closeTuning">SAVE & RETURN</button
+        ><button id="resetTuning" class="secondary">
+          RESTORE DEFAULT VALUES
+        </button>
+        <p class="small">
+          Live variables persist in this browser. Edit src/data/config.js for
+          project defaults. Tuning is a prototype tool.
+        </p>
+      </div>
+    </div>
+    <div id="cheats" class="overlay hidden">
+      <div class="panel wide">
+        <div class="eyebrow">PROTOTYPE CHEATS / F2</div>
+        <h2>Make your own rules.</h2>
+        <div id="cheatFlags"></div>
+        <div class="cheat-actions">
+          <button id="giveItems">ALL KEYS, TOOLS & BATTERIES</button
+          ><button id="unlockAll" class="secondary">UNLOCK ALL DOORS</button
+          ><button id="refill" class="secondary">REFILL ALL BARS</button
+          ><button id="resetMonsters" class="secondary">
+            RESET ALL ROOM MONSTERS
+          </button>
+          <button id="resetHauntings" class="secondary">
+            RESET VANISHING FIGURES & SCHOOL SCARES
+          </button>
+        </div>
+        <p id="monsterStatus" class="small"></p>
+        <button id="peekDemo" class="secondary">VIEW VANISHING FIGURE</button>
+        <p class="small">
+          Restores the Locker checkpoint and faces the west doorway. Walk toward
+          the figure to make it disappear.
+        </p>
+        <label class="option"
+          >Teleport
+          <select id="teleport">
+            <option value="reception">Reception</option><option value="westWing">West wing</option><option value="library">Library</option><option value="infirmary">Infirmary</option><option value="workshop">Workshop</option><option value="boiler">Boiler room</option>
+            <option value="classroom">Classroom 04</option>
+            <option value="phone">Classroom 08</option>
+            <option value="maintenance">East maintenance</option>
+            <option value="archive">Staff archive</option>
+            <option value="gym">Gym</option></select
+          ><button id="teleportButton">GO</button></label
+        >
+        <label class="option"
+          >Story checkpoint
+          <select id="cheatStage"></select
+          ><button id="jumpStage">RESTORE</button></label
+        >
+        <button id="closeCheats">RETURN TO GAME</button>
+        <p class="small">
+          Cheats pause the game. A checkpoint jump supplies completed
+          prerequisites. Start a new game to clear cheat switches.
+        </p>
+      </div>
+    </div>
+    <div id="ending" class="overlay hidden">
+      <div class="end-content">
+        <div id="endingEyebrow" class="eyebrow">ONE NEW VOICEMAIL</div>
+        <h1>AFTER HOURS</h1>
+        <p id="endingStory">
+          Some people don't haunt places because they died there.<br />They
+          haunt them because they were waiting for someone to come back.
+        </p>
+        <button id="again">RETURN TO THE BEGINNING</button>
+        <div id="endingDetail" class="small">End of playable prototype · Eli & Mara's story</div>
+      </div>
+    </div>
+    <div id="death" class="overlay hidden">
+      <div class="panel death-panel">
+        <div id="deathCount" class="eyebrow"></div>
+        <h2>You didn’t get away.</h2>
+        <p id="deathTip"></p>
+        <button id="retry">TRY AGAIN <span>R ↗</span></button>
+        <p class="small">Restart this encounter with full breath.</p>
+      </div>
+    </div>
+    <div id="error" class="overlay hidden">
+      <div class="panel">
+        <h2>The school couldn't open.</h2>
+        <p id="errorText"></p>
+      </div>
+    </div>
+    <script type="module" src="src/main.js?v=24"></script>
+  </body>
+</html>

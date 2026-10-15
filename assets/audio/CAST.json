@@ -1,0 +1,47 @@
+{
+  "revision": 12,
+  "engine": "Microsoft Ana Neural for all Mara speech; Seed Audio for Eli and Mrs Vale",
+  "format": "48kHz mono, 16-bit PCM WAV",
+  "casting": {
+    "mara-child": {
+      "name": "Ana",
+      "voice_id": "en-US-AnaNeural",
+      "voice_type": "native-child",
+      "engine": "Microsoft Neural",
+      "source": "https://learn.microsoft.com/en-us/azure/ai-services/speech-service/language-support"
+    },
+    "mara-older": {
+      "name": "Ana",
+      "voice_id": "en-US-AnaNeural",
+      "voice_type": "native-child",
+      "engine": "Microsoft Neural",
+      "source": "https://learn.microsoft.com/en-us/azure/ai-services/speech-service/language-support"
+    },
+    "eli-young": {
+      "name": "Evan",
+      "voice_id": "f7a46aa0-183a-5327-b554-e71d8c0071bb",
+      "voice_type": "preset"
+    },
+    "eli": {
+      "name": "Dylan",
+      "voice_id": "b847bc29-f184-583a-8ad9-d1f1e16d1a60",
+      "voice_type": "preset"
+    },
+    "teacher": {
+      "name": "Helena",
+      "voice_id": "3c2b83c0-2e0a-5ae8-998a-a5fe71b7eccd",
+      "voice_type": "preset"
+    }
+  },
+  "performance_note": "Mara is a native synthetic female child voice, used for all her lines at the user’s request. Other character casting remains unchanged. Speech is not a recording of a human child actor. No pitch shifting, time stretching or cloned child voice. Device effects are separate.",
+  "nonverbal": {
+    "file": "v11-lastVoicemail-0.wav",
+    "author": "ashjenx",
+    "title": "child laughing.wav",
+    "source": "https://freesound.org/people/ashjenx/sounds/135387/",
+    "download": "https://cdn.freesound.org/previews/135/135387_2424331-hq.mp3",
+    "license": "CC0 1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "edits": "Decoded public HQ preview, downmixed to mono, resampled to 48kHz, level matched, short edge fades."
+  }
+}

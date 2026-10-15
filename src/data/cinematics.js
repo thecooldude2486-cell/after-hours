@@ -1,0 +1,45 @@
+// Camera shots are brief punctuation around existing story beats; they add no dialogue or lore.
+export const CINEMATICS = {
+  teacherArrival: {
+    duration: 1.7,
+    target: "teacher",
+    local: true,
+    fov: 59,
+    scare: true,
+    cue: "scare",
+  },
+  fireMemory: {
+    duration: 2.7,
+    yaw: -0.42,
+    pitch: 0.13,
+    fov: 78,
+    cue: "collapse",
+    shake: 0.017,
+  },
+  reunion: { duration: 2.3, target: "mara", local: true, fov: 58 },
+  lastBell: {
+    duration: 3.6,
+    target: "front",
+    fov: 55,
+    lift: 0.25,
+    cue: "rain",
+  },
+  ambushCapture: {
+    duration: 1.3,
+    target: "monster",
+    local: true,
+    fov: 81,
+    scare: true,
+    cue: "shadowScare",
+    shake: 0.04,
+  },
+  capture: {
+    duration: 1.65,
+    target: "teacher",
+    local: true,
+    fov: 61,
+    scare: true,
+    cue: "scare",
+    shake: 0.04,
+  },
+};

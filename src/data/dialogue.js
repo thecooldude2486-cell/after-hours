@@ -1,0 +1,110 @@
+import { VOICES } from "./voices.js";
+// Story wording and the user-approved clarity revisions are documented in ADAPTATIONS.md.
+const l = (speaker, text, duration = 4, audio = null) => ({
+  speaker,
+  text,
+  duration,
+  audio,
+});
+export const DIALOGUE = {
+  voicemail: [l("MARA · VOICEMAIL", "Eli… you said you’d come back.", 7)],
+  intercom: [l("MARA · INTERCOM", "You took a long time.", 4.5)],
+  hideMemory: [
+    l("MARA · CASSETTE", "Do you remember where we used to hide?", 4.5),
+  ],
+  argument: [
+    l("YOUNG MARA", "Can you wait after school today?"),
+    l("YOUNG ELI", "I've got things to do.", 3),
+    l("YOUNG MARA", "Please?", 2.5),
+    l("YOUNG ELI", "Mara, stop.", 3),
+    l("", "", 3),
+  ],
+  teacher: [l("THE TEACHER", "Mara?", 3), l("THE TEACHER", "You left her.", 3)],
+  phone: [
+    l("ELI", "Where are you?", 3),
+    l("MARA · TELEPHONE", "Still here.", 4),
+    l("ELI", "Are you hurt?", 3),
+    l("", "", 5),
+    l("MARA · TELEPHONE", "Not anymore.", 4.5),
+    l("ELI", "Mara… I'm sorry.", 5),
+    l("MARA · TELEPHONE", "For what?", 5),
+    l("", "", 4),
+    l("MARA · TELEPHONE", "I hear things when people come here.", 5),
+    l("MARA · TELEPHONE", "I heard Mum looking for me.", 6),
+  ],
+  abandonment: [
+    l("YOUNG ELI", "You're not my responsibility.", 5),
+    l("", "", 2),
+  ],
+  walkingAway: [
+    l("MARA", "Eli?", 3),
+    l("MARA", "Eli?", 3),
+    l("MARA", "Please don't leave me.", 5),
+  ],
+  teacherReveal: [
+    l("THE TEACHER", "She waited.", 4),
+    l("THE TEACHER", "You went home.", 4),
+  ],
+  belief: [l("MARA · MEMORY", "He'll come back.", 5)],
+  reunion: [
+    l("ELI", "Mara… is it really you?", 4),
+    l("MARA", "It’s me, Eli.", 3),
+    l("ELI", "You’re really here.", 5),
+    l("MARA", "I waited for you.", 5),
+  ],
+  embrace: [l("MARA", "I knew you'd come back.", 6), l("", "", 4)],
+  companion1: [
+    l("MARA", "What's driving like?", 4),
+    l("MARA", "Did Dad get grey hair?", 4),
+    l("MARA", "Do you still talk to your school friends?", 4),
+  ],
+  companion2: [
+    l("MARA", "Do you think I'd have been happy?", 5),
+    l("ELI", "You would've been annoying.", 4),
+    l("MARA", "I hate you.", 3),
+    l("ELI", "Yeah.", 2),
+    l("", "", 2),
+    l("ELI", "I missed you too.", 5),
+  ],
+  entrance: [l("ELI", "Come on.", 4), l("ELI", "Mara?", 5)],
+  return: [
+    l("MARA", "No.", 3),
+    l("MARA", "No, no, no. Go.", 5),
+    l("ELI", "I already left you once.", 5),
+    l("MARA", "You were scared.", 4),
+    l("MARA", "You were a kid.", 4),
+    l("ELI", "So were you.", 5),
+    l("MARA", "I never blamed you.", 7),
+  ],
+  together: [
+    l("MARA", "Are you staying?", 4),
+    l("ELI", "No.", 3),
+    l("ELI", "We're leaving together.", 6),
+  ],
+  classroom: [l("MARA", "Can we go now?", 5), l("ELI", "Yeah.", 5)],
+  lastVoicemail: [
+    l("MARA · VOICEMAIL", "[laughing]", 3),
+    l("ELI · VOICEMAIL", "Come on, slowpoke.", 4),
+    l("MARA · VOICEMAIL", "Wait for me!", 4),
+    l("ELI · VOICEMAIL", "I am.", 5),
+  ],
+};
+
+// Distance-triggered fragments of the abandonment memory.
+DIALOGUE.walkaway1 = [DIALOGUE.walkingAway[0]];
+DIALOGUE.walkaway2 = [DIALOGUE.walkingAway[1]];
+DIALOGUE.walkaway3 = [DIALOGUE.walkingAway[2]];
+
+for (const [group, lines] of Object.entries(DIALOGUE))
+  for (let i = 0; i < lines.length; i++) {
+    const clip = VOICES[group + ":" + i];
+    if (clip) {
+      lines[i].audio = clip.audio;
+      lines[i].voiceProfile =
+        lines[i].speaker.includes("MARA") &&
+        /INTERCOM|VOICEMAIL/.test(lines[i].speaker)
+          ? "mara-device"
+          : clip.character;
+      lines[i].duration = Math.max(lines[i].duration, clip.duration);
+    }
+  }

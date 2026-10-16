@@ -89,7 +89,7 @@ export function addWestWing({scene,box,textPlane,floor,gate,interactables,builde
   const valve={id:'annex_steamValve',type:'valve',label:'Fit the steam shutoff wheel',mesh:valveBase,position:valveBase.position.clone(),enabled:true};interactables.push(valve);
   const fuseCase=container('annex_fuseCase','wired electrical case',-22,.7,-41.5,1,.35,.7,null,'pliers');
   box(-22,.31,-41.5,1.4,.62,.9,0x494c3e,'desk','boiler',true);
-  pickup('annex_spareFuse','fuse',fuseCase,[-.2,.04,0]);pickup('annex_battery','battery',fuseCase,[.2,.04,0]);
+  pickup('annex_spareFuse','fuse',fuseCase,[-.2,.04,0]);
   const sync=opened=>{
     const fixed=opened.has(valve.id);valve.open=fixed;wheel.visible=fixed;needle.rotation.z=fixed?1.1:-.7;
     steamCollider.userData.obstacle.enabled=!fixed;

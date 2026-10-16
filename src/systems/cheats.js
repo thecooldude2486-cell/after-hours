@@ -5,15 +5,13 @@ export class CheatSystem {
     this.invincible = false;
     this.infiniteStamina = false;
     this.infiniteSanity = false;
-    this.infiniteLight = false;
     this.allKeys = false;
     this.freezeTeacher = false;
     this.disableMonsters = false;
   }
   grantItems() {
     for (const id of Object.keys(ITEMS))
-      if (!["battery", "groundingKit"].includes(id)) this.game.inventory.items.add(id);
-    this.game.inventory.batteries = 99;
+      if (id !== "groundingKit") this.game.inventory.items.add(id);
     this.game.inventory.groundingKits = 99;
     this.game.inventory.draw();
   }
@@ -26,7 +24,6 @@ export class CheatSystem {
   }
   refill() {
     const p = this.game.player;
-    p.battery = 100;
     p.sanity = 100;
     p.stamina = this.game.config.sprintCapacity;
     p.exhausted = false;

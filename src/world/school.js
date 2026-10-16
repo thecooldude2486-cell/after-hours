@@ -65,9 +65,9 @@ export function createSchool(renderer, config) {
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0x080f13);
   scene.fog = new THREE.FogExp2(0x080f13, 0.026);
-  const ambient = new THREE.HemisphereLight(0x637a8c, 0x111713, 0.075);
+  const ambient = new THREE.HemisphereLight(0x637a8c, 0x111713, 0.52);
   scene.add(ambient);
-  scene.environmentIntensity = 0.075;
+  scene.environmentIntensity = 0.55;
   const env = new EnvironmentSystem(scene, ambient, config),
     obstacles = [],
     interactables = [],
@@ -344,7 +344,7 @@ export function createSchool(renderer, config) {
     scene.add(l);
     lights.push({ light: l, z, base: 6 });
   }
-  const exterior = new THREE.DirectionalLight(0x9fb9d9, 0.06);
+  const exterior = new THREE.DirectionalLight(0x9fb9d9, 0.8);
   exterior.position.set(-10, 7, -20);
   scene.add(exterior);
   function windowAt(x, z, rotation) {
@@ -813,16 +813,24 @@ export function createSchool(renderer, config) {
     for (const dz of [-0.35, 0.35])
       box(5 + dx, 0.525, -21 + dz, 0.055, 1.05, 0.055, 0x353c33);
   const crt = box(5, 1.45, -21, 0.7, 0.6, 0.6, 0x858b78);
-  const crtScreen = box(5, 1.48, -20.67, 0.55, 0.4, 0.035, 0x23433b, null, "school", false, {
+  const crtScreen = box(5, 1.48, -20.67, 0.55, 0.4, 0.035, 0x101917, null, "school", false, {
     emissive: 0x46725f,
-    emissiveIntensity: 0.5,
+    emissiveIntensity: 0,
   });
-  const crtGlow = new THREE.PointLight(0x83bba8, .62, 6, 2);
+  const crtGlow = new THREE.PointLight(0x83bba8, 0, 6, 2);
   crtGlow.position.set(5,1.5,-20.4);scene.add(crtGlow);
   // A small bounced spill at the office entrance, rather than a global hallway change.
-  const crtSpill = new THREE.PointLight(0x83bba8, .14, 3.8, 2);
+  const crtSpill = new THREE.PointLight(0x83bba8, 0, 3.8, 2);
   crtSpill.position.set(2.72,1.45,-16.7);scene.add(crtSpill);
-  const crtTarget=target("crt", "Switch CRT monitor off", crt, "switch", {open:true,screen:crtScreen,glow:crtGlow,spill:crtSpill});
+  const crtTarget=target("crt", "Switch CRT monitor on", crt, "switch", {open:false,screen:crtScreen,glow:crtGlow,spill:crtSpill});
+  function setCRT(on) {
+    crtTarget.open = !!on;
+    crtScreen.material.emissiveIntensity = on ? 0.5 : 0;
+    crtScreen.material.color.setHex(on ? 0x23433b : 0x101917);
+    crtGlow.intensity = on ? 0.62 : 0;
+    crtSpill.intensity = on ? 0.14 : 0;
+    crtTarget.label = "Switch CRT monitor " + (on ? "off" : "on");
+  }
   const drawer = box(
     8,
     0.65,
@@ -1017,7 +1025,7 @@ export function createSchool(renderer, config) {
   interactables.find((t) => t.id === "bracelet").requires = "lockerKey";
   interactables.find((t) => t.id === "vale").requires = "recordsKey";
   const fuseBox = box(19.34, 1.5, -50, 0.07, 0.7, 0.55, 0x6e7460);
-  target("fuseBox", "Install fuse / recharge flashlight", fuseBox, "power");
+  target("fuseBox", "Restore school power / install fuse", fuseBox, "power");
   textPlane("FUSE / CHARGER", 19.29, 2.05, -50, 1, 0.25, -Math.PI / 2);
   for (const [x, z, y] of [
     [17.5, -52, 0.76],
@@ -1083,19 +1091,6 @@ export function createSchool(renderer, config) {
   teacher.position.set(0, 0, -34);
   teacher.visible = false;
   scene.add(teacher);
-  const flash = new THREE.SpotLight(
-    0xe9ead2,
-    config.flashlightIntensity,
-    config.flashlightRange,
-    config.flashlightAngle,
-    0.65,
-    1.6,
-  );
-  flash.castShadow = true;
-  flash.shadow.mapSize.set(1024, 1024);
-  flash.shadow.bias = -0.001;
-  scene.add(flash);
-  scene.add(flash.target);
   const storage = addPickups({ scene, box, interactables, env });
   const secrets = addSecrets({scene, box, textPlane, interactables, storage, env});
   const annex=addWestWing({scene,box,textPlane,floor,gate,interactables,builders:secrets.builders});
@@ -1122,8 +1117,8 @@ export function createSchool(renderer, config) {
     annex,
     secretExit:secrets.fireExit,
     crt:crtTarget,
+    setCRT,
     teacher,
-    flash,
     rain,
     exterior,
     box,
@@ -1217,7 +1212,7 @@ export function createSchool(renderer, config) {
         }
       }
       exterior.color.setHex(friendly ? 0xffecc3 : 0x9fb9d9);
-      exterior.intensity = friendly ? 2.1 : 0.06;
+      exterior.intensity = friendly ? 2.1 : 0.8;
       for (const r of rain) {
         r.visible = !friendly;
         r.position.y -= dt * (0.5 + (r.position.z % 1) * 0.2);
@@ -1239,7 +1234,7 @@ export function createSchool(renderer, config) {
             f.base *
             flicker *
             behind *
-            (friendly ? 1.7 : 0.12) *
+            (friendly ? 1.7 : 1) *
             (1 + (this.scarePulse || 0) * 3);
           f.light.color.setHex(
             f.colorOverride ??
@@ -1252,7 +1247,7 @@ export function createSchool(renderer, config) {
         }
         if (f.tube)
           f.tube.material.emissiveIntensity =
-            f.base * flicker * behind * (friendly ? 1 : 0.18) * (1 + (this.scarePulse || 0) * 3);
+            f.base * flicker * behind * (1 + (this.scarePulse || 0) * 3);
       }
     },
   };

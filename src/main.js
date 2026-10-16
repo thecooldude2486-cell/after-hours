@@ -1,5 +1,4 @@
 import { EnvironmentSoundSystem } from "./systems/environment-sounds.js";
-import { loadHandSurface } from "./world/viewmodel.js";
 import { SchoolRenderer } from "./systems/rendering.js";
 import { AtmosphereSystem } from "./systems/atmosphere.js";
 import { loadHorrorMaterials } from "./world/horror-detail.js";
@@ -113,7 +112,6 @@ class Game {
       invincible: "Cannot be caught",
       infiniteStamina: "Infinite stamina",
       infiniteSanity: "Infinite sanity",
-      infiniteLight: "Infinite flashlight",
       freezeTeacher: "Freeze The Teacher",
       disableMonsters: "Disable room ambushes",
       allKeys: "Use any key or tool",
@@ -277,17 +275,7 @@ class Game {
       }
       if (e.code === "KeyH" && !this.interactions.reader)
         this.inventory.useGroundingKit();
-      if (e.code === "KeyB" && !this.interactions.reader)
-        this.inventory.useBattery();
       if (e.code === "KeyE") this.interactions.use();
-      if (
-        e.code === "KeyF" &&
-        !this.player.hidden &&
-        !this.interactions.reader
-      ) {
-        this.player.flashlight = !this.player.flashlight;
-        this.audio.cue("switch");
-      }
       if (
         e.code === "Space" &&
         !this.interactions.reader &&
@@ -409,7 +397,6 @@ class Game {
       "invincible",
       "infiniteStamina",
       "infiniteSanity",
-      "infiniteLight",
       "freezeTeacher",
       "disableMonsters",
       "allKeys",
@@ -510,18 +497,7 @@ class Game {
     } else if (!this.started) {
       this.camera.position.set(0.4, 1.68, 8);
       this.camera.rotation.set(0, -0.08 + Math.sin(this.time * 0.05) * 0.04, 0);
-      this.world.flash.position.copy(this.camera.position);
-      this.world.flash.target.position.set(0, 1.2, -20);
-      this.world.flash.intensity = 8;
     }
-    this.player.viewModel.root.visible =
-      this.started &&
-      !this.ended &&
-      !this.player.hidden &&
-      !this.interactions.reader &&
-      !this.cinematics.active &&
-      !this.recovering &&
-      !this.ambushes.blocking;
     if (!this.paused) this.cinematics.update(dt);
     const speaker = this.dialogue.current?.line?.speaker || "";
     this.world.mara.userData.speaking =
@@ -543,7 +519,6 @@ try {
     loadMaraModel(),
     loadSchoolArt(),
     loadHorrorMaterials(),
-    loadHandSurface(),
   ]);
   $("#begin").disabled = false;
   const game = new Game();

@@ -65,47 +65,26 @@ test("five distinct presets increase pursuit pressure and relocate each required
   assert.equal(values[0].enemy, false);
   for (let i = 1; i < 5; i++) {
     assert.ok(values[i].chaseSpeed > values[i - 1].chaseSpeed);
-    assert.ok(values[i].batteryDrain > values[i - 1].batteryDrain);
     assert.ok(values[i].sprintCapacity < values[i - 1].sprintCapacity);
   }
   for (const anchors of Object.values(ITEM_LAYOUTS))
     assert.equal(new Set(anchors.map((a) => a.join(","))).size, 5);
 });
-test("battery drains only when lit, flickers strictly below 25%, and is dark at zero", () => {
-  const g = fixture();
-  const r = g.resources;
-  g.player.battery = 25;
-  for (let i = 0; i < 30; i++) assert.equal(r.flashlightFactor(i / 9), 1);
-  g.player.battery = 24.9;
-  const low = Array.from({ length: 100 }, (_, i) => r.flashlightFactor(i / 9));
-  assert.ok(low.some((v) => v === 0.08));
-  assert.ok(low.some((v) => v > 0.75));
-  g.player.battery = 0;
-  assert.equal(r.flashlightFactor(1), 0);
-  g.player.battery = 70;
-  r.update(10);
-  assert.equal(g.player.battery, 68.6);
-  g.player.flashlight = false;
-  r.update(10);
-  assert.equal(g.player.battery, 68.6);
+test("safe exploration uses school lighting, and legacy battery saves cannot impose torch penalties", () => {
+ const g=fixture();g.player.moving=true;
+ g.resources.restore({battery:0,sanity:75});g.resources.update(20);
+ assert.equal(g.player.sanity,75);assert.equal(g.resources.flashlightFactor,undefined);
+ assert.deepEqual(g.resources.snapshot(),{sanity:75});
+ g.player.lightsOut=true;g.resources.update(1);assert.ok(g.player.sanity<75);
 });
-test("spare batteries are consumed, fuse repair unlocks repeated recharges, locks require matching tools", () => {
-  const g = fixture(),
-    inv = g.inventory;
-  g.player.battery = 10;
-  assert.equal(inv.useBattery(), false);
-  inv.batteries = 2;
-  assert.equal(inv.useBattery(), true);
-  assert.equal(inv.batteries, 1);
-  assert.equal(g.player.battery, 80);
+test("fuse repair preserves school-power puzzles and locks still require matching tools", () => {
+  const g = fixture(), inv = g.inventory;
   assert.equal(inv.repairPower(), false);
   inv.items.add("fuse");
   assert.equal(inv.repairPower(), true);
   assert.equal(inv.power, true);
   assert.equal(inv.has("fuse"), false);
-  g.player.battery = 12;
   assert.equal(inv.repairPower(), true);
-  assert.equal(g.player.battery, 100);
   const door = {
     id: "phoneGate",
     requires: "staffKey",
@@ -117,18 +96,18 @@ test("spare batteries are consumed, fuse repair unlocks repeated recharges, lock
   inv.items.delete("staffKey");
   assert.equal(inv.check(door), true);
 });
-test("saved inventory restores collected props, batteries and locks; old checkpoints receive only completed prerequisites", () => {
+test("saved inventory restores collected props, grounding supplies and locks; old checkpoints receive only completed prerequisites", () => {
   const g = fixture(),
     inv = g.inventory;
   inv.items.add("lockerKey");
-  inv.batteries = 3;
+  inv.groundingKits = 3;
   inv.collected.add("item_lockerKey");
   inv.unlocked.add("bracelet");
   const save = inv.snapshot();
   inv.reset();
   inv.restore(save);
   assert.ok(inv.has("lockerKey"));
-  assert.equal(inv.batteries, 3);
+  assert.equal(inv.groundingKits, 3);
   assert.ok(inv.unlocked.has("bracelet"));
   inv.reset();
   inv.hydrateStage("survive");
@@ -143,25 +122,22 @@ test("saved inventory restores collected props, batteries and locks; old checkpo
   assert.equal(inv.has("cutters"), false);
   assert.equal(inv.power, true);
   g.resources.restore({ battery: 0, sanity: 5 }, true);
-  assert.equal(g.player.battery, 30);
   assert.equal(g.player.sanity, 55);
 });
 test("cheats refill resources, grant tools, and bypass locks without changing story order", () => {
   const g = fixture();
   g.cheats.grantItems();
   assert.ok(g.inventory.has("cutters"));
-  assert.equal(g.inventory.batteries, 99);
+  assert.equal(g.inventory.groundingKits, 99);
   g.player.sanity = 10;
   g.cheats.refill();
   assert.equal(g.player.sanity, 100);
   g.cheats.allKeys = true;
   assert.equal(g.inventory.check({ id: "new", requires: "staffKey" }), true);
-  g.cheats.infiniteLight =
     g.cheats.infiniteSanity =
     g.cheats.infiniteStamina =
       true;
   g.resources.update(100);
-  assert.equal(g.player.battery, 100);
   assert.equal(g.player.sanity, 100);
   assert.equal(g.story.stage, "survive");
 });
@@ -212,7 +188,6 @@ test("walking and sprinting never drain sanity in safe lit exploration", () => {
   for (const sprinting of [false, true]) {
     for (const sanity of [100, 62.5]) {
       const g = fixture();
-      g.config.batteryDrain = 0;
       Object.assign(g.player, {moving: true, sprinting, sanity});
       for (let i=0; i<3600; i++) g.resources.update(1/60);
       assert.equal(g.player.sanity, sanity);
@@ -220,7 +195,7 @@ test("walking and sprinting never drain sanity in safe lit exploration", () => {
   }
   const g = fixture();
   g.player.sprinting = true;
-  g.player.flashlight = false;
+  g.player.lightsOut = true;
   g.resources.update(1);
   assert.ok(g.player.sanity < 100, "Darkness remains a separate sanity risk");
 });

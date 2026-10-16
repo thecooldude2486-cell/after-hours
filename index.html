@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>After Hours · v25.1</title>
-    <link rel="stylesheet" href="style.css?v=25.1" />
+    <title>After Hours · v26</title>
+    <link rel="stylesheet" href="style.css?v=26" />
   </head>
   <body>
     <canvas id="game" aria-label="First-person school environment"></canvas>
@@ -59,14 +59,6 @@
           <div class="track"><i id="staminaFill"></i></div>
           <small id="staminaValue">100%</small>
         </div>
-        <div class="meter" id="flashlightMeter">
-          <span>FLASHLIGHT</span>
-          <div class="track"><i id="flashlightFill"></i></div>
-          <small id="flashlightValue">70%</small>
-        </div>
-        <div class="supplies">
-          SPARE BATTERIES <b id="batteryCount">0</b> · B REPLACE
-        </div>
       </div>
       <div id="inventory" class="hidden">
         <span>POCKETS / TAB</span>
@@ -78,14 +70,13 @@
         <span></span><small>BREATH</small>
       </div>
       <div class="controls">
-        WASD MOVE <b>·</b> MOUSE LOOK <b>·</b> E INTERACT <b>·</b> F LIGHT
-        <b>·</b> SHIFT RUN <b>·</b> SPACE JUMP <b>·</b> C CROUCH <b>·</b> B
-        BATTERY <b>·</b> H GROUNDING KIT <b>·</b> TAB POCKETS <b>·</b> J JOURNAL <b>·</b> F2 CHEATS <b>·</b> ESC PAUSE
+        WASD MOVE <b>·</b> MOUSE LOOK <b>·</b> E INTERACT
+        <b>·</b> SHIFT RUN <b>·</b> SPACE JUMP <b>·</b> C CROUCH <b>·</b> H GROUNDING KIT <b>·</b> TAB POCKETS <b>·</b> J JOURNAL <b>·</b> F2 CHEATS <b>·</b> ESC PAUSE
       </div>
     </div>
     <div id="title" class="overlay">
       <div class="title-top">
-        <span>A NARRATIVE HORROR PROTOTYPE · V23</span
+        <span>A NARRATIVE HORROR PROTOTYPE · V26</span
         ><span>HEADPHONES RECOMMENDED</span>
       </div>
       <div class="title-content">
@@ -207,7 +198,7 @@
         <h2>Make your own rules.</h2>
         <div id="cheatFlags"></div>
         <div class="cheat-actions">
-          <button id="giveItems">ALL KEYS, TOOLS & BATTERIES</button
+          <button id="giveItems">ALL KEYS & TOOLS</button
           ><button id="unlockAll" class="secondary">UNLOCK ALL DOORS</button
           ><button id="refill" class="secondary">REFILL ALL BARS</button
           ><button id="resetMonsters" class="secondary">
@@ -273,6 +264,6 @@
         <p id="errorText"></p>
       </div>
     </div>
-    <script type="module" src="src/main.js?v=25.1"></script>
+    <script type="module" src="src/main.js?v=26"></script>
   </body>
 </html>

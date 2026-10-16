@@ -61,13 +61,13 @@ test('nested caches gate contents by both lids and key, with persistent tool and
  await g.interactions.use(g.target('secret_calm_2'));assert.equal(g.inventory.groundingKits,1);
  assert.ok(g.inventory.useGroundingKit());assert.equal(g.player.sanity,75);assert.equal(g.inventory.groundingKits,0);
  const save=g.inventory.snapshot();g.inventory.restore(save);assert.equal(cutters.enabled,false);
- g.inventory.toggleStorage(crate);assert.equal(toolbox.enabled,false);assert.equal(g.target('secret_battery').enabled,false);
+ g.inventory.toggleStorage(crate);assert.equal(toolbox.enabled,false);assert.equal(g.target('secret_battery'),undefined);
 });
 test('grounding cards recover sanity only while nearby, lit and stationary, and kits clamp and persist',()=>{
  const g=game(),card=g.target('ground_reception');g.player.position.set(-4.4,1.65,8);
  assert.ok(g.resources.beginGrounding(card));g.resources.update(2);assert.equal(g.player.sanity,56);
  g.player.moving=true;g.resources.update(1);assert.equal(g.resources.restAt,null);assert.equal(g.player.sanity,56);
- g.player.moving=false;g.player.flashlight=false;assert.equal(g.resources.beginGrounding(card),false);
+ g.player.moving=false;g.player.lightsOut=true;assert.equal(g.resources.beginGrounding(card),false);
  g.inventory.groundingKits=2;g.player.sanity=90;g.inventory.useGroundingKit();assert.equal(g.player.sanity,100);
  assert.equal(g.inventory.useGroundingKit(),false);assert.equal(g.inventory.groundingKits,1);
  const save=g.inventory.snapshot();g.inventory.reset();g.inventory.restore(save);assert.equal(g.inventory.groundingKits,1);

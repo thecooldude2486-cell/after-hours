@@ -10,7 +10,7 @@ export const PALETTES = {
     ceiling: 0x646a62,
     fog: 0x080f13,
     ambient: 0x637a8c,
-    intensity: 0.075,
+    intensity: 0.52,
   },
   normal: {
     wall: 0xe1dfcb,
@@ -46,7 +46,7 @@ export const PALETTES = {
     ceiling: 0x3c3630,
     fog: 0x180e0a,
     ambient: 0xd07548,
-    intensity: 0.065,
+    intensity: 0.4,
   },
   distorted: {
     wall: 0x524b41,
@@ -58,7 +58,7 @@ export const PALETTES = {
     ceiling: 0x4b4841,
     fog: 0x131311,
     ambient: 0xd4a37a,
-    intensity: 0.085,
+    intensity: 0.48,
   },
 };
 export class EnvironmentSystem {
@@ -124,7 +124,7 @@ export class EnvironmentSystem {
     this.targetAmbient = new THREE.Color(PALETTES[this.state].ambient);
     this.startIntensity = this.ambient.intensity;
     this.fromReflection = this.scene.environmentIntensity;
-    this.targetReflection = ["normal", "memory"].includes(this.state) ? 1 : 0.075;
+    this.targetReflection = ["normal", "memory"].includes(this.state) ? 1 : 0.55;
     this.targetIntensity = PALETTES[this.state].intensity;
     this.apply();
   }

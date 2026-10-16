@@ -40,11 +40,6 @@ export const ITEMS = {
     type: "tool",
     clue: "Staff archive · gym padlocks",
   },
-  battery: {
-    name: "Flashlight battery",
-    type: "battery",
-    clue: "Press B to replace the battery",
-  },
 };
 // Rotation faces each container into its room. Position is cabinet centre, not a loose surface.
 export const STORAGE = {
@@ -126,18 +121,4 @@ export const ITEM_LAYOUTS = Object.fromEntries(
     item,
     s.slots.map(([x, z]) => [x, s.kind === "locker" ? 0.91 : 0.67, z]),
   ]),
-);
-// Batteries share storage slots, but never the occupied slot in the active preset.
-export const BATTERY_STORES = [
-  ["lockerKey", 2],
-  ["lockerKey", 4],
-  ["classroomKey", 1],
-  ["staffKey", 3],
-  ["recordsKey", 4],
-  ["cutters", 0],
-  ["fuse", 2],
-  ["fuse", 4],
-];
-export const BATTERY_SPAWNS = BATTERY_STORES.map(
-  ([item, i]) => ITEM_LAYOUTS[item][i],
 );

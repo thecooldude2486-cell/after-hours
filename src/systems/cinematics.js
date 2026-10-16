@@ -117,7 +117,6 @@ export class CinematicSystem {
     }
     g.camera.fov = THREE.MathUtils.lerp(shot.fov, data.fov, ease);
     g.camera.updateProjectionMatrix();
-    g.player.syncFlashlight?.();
     if (data.scare)
       scareFeedback(g, this.revealLight, shot.elapsed, {
         power: 1.2,

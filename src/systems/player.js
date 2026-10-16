@@ -1,11 +1,8 @@
 import * as THREE from "../../vendor/three.module.js";
 import { PlayerPhysics } from "./physics.js";
-import { createFlashlightViewModel } from "../world/viewmodel.js";
 export class Player {
   constructor(camera, world, audio, config) {
     this.camera = camera;
-    this.viewModel = createFlashlightViewModel(camera, world.scene);
-    this.viewTime = 0;
     this.world = world;
     this.audio = audio;
     this.config = config;
@@ -17,10 +14,7 @@ export class Player {
     this.keys = new Set();
     this.hidden = null;
     this.crouched = false;
-    this.flashlight = true;
-    this.battery = config.startBattery ?? 70;
     this.sanity = 100;
-    this.lightFactor = 1;
     this.moving = false;
     this.sprinting = false;
     this.stamina = config.sprintCapacity;
@@ -92,7 +86,6 @@ export class Player {
     this.position.set(spot.hide.x, spot.hide.y, spot.hide.z);
     this.yaw = spot.hide.yaw;
     this.pitch = 0;
-    this.flashlight = false;
     this.keys.clear();
     this.audio.cue("door", this.position);
   }
@@ -185,7 +178,6 @@ export class Player {
     this.syncCamera(dt);
   }
   syncCamera(dt) {
-    this.viewTime += dt;
     this.camera.position.copy(this.position);
     this.camera.position.y +=
       (this.moving && this.physics.grounded
@@ -194,21 +186,5 @@ export class Player {
       this.physics.landing * (this.config.cameraShake ?? 1);
     this.camera.rotation.order = "YXZ";
     this.camera.rotation.set(this.pitch, this.yaw, 0);
-    this.viewModel.update(this, this.viewTime);
-    this.syncFlashlight();
-  }
-  syncFlashlight() {
-    const dir = new THREE.Vector3();
-    this.camera.getWorldDirection(dir);
-    this.world.flash.position.copy(this.viewModel.muzzle());
-    this.world.flash.target.position
-      .copy(this.camera.position)
-      .addScaledVector(dir, 10);
-    this.world.flash.intensity =
-      this.flashlight && !this.hidden && this.battery > 0
-        ? this.config.flashlightIntensity * this.lightFactor
-        : 0;
-    this.world.flash.distance = this.config.flashlightRange;
-    this.world.flash.angle = this.config.flashlightAngle;
   }
 }

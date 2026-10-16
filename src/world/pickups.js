@@ -1,5 +1,5 @@
 import * as THREE from "../../vendor/three.module.js";
-import { ITEMS, STORAGE, BATTERY_STORES } from "../data/items.js";
+import { ITEMS, STORAGE } from "../data/items.js";
 /** Supplies are real, small meshes concealed by openable school storage. No glowing beacons. */
 export function addPickups(world) {
   const metal = new THREE.MeshStandardMaterial({
@@ -299,8 +299,6 @@ export function addPickups(world) {
     for (let i = 0; i < data.slots.length; i++) container(item, data, i);
     pickup(item, "item_" + item);
   }
-  for (let slot = 0; slot < BATTERY_STORES.length; slot++)
-    pickup("battery", "battery_" + slot, slot);
   return storage;
 }
 /** Kept here so tests and the main loop use the same physical opening motion. */

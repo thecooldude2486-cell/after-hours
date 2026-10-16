@@ -1,5 +1,5 @@
 import { syncSecrets } from "../world/secrets.js";
-import { ITEMS, ITEM_LAYOUTS, BATTERY_STORES } from "../data/items.js";
+import { ITEMS, ITEM_LAYOUTS } from "../data/items.js";
 import { PRESETS } from "../data/presets.js";
 import { STAGE_ORDER } from "../data/beats.js";
 import { itemIcon } from "../ui/item-icons.js";
@@ -18,11 +18,12 @@ export class InventorySystem {
   }
   reset() {
     this.items = new Set();
-    this.batteries = 0;
     this.groundingKits = 0;
     this.collected = new Set();
     this.unlocked = new Set();
     this.power = false;
+    this.crtOn = false;
+    this.game.world.setCRT?.(false);
     this.opened = new Set();
     this.notes = new Set();
   }
@@ -33,23 +34,23 @@ export class InventorySystem {
     return {
       pushDoorRevision: 1,
       items: [...this.items],
-      batteries: this.batteries,
       groundingKits: this.groundingKits,
       collected: [...this.collected],
       unlocked: [...this.unlocked],
       power: this.power,
+      crtOn: this.crtOn,
       opened: [...this.opened],
       notes: [...this.notes],
       preset: this.game.config.preset,
     };
   }
   restore(save = {}) {
-    this.items = new Set(save.items || []);
-    this.batteries = save.batteries || 0;
+    this.items = new Set((save.items || []).filter(id => id !== "battery"));
     this.groundingKits = save.groundingKits || 0;
     this.collected = new Set(save.collected || []);
     this.unlocked = new Set(save.unlocked || []);
     this.power = !!save.power;
+    this.setCRT(save.crtOn === true);
     this.opened = new Set(save.opened || []);
     this.notes = new Set(save.notes || []);
     if(save.pushDoorRevision!==1) for(const door of this.game.world.doors||[])
@@ -57,6 +58,10 @@ export class InventorySystem {
     this.applyLayout();
     this.applyLocks();
     this.draw();
+  }
+  setCRT(on) {
+    this.crtOn = !!on;
+    this.game.world.setCRT?.(this.crtOn);
   }
   applyLayout() {
     const { world, config } = this.game,
@@ -76,18 +81,13 @@ export class InventorySystem {
         }
         let item = target.item,
           index = layout;
-        if (item === "battery") {
-          [item, index] = BATTERY_STORES[target.slot];
-          // A spare sits in a different drawer from the required item, in every layout.
-          if (index === layout) index = (index + 1) % 5;
-        }
         const container = world.storage?.find(
           (c) => c.storageItem === item && c.index === index,
         );
         if (container) {
           container.tray.add(target.mesh);
           target.mesh.position.set(
-            target.item === "battery" ? 0.22 : 0,
+            0,
             0.045,
             0,
           );
@@ -100,7 +100,7 @@ export class InventorySystem {
               target.mesh.rotation.set(Math.PI / 2, 0, -0.35);
               target.mesh.scale.setScalar(1.55);
             } else {
-              target.mesh.position.set(target.item === "battery" ? 0.19 : -0.04, 0.045, 0.13);
+              target.mesh.position.set(-0.04, 0.045, 0.13);
               target.mesh.scale.setScalar(1.45);
             }
           }
@@ -108,11 +108,7 @@ export class InventorySystem {
           container.root.updateMatrixWorld(true);
           target.mesh.getWorldPosition(target.position);
         } else target.mesh.position.fromArray(ITEM_LAYOUTS[item][index]);
-        const limit =
-          config.preset === "nightmare" ? 5 : config.preset === "hard" ? 6 : 8;
-        target.available =
-          !this.collected.has(target.id) &&
-          (target.item !== "battery" || target.slot < limit);
+        target.available = !this.collected.has(target.id);
       }
     this.syncStorage();
   }
@@ -159,8 +155,7 @@ export class InventorySystem {
     )
       return;
     this.collected.add(target.id);
-    if (target.item === "battery") this.batteries++;
-    else if (target.item === "groundingKit") this.groundingKits++;
+    if (target.item === "groundingKit") this.groundingKits++;
     else this.items.add(target.item);
     target.available = false;
     target.mesh.visible = false;
@@ -197,21 +192,6 @@ export class InventorySystem {
       } else this.game.world.openDoor(door,!!unlocked);
     }
   }
-  useBattery() {
-    if (this.batteries <= 0) {
-      this.game.interactions.prompt.textContent =
-        "NO SPARE BATTERIES / FIND A BATTERY OR POWERED CHARGER";
-      return false;
-    }
-    if (this.game.player.battery >= 99) return false;
-    this.batteries--;
-    this.game.player.battery = Math.min(100, this.game.player.battery + 70);
-    this.game.audio.cue("switch");
-    this.draw();
-    this.game.story.refreshObjective?.();
-    this.game.story.save?.();
-    return true;
-  }
   useGroundingKit() {
     const g = this.game;
     if (this.groundingKits <= 0 || g.player.sanity >= 100) return false;
@@ -232,7 +212,6 @@ export class InventorySystem {
     const firstRepair = !this.power;
     this.power = true;
     this.items.delete("fuse");
-    this.game.player.battery = 100;
     if (firstRepair) this.game.player.sanity = Math.min(100, this.game.player.sanity + 15);
     this.game.audio.cue("switch");
     this.draw();
@@ -290,27 +269,12 @@ export class InventorySystem {
     el.textContent =
       [...this.items].map((id) => ITEMS[id]?.name || id).join("\n\n") ||
       "No tools or keys";
-    document.querySelector("#batteryCount").textContent = String(
-      this.batteries,
-    );
     const corner = document.querySelector("#pocketSlots");
     if (!corner) return;
     const slot = (type, label, key, extra = "") =>
       `<div class="pocket-slot" title="${label}" aria-label="${label}">${itemIcon(type)}<small>${key}</small>${extra}</div>`;
     const carried = [...this.items];
     corner.innerHTML =
-      slot(
-        "flashlight",
-        "Flashlight · F",
-        "F",
-        '<i class="pocket-charge"><b id="pocketCharge"></b></i>',
-      ) +
-      slot(
-        "battery",
-        `${this.batteries} spare batteries · B`,
-        "B",
-        `<em>${this.batteries}</em>`,
-      ) +
       slot("calm", `${this.groundingKits} grounding kits · H · +25 sanity`, "H", `<em>${this.groundingKits}</em>`) +
       carried
         .slice(-3)
@@ -332,7 +296,5 @@ export class InventorySystem {
       (carried.length > 3
         ? `<div class="pocket-more">+${carried.length - 3}<small>TAB</small></div>`
         : "");
-    const charge = document.querySelector("#pocketCharge");
-    if (charge) charge.style.height = `${this.game.player?.battery ?? 70}%`;
   }
 }

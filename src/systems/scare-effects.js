@@ -33,7 +33,6 @@ export function scareFeedback(
     camera.fov = fovBase - 14 * impact * shake;
     camera.updateProjectionMatrix();
   }
-  game.player?.syncFlashlight?.();
   const flashes = game.config?.scareFlash !== false;
   light.position.copy(camera.position);
   light.color.setHex(0xe3ede2);

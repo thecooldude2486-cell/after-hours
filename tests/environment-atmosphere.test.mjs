@@ -70,29 +70,29 @@ test("normal school swaps clean surfaces, friendly photographs and posters; horr
   assert.ok(w.art.writing.every((m) => m.visible));
   assert.ok(w.art.friendlyProps.every((m) => !m.visible));
 });
-test("horror lighting needs the flashlight while friendly states restore their full lighting", () => {
+test("school stays readable without a flashlight while friendly states retain daylight", () => {
   const w = createSchool({}, DEFAULTS), player = { position: new THREE.Vector3() };
   w.update(0, 0, player);
   const darkFixture = w.lights.filter(f => f.light).map(f => f.light.intensity);
-  assert.ok(w.env.ambient.intensity < 0.1);
-  assert.ok(w.scene.environmentIntensity < 0.1);
-  assert.ok(w.exterior.intensity < 0.1);
+  assert.ok(w.env.ambient.intensity >= 0.4);
+  assert.ok(w.scene.environmentIntensity >= 0.5);
+  assert.ok(w.exterior.intensity >= 0.8);
   for (const state of ["normal", "memory"]) {
     w.env.set(state, "school", true);
     w.update(0, 0, player);
     assert.ok(w.env.ambient.intensity >= 2);
     assert.equal(w.scene.environmentIntensity, 1);
     assert.ok(w.exterior.intensity >= 2);
-    w.lights.filter(f => f.light).forEach((f,i) => assert.ok(f.light.intensity > darkFixture[i]*10));
+    w.lights.filter(f => f.light).forEach((f,i) => assert.ok(f.light.intensity > darkFixture[i]*1.5));
   }
   for (const state of ["ruined", "burned", "distorted"]) {
     w.env.set(state, "school", true);
     w.update(0, 0, player);
-    assert.ok(w.env.ambient.intensity < 0.1);
-    assert.ok(w.scene.environmentIntensity < 0.1);
-    assert.ok(w.exterior.intensity < 0.1);
+    assert.ok(w.env.ambient.intensity >= 0.4);
+    assert.ok(w.scene.environmentIntensity >= 0.5);
+    assert.ok(w.exterior.intensity >= 0.8);
   }
-  assert.equal(w.flash.intensity, DEFAULTS.flashlightIntensity);
+  assert.equal(w.flash, undefined);
 });
 test("Teacher animation overlays do not accumulate head and chest rotation between frames", () => {
   const w = createSchool({}, DEFAULTS),

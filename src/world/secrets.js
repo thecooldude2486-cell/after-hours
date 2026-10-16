@@ -112,7 +112,6 @@ export function addSecrets({scene, box, textPlane, interactables, storage, env})
   const crate=container('cache_serviceCrate','wooden supply crate',22.8,0,-53.6,1.4,.62,1);
   const toolbox=container('cache_toolbox','locked service toolbox',0,.04,0,1,.34,.7,crate,'serviceKey');
   pickup('secret_cutters','cutters',toolbox,[0,.04,0]);
-  pickup('secret_battery','battery',toolbox,[.34,.04,0]);
   pickup('secret_calm_2','groundingKit',toolbox,[-.32,.04,0]);
   pickup('secret_screwdriver','screwdriver',toolbox,[-.21,.11,-.14]);
   pickup('secret_crowbar','crowbar',crate,[.54,.05,0]);
@@ -145,7 +144,6 @@ export function addSecrets({scene, box, textPlane, interactables, storage, env})
     'The screwdriver removes the MAP STORE cover on the office east wall. The crowbar lifts the boards over PROJECTION on the archive west wall. Keep the bolt cutters: the rescue case is chained shut.',24,-51.2,'serviceCache');
   const maps=container('cache_mapCabinet','map cabinet',18.6,0,-23.4,1.2,.62,.8);
   pickup('secret_crank','crank',maps);
-  pickup('map_battery','battery',maps,[.36,.05,0]);
   clue('clue_maps','The missing slide',
     'Staff were told to hide the evacuation route in a projection slide. The projector crank was stored in this map cabinet. Take it to the boarded booth behind the archive, and restore school power at the maintenance fuse box. The slide carries the vault access code.',18.7,-20.6,'mapStore');
   // Three-dimensional projector, hand crank socket and a screen visible from the doorway.

@@ -77,8 +77,7 @@ export class TeacherAI {
     if (
       dist >
       this.config.visionRange *
-        (p.crouched ? 0.65 : 1) *
-        (p.flashlight && (p.battery ?? 100) > 0 ? 1 : 0.8)
+        (p.crouched ? 0.65 : 1)
     )
       return false;
     const look = Math.atan2(-dx, -dz),

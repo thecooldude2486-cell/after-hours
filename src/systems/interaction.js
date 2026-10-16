@@ -253,14 +253,13 @@ export class InteractionSystem {
     }
     if (target.type === "switch") {
       g.audio.cue("switch", target.position);
-      target.open = !target.open;
       if (target.id === "crt") {
-        target.screen.material.emissiveIntensity=target.open?.5:0;
-        target.screen.material.color.setHex(target.open?0x23433b:0x101917);
-        target.glow.intensity=target.open?.62:0;
-        target.spill.intensity=target.open?.14:0;
-        target.label="Switch CRT monitor "+(target.open?"off":"on");
-      } else g.player.lightsOut = !g.player.lightsOut;
+        g.inventory.setCRT(!target.open);
+        g.story.save?.();
+      } else {
+        target.open = !target.open;
+        g.player.lightsOut = !g.player.lightsOut;
+      }
       return;
     }
     g.story.signal("interact", target.id);

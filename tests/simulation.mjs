@@ -348,13 +348,9 @@ const pickup = async (item) => {
   g.inventory.syncStorage();
   assert.equal(t.enabled, true, "Opening storage reveals item");
   await use(t.id);
-  assert.ok(g.inventory.has(item) || item === "battery");
+  assert.ok(g.inventory.has(item));
 };
 await pickup("lockerKey");
-await pickup("battery");
-g.player.battery = 10;
-g.inventory.useBattery();
-assert.ok(g.player.battery > 25);
 await use("bracelet", -1.5, -7.3);
 await stage("drawing");
 await pickup("classroomKey");
@@ -377,7 +373,6 @@ if (g.config.enemy)
     6000,
   );
 g.player.leaveHide();
-g.player.flashlight = false;
 await walk(-1.3, -17, "crouch");
 await use("phoneGate", 1.5, -36.5);
 await use("phoneGate"); // Pull the door closed behind us after physically pushing through it.
@@ -538,9 +533,9 @@ assert.equal(
   g.config.sprintCapacity,
   "Breath recovers while still",
 );
-assert.equal(g.player.viewModel.fingers.length, 4);
-assert.equal(g.player.viewModel.thumb.name, "thumb-phalanx-proximal");
-console.log("PASS finite sprint reserve, recovery, and five-finger grip");
+assert.equal(g.player.viewModel, undefined);
+assert.equal(g.world.flash, undefined);
+console.log("PASS finite sprint reserve, recovery, and no held flashlight");
 g.teacher.deactivate();
 g.player.teleport(-9, -19, Math.PI);
 g.player.keys.add("KeyW");
@@ -589,13 +584,9 @@ assert.equal(
   g.world.teacher.scale.y,
   "No stretched vertical scaling",
 );
-assert.equal(g.player.viewModel.hands.length, 2);
-assert.equal(g.player.viewModel.root.parent, g.camera);
 g.player.syncCamera(0);
-assert.ok(g.player.viewModel.muzzle().distanceTo(g.camera.position) < 1);
-g.player.flashlight = false;
-g.player.syncCamera(0);
-assert.equal(g.player.viewModel.lens.material.emissiveIntensity, 0.02);
+assert.equal(g.player.viewModel, undefined);
+assert.equal(g.world.interactables.some(t=>t.item==='battery'),false);
 g.interactions.read("photo");
 assert.equal(
   document.querySelector("#readImage").src,
@@ -608,7 +599,7 @@ assert.equal(
   "assets/images/first-day.png",
 );
 console.log(
-  "PASS articulated characters, held flashlight, and visible photograph inspection",
+  "PASS articulated characters, readable unlit exploration, and visible photograph inspection",
 );
 g.story.epoch++;
 g.dialogue.reset();

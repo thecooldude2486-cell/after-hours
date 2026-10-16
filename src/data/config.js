@@ -9,9 +9,6 @@ export const DEFAULTS = {
   eyeHeight: 1.65,
   crouchHeight: 0.94,
   interactionDistance: 2.5,
-  flashlightIntensity: 18,
-  flashlightRange: 27,
-  flashlightAngle: 0.39,
   visionRange: 17,
   visionAngle: 1.15,
   hearingRange: 19,
@@ -31,9 +28,7 @@ export const DEFAULTS = {
   triggerTiming: 1,
   footstepInterval: 0.56,
   pixelRatio: 1.4,
-  batteryDrain: 0.14,
   sanityDrain: 0.22,
-  startBattery: 70,
   monsterSanityDrain: 8,
   monsterRevealDuration: 0.75,
   struggleWindow: 1,
@@ -49,9 +44,6 @@ export const TUNING = {
   sprintSpeed: [2, 9, "Sprint speed"],
   crouchSpeed: [0.4, 3, "Crouch speed"],
   interactionDistance: [1, 5, "Interaction distance"],
-  flashlightIntensity: [1, 40, "Flashlight brightness"],
-  flashlightRange: [5, 50, "Flashlight reach"],
-  flashlightAngle: [0.15, 0.8, "Flashlight cone"],
   visionRange: [3, 25, "Teacher vision"],
   hearingRange: [2, 30, "Teacher hearing"],
   chaseSpeed: [1, 7, "Chase speed"],
@@ -62,8 +54,7 @@ export const TUNING = {
   sprintRecovery: [0.2, 2, "Breath recovery"],
   lostSightDuration: [1, 8, "Chase persistence"],
   hideCheckDuration: [1, 6, "Time to search a witnessed hiding place"],
-  batteryDrain: [0.01, 0.5, "Flashlight drain (% per second)"],
-  sanityDrain: [0.02, 2, "Sanity drain in darkness"],
+  sanityDrain: [0.02, 2, "Sanity drain with school lights off"],
   audioVolume: [0, 1, "Master volume"],
   dialogueTiming: [0.35, 2, "Dialogue duration"],
   triggerTiming: [0.5, 2, "Sequence timing"],
@@ -72,6 +63,7 @@ export const TUNING = {
 export function loadConfig(storage = globalThis.localStorage) {
   try {
     const saved = JSON.parse(storage?.getItem("after-hours-tuning") || "{}");
+    for (const key of ["flashlightIntensity", "flashlightRange", "flashlightAngle", "batteryDrain", "startBattery"]) delete saved[key];
     // Earlier releases saved every default when changing volume. Migrate old encounter defaults.
     if (![3, 4].includes(saved.revision)) {
       for (const key of [

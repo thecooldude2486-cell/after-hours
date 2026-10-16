@@ -444,7 +444,7 @@ export class StorySystem {
         ? "Front entrance"
         : "The front doors won’t open";
     if (t.type === "grounding" && this.game.resources?.restAt === t.id)
-      return "Recovering sanity / stay still with your flashlight on";
+      return "Recovering sanity / stay still in the light";
     if (t.type === "container" && t.fixed)
       return (t.open ? "Close " : "Open ") + t.title;
     if (t.type === "container" && t.title)
@@ -583,9 +583,7 @@ export class StorySystem {
         : "HIDDEN · LISTEN BEFORE LEAVING"
       : p.crouched
         ? "CROUCHING"
-        : p.flashlight
-          ? ""
-          : "FLASHLIGHT OFF";
+        : "";
     const breath = document.querySelector("#breath");
     breath.style.setProperty?.(
       "--reserve",

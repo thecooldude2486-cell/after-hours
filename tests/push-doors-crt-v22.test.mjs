@@ -60,21 +60,40 @@ test('locked doors block movement and walking parallel to an ajar leaf does not 
  g.inventory.items.add('classroomKey');await g.interactions.use(t);
  const a=d.amount;g.world.pushDoors({x:0,z:-10},0,-.1,.23);assert.equal(d.amount,a);
 });
-test('CRT only changes its screen and local light spill, and corridor switch is independent',async()=>{
+test('CRT defaults off and restores its exact switch, screen and spill state after a refresh',async()=>{
  const g=game(),crt=g.target('crt'),lightSwitch=g.target('switch');
- assert.ok(crt.open);assert.ok(crt.spill.intensity>0&&crt.spill.intensity<.3);assert.ok(crt.spill.distance<4);
- const before=g.player.lightsOut;
- await g.interactions.use(crt);
  assert.equal(crt.open,false);assert.equal(crt.spill.intensity,0);assert.equal(crt.glow.intensity,0);
- assert.equal(crt.screen.material.emissiveIntensity,0);assert.equal(g.player.lightsOut,before);
- await g.interactions.use(lightSwitch);assert.notEqual(g.player.lightsOut,before);assert.equal(crt.spill.intensity,0);
- await g.interactions.use(crt);assert.equal(crt.spill.intensity,.14);assert.equal(crt.glow.intensity,.62);
- assert.notEqual(g.player.lightsOut,before);
+ assert.equal(crt.screen.material.emissiveIntensity,0);
+ const before=g.player.lightsOut;
+ await g.interactions.use(crt);assert.ok(crt.open);assert.equal(crt.spill.intensity,.14);assert.equal(crt.glow.intensity,.62);
+ assert.equal(g.player.lightsOut,before);
+ const onSave=JSON.parse(JSON.stringify(g.inventory.snapshot())),refreshed=game();refreshed.inventory.restore(onSave);
+ assert.ok(refreshed.world.crt.open);assert.equal(refreshed.world.crt.screen.material.emissiveIntensity,.5);
+ await refreshed.interactions.use(refreshed.world.crt);
+ const offSave=JSON.parse(JSON.stringify(refreshed.inventory.snapshot())),again=game();again.inventory.restore(offSave);
+ for(const state of ['normal','ruined','memory','burned','distorted']){
+  again.world.env.set(state,'school',true);again.step();
+  assert.equal(again.world.crt.open,false);assert.equal(again.world.crt.spill.intensity,0);
+  assert.equal(again.world.crt.glow.intensity,0);assert.equal(again.world.crt.screen.material.emissiveIntensity,0);
+ }
+ again.inventory.restore({});assert.equal(again.world.crt.open,false,'Old saves migrate to switched off');
+ await g.interactions.use(lightSwitch);assert.notEqual(g.player.lightsOut,before);assert.equal(crt.spill.intensity,.14);
 });
 test('the journal contains only carried names and found clues, with no hint system',async()=>{
  const g=game();assert.equal(g.interactions.hint,undefined);
  const html=await readFile(new URL('../index.html',import.meta.url),'utf8');
  assert.ok(!html.includes('journalHint'));assert.ok(!html.includes('NEED A NUDGE'));
+});
+test('exploration has no held flashlight, beam, batteries or torch controls',async()=>{
+ const g=game(),player=new Player(g.camera,g.world,g.audio,g.config);
+ assert.equal(player.viewModel,undefined);assert.equal(player.flashlight,undefined);assert.equal(player.battery,undefined);
+ assert.equal(g.world.flash,undefined);assert.equal(g.world.scene.getObjectByName('Held flashlight'),undefined);
+ assert.equal(g.world.interactables.some(t=>t.item==='battery'),false);
+ const html=await readFile(new URL('../index.html',import.meta.url),'utf8');
+ for(const text of ['flashlightMeter','batteryCount','F LIGHT','B REPLACE'])assert.equal(html.includes(text),false,text);
+ g.inventory.restore({items:['lockerKey','battery'],batteries:9});
+ assert.ok(g.inventory.has('lockerKey'));assert.equal(g.inventory.has('battery'),false);
+ assert.equal(Object.hasOwn(g.inventory.snapshot(),'batteries'),false);
 });
 
 test('an unlatched save restores an ajar door, and long-frame sprint contact still opens it without tunnelling',async()=>{

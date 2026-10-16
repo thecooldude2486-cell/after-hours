@@ -1,7 +1,6 @@
 // Five fixed, reproducible layouts. Every dependency is placed on the accessible side of its lock.
 export const PRESETS = {
   story: {
-    startBattery: 100,
     name: "Story",
     hint: "The Teacher cannot catch you. Room monsters still drain sanity and can kill you.",
     layout: 0,
@@ -13,13 +12,11 @@ export const PRESETS = {
     hearingRange: 11,
     sprintCapacity: 8,
     sprintRecovery: 1.1,
-    batteryDrain: 0.08,
     sanityDrain: 0.09,
   },
   easy: {
-    startBattery: 85,
     name: "Easy",
-    hint: "More breath and battery life. Shorter searches.",
+    hint: "More breath and shorter searches.",
     layout: 1,
     enemy: true,
     chaseSpeed: 3.6,
@@ -29,13 +26,11 @@ export const PRESETS = {
     hearingRange: 13,
     sprintCapacity: 6.5,
     sprintRecovery: 0.9,
-    batteryDrain: 0.1,
     sanityDrain: 0.15,
   },
   normal: {
-    startBattery: 70,
     name: "Normal",
-    hint: "Listen, search, and conserve your light.",
+    hint: "Listen carefully and search for a way out.",
     layout: 2,
     enemy: true,
     chaseSpeed: 4.1,
@@ -45,11 +40,9 @@ export const PRESETS = {
     hearingRange: 16,
     sprintCapacity: 5.5,
     sprintRecovery: 0.8,
-    batteryDrain: 0.14,
     sanityDrain: 0.22,
   },
   hard: {
-    startBattery: 60,
     name: "Hard",
     hint: "Fast pursuit, fewer supplies, longer searches.",
     layout: 3,
@@ -61,11 +54,9 @@ export const PRESETS = {
     hearingRange: 19,
     sprintCapacity: 4.5,
     sprintRecovery: 0.65,
-    batteryDrain: 0.19,
     sanityDrain: 0.3,
   },
   nightmare: {
-    startBattery: 50,
     name: "Nightmare",
     hint: "Precise stealth and short sprint bursts. Every supply matters.",
     layout: 4,
@@ -77,7 +68,6 @@ export const PRESETS = {
     hearingRange: 21,
     sprintCapacity: 4.1,
     sprintRecovery: 0.55,
-    batteryDrain: 0.23,
     sanityDrain: 0.36,
   },
 };

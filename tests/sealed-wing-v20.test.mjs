@@ -109,8 +109,8 @@ test('tools gate each new lock and old saves have a clean journal',async()=>{
  assert.equal(g.target('puzzle_projector').projected.visible,false);
 });
 
-test('powered charger refills batteries without granting the repair sanity bonus repeatedly',()=>{
+test('school-power repair never grants the sanity bonus repeatedly',()=>{
  const g=game();g.inventory.items.add('fuse');assert.ok(g.inventory.repairPower());
- g.player.battery=15;g.player.sanity=22;assert.ok(g.inventory.repairPower());
- assert.equal(g.player.battery,100);assert.equal(g.player.sanity,22);
+ g.player.sanity=22;assert.ok(g.inventory.repairPower());
+assert.equal(g.player.sanity,22);
 });

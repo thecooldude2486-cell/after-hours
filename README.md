@@ -1,3 +1,15 @@
+# After Hours v26 — Brighter school, no flashlight
+
+Play https://thecooldude2486-cell.github.io/after-hours/?v=26 or preview locally at http://127.0.0.1:4173/?v=26.
+
+Ambient light, reflections, window light and ceiling fixtures are brighter again. The held flashlight and beam are removed, along with its controls, charge meter, battery pickups, recharge prompts and tuning options. Sanity and stamina remain; grounding depends on school lighting rather than torch charge. Required keys, tools, the fuse-powered projector and secret-room progression remain available.
+
+The CRT defaults to off. Switching it saves the screen, glow and hallway-spill state, so turning it off survives refresh and scene changes. Older saves default to off. The large SPAM E room-grab prompt remains.
+
+GitHub Actions checks gameplay and publishes the static site on pushes to main. All module URLs carry the release version to avoid stale cached gameplay code.
+
+---
+
 # After Hours v23 — West-wing expansion
 
 Open http://127.0.0.1:4173/?v=23. A connected west wing branches from the main corridor near its south end, adding a library, infirmary, workshop and boiler room. The annex adds about 630 square metres of explorable floor and a linked optional supply route.

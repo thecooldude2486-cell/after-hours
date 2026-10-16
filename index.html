@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>After Hours · v24</title>
-    <link rel="stylesheet" href="style.css?v=24" />
+    <title>After Hours · v25</title>
+    <link rel="stylesheet" href="style.css?v=25" />
   </head>
   <body>
     <canvas id="game" aria-label="First-person school environment"></canvas>
@@ -13,11 +13,20 @@
     <div id="sanityEffect"></div>
     <div id="transition"></div>
     <div id="scareFlash"></div>
-    <div id="ambush" class="hidden" role="status" aria-live="polite">
-      <strong id="ambushTitle">BREAK FREE</strong>
-      <p id="ambushInstruction"></p>
-      <div class="struggle-track"><i id="struggleFill"></i></div>
-      <span id="struggleTime"></span>
+    <div id="ambush" class="hidden" role="status" aria-live="assertive" aria-atomic="true">
+      <strong id="ambushTitle">IT'S GOT YOU</strong>
+      <div class="ambush-command">
+        <kbd id="ambushKey" aria-hidden="true">E</kbd>
+        <div>
+          <p id="ambushInstruction">SPAM E TO BREAK FREE</p>
+          <span id="ambushHelp">Press, release, repeat. Don't hold.</span>
+        </div>
+      </div>
+      <div class="struggle-track" aria-hidden="true"><i id="struggleFill"></i></div>
+      <div class="struggle-status" aria-live="off">
+        <span id="struggleProgress"></span>
+        <span id="struggleTime"></span>
+      </div>
     </div>
     <div id="cinematic" class="hidden">
       <div class="cinema-bar top"></div>
@@ -264,6 +273,6 @@
         <p id="errorText"></p>
       </div>
     </div>
-    <script type="module" src="src/main.js?v=24"></script>
+    <script type="module" src="src/main.js?v=25"></script>
   </body>
 </html>

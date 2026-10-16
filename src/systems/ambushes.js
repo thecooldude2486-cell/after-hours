@@ -93,7 +93,13 @@ export class AmbushSystem {
     const a = this.active;
     if (!this.blocking || event.code !== "KeyE") return false;
     event.preventDefault?.();
-    if (event.repeat || a.elapsed - a.lastTap < 0.07) return true;
+    if (event.repeat) {
+      a.holding = true;
+      this.draw();
+      return true;
+    }
+    if (a.elapsed - a.lastTap < 0.07) return true;
+    a.holding = false;
     a.lastTap = a.elapsed;
     a.taps++;
     this.game.audio.cue("struggle");
@@ -141,6 +147,7 @@ export class AmbushSystem {
         elapsed: 0,
         taps: 0,
         lastTap: -1,
+        holding: false,
         direction: scareDirection(
           g.camera,
           g.player.position,
@@ -224,15 +231,25 @@ export class AmbushSystem {
   draw() {
     const a = this.active;
     if (!a) return;
-    document.querySelector("#ambushTitle").textContent = "BREAK FREE";
-    document.querySelector("#ambushInstruction").textContent =
-      `TAP E REPEATEDLY / ${a.taps} OF ${a.rules.taps}`;
+    const text = (selector, value) => {
+      const element = document.querySelector(selector);
+      if (element.textContent !== value) element.textContent = value;
+    };
+    const remaining = Math.max(0,
+      a.rules.seconds * this.game.config.struggleWindow - a.elapsed);
+    const urgent = remaining < a.rules.seconds * this.game.config.struggleWindow * 0.35;
+    for (const [name, enabled] of [
+      ["pressed", !a.holding && a.elapsed - a.lastTap < 0.1],
+      ["urgent", urgent],
+    ]) this.ui.classList[enabled ? "add" : "remove"](name);
+    text("#ambushTitle", "IT'S GOT YOU");
+    text("#ambushInstruction", "SPAM E TO BREAK FREE");
+    text("#ambushHelp", a.holding
+      ? "RELEASE E, THEN KEEP TAPPING!"
+      : "Press, release, repeat. Don't hold.");
+    text("#struggleProgress", `${Math.min(a.taps, a.rules.taps)} / ${a.rules.taps} PRESSES`);
     document.querySelector("#struggleFill").style.width =
-      (a.taps / a.rules.taps) * 100 + "%";
-    document.querySelector("#struggleTime").textContent =
-      Math.max(
-        0,
-        a.rules.seconds * this.game.config.struggleWindow - a.elapsed,
-      ).toFixed(1) + "s";
+      Math.min(100, (a.taps / a.rules.taps) * 100) + "%";
+    text("#struggleTime", remaining.toFixed(1) + "s LEFT");
   }
 }

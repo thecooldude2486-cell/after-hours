@@ -7,6 +7,15 @@ export const HAND_MODELS = {
   right: "assets/models/hand-right-v14.glb",
 };
 const templates = new Map();
+// Cylindrical power grip: the handle sits against the palm, four separate
+// finger arcs encircle it, and the opposed thumb pad closes the near side.
+// Dimensions are metres; the pose preserves every authored bone length.
+export const FLASHLIGHT_GRIP = {
+  center: [0, 0.069, -0.0453],
+  angle: -0.2,
+  radius: 0.0165,
+  flexion: [[67, 63.4, 45.4], [77, 49.4, 59.8], [73.8, 48, 50], [60, 49.4, 43.4]],
+};
 const digitNames = [
   "index-finger",
   "middle-finger",
@@ -130,7 +139,7 @@ export function createRiggedHand(side, material) {
   for (let i = 0; i < 4; i++) {
     const angles =
       side === "right"
-        ? [[96, 100, 65], [94, 100, 65], [90, 100, 65], [84, 100, 65]][i]
+        ? FLASHLIGHT_GRIP.flexion[i]
         : [12 + i * 2, 18 + i * 3, 8 + i * 2];
     for (const [j, name] of [
       "phalanx-proximal",
@@ -150,11 +159,11 @@ export function createRiggedHand(side, material) {
     root.updateMatrixWorld(true);
     const origin = saddle.getWorldPosition(new THREE.Vector3());
     const direction = proximal.getWorldPosition(new THREE.Vector3()).sub(origin).normalize();
-    const desired = new THREE.Vector3(-0.046, 0.062, 0.002).sub(origin).normalize();
+    const desired = new THREE.Vector3(-0.046, 0.064, -0.007).sub(origin).normalize();
     const saddleQ = new THREE.Quaternion().setFromUnitVectors(direction, desired)
       .multiply(saddle.getWorldQuaternion(new THREE.Quaternion()));
     saddle.quaternion.copy(saddle.parent.getWorldQuaternion(new THREE.Quaternion()).invert().multiply(saddleQ));
-    const target = new THREE.Vector3(-0.025, 0.092, -0.008),
+    const target = new THREE.Vector3(-0.012, 0.084, -0.023),
       tip = bone("thumb-tip");
     const chain = [
       bone("thumb-phalanx-distal"),

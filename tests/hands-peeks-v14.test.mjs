@@ -104,7 +104,7 @@ test("the flashlight stays inside the cylindrical grip and bob never drifts the 
   }
   for (let i = 0; i < pose.length; i++)
     assert.ok(right.joints[i].quaternion.equals(pose[i]));
-  right.root.updateWorldMatrix(true, true);
+  camera.updateMatrixWorld(true);
   // Finger centers must curl around the barrel, rather than pointing through its axis or staying straight.
   for (const name of [
     "index-finger",
@@ -117,13 +117,27 @@ test("the flashlight stays inside the cylindrical grip and bob never drifts the 
     const distance = Math.hypot(p.y, p.z);
     assert.ok(distance > 0.02 && distance < 0.032, name + " contact clearance about the tilted barrel");
   }
-  const tip = right.root.worldToLocal(
+  const tip = view.torch.worldToLocal(
     right.model.getObjectByName("thumb-tip").getWorldPosition(new T.Vector3()),
   );
   assert.ok(
-    tip.y > 0.085 && tip.z > view.torch.position.z,
-    "Opposing thumb reaches the near side",
+    tip.y > 0 && tip.z > 0 && Math.hypot(tip.y, tip.z) > 0.023 && Math.hypot(tip.y, tip.z) < 0.034,
+    "Opposed thumb pad closes the upper near side of the handle",
   );
+  // Test the actual deformed skin, including the palm and thumb, against the
+  // handle. A joint-only check missed the old barrel passing through the skin.
+  const skin = right.mesh.geometry.attributes.position;
+  let contact = 0;
+  for (let i = 0; i < skin.count; i++) {
+    const p = new T.Vector3().fromBufferAttribute(skin, i);
+    right.mesh.applyBoneTransform(i, p);
+    view.torch.worldToLocal(p.applyMatrix4(right.mesh.matrixWorld));
+    if (p.x < -0.0675 || p.x > 0.0635) continue;
+    const radius = Math.hypot(p.y, p.z);
+    assert.ok(radius > view.torch.userData.gripRadius - 0.0015, "No deep skin penetration into the handle");
+    if (radius < view.torch.userData.gripRadius + 0.004) contact++;
+  }
+  assert.ok(contact > 10, "The palm and fingers touch the grip instead of floating around it");
   assert.ok(view.muzzle().toArray().every(Number.isFinite));
   player.hidden = true;
   view.update(player, 6);

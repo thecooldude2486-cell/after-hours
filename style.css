@@ -824,41 +824,98 @@ button:disabled {
   position: fixed;
   z-index: 15;
   left: 50%;
-  bottom: 18%;
+  bottom: clamp(26px, 12vh, 120px);
   transform: translateX(-50%);
-  width: min(430px, 85vw);
-  text-align: center;
-  color: #eee7d5;
+  width: min(550px, 92vw);
+  color: #fff7df;
   pointer-events: none;
-  text-shadow: 0 2px 12px #000;
-  background: linear-gradient(90deg, transparent, #101412d9, transparent);
-  padding: 16px 24px;
+  text-shadow: 0 2px 4px #000;
+  background: #0c1113f5;
+  border: 2px solid #e7c18c;
+  border-radius: 6px;
+  box-shadow: 0 8px 40px #000c;
+  padding: 18px 24px;
+  font-family: Arial, sans-serif;
 }
 #ambush strong {
-  font-size: 22px;
-  letter-spacing: 0.25em;
+  display: block;
+  font-size: 13px;
+  letter-spacing: 0.2em;
+  color: #e7c18c;
+  margin-bottom: 12px;
 }
-#ambush p {
-  font-size: 12px;
-  letter-spacing: 0.1em;
-  line-height: 1.7;
+.ambush-command {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+#ambushKey {
+  display: grid;
+  place-items: center;
+  flex: 0 0 78px;
+  height: 78px;
+  color: #101719;
+  background: #fff4cf;
+  border: 2px solid #fffbe8;
+  border-bottom: 7px solid #9a865f;
+  border-radius: 8px;
+  font: 800 54px/1 Arial, sans-serif;
+  transition: transform 55ms, background 55ms;
+}
+#ambushInstruction {
+  margin: 0 0 8px;
+  font-size: clamp(21px, 3vw, 28px);
+  font-weight: 900;
+  line-height: 1.13;
+  letter-spacing: 0.015em;
+}
+#ambushHelp {
+  font-size: 14px;
+  line-height: 1.4;
+  color: #e5d9c1;
+}
+#ambush.pressed #ambushKey {
+  transform: translateY(4px) scale(0.95);
+  background: #bce5c5;
+  border-bottom-width: 3px;
+}
+#ambush.urgent {
+  border-color: #ffab8b;
+}
+#ambush.urgent #struggleTime {
+  color: #ffb294;
+}
+.struggle-status {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  font: 700 13px/1.4 monospace;
+  letter-spacing: 0.04em;
 }
 .struggle-track {
-  height: 5px;
-  background: #272c28;
+  height: 12px;
+  border: 1px solid #647265;
+  border-radius: 3px;
+  background: #242d29;
   overflow: hidden;
-  margin: 15px 0 8px;
+  margin: 18px 0 8px;
 }
 .struggle-track i {
   display: block;
   height: 100%;
   width: 0;
-  background: #c3a97f;
+  background: #d9ecc2;
   transition: width 0.08s;
 }
 #struggleTime {
-  font: 12px monospace;
-  color: #c3a97f;
+  color: #fff0c6;
+}
+@media (max-height: 520px) {
+  #ambush { bottom: 12px; padding: 12px 18px; }
+  #ambushKey { height: 60px; flex-basis: 60px; font-size: 42px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #ambushKey { transition: none; }
 }
 
 #settings {

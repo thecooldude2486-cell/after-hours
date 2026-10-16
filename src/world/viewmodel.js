@@ -1,5 +1,5 @@
 import * as THREE from "../../vendor/three.module.js";
-import { loadHandModels, createRiggedHand } from "./hand-rig.js";
+import { loadHandModels, createRiggedHand, FLASHLIGHT_GRIP } from "./hand-rig.js";
 export const HAND_SKIN = "assets/images/hand-skin-v12.png";
 let skinTexture;
 export async function loadHandSurface(bytes = {}) {
@@ -93,8 +93,9 @@ export function createFlashlightViewModel(camera, scene) {
   const torch = new THREE.Group();
   torch.name = "Held flashlight";
   right.root.add(torch);
-  torch.position.set(0, 0.073, -0.028);
-  torch.rotation.z = -0.2;
+  torch.position.fromArray(FLASHLIGHT_GRIP.center);
+  torch.rotation.z = FLASHLIGHT_GRIP.angle;
+  torch.userData.gripRadius = FLASHLIGHT_GRIP.radius;
   const steel = new THREE.MeshStandardMaterial({
       color: 0x343c37,
       metalness: 0.72,
@@ -114,10 +115,14 @@ export function createFlashlightViewModel(camera, scene) {
     torch.add(m);
     return m;
   };
-  cylinder(steel, 0.016, 0.016, 0.21, -0.035);
-  cylinder(rubber, 0.016, 0.016, 0.115, 0.015);
+  // Keep the rubber above the metal core; coincident surfaces flickered
+  // through the fingers and made the old grip look broken.
+  cylinder(steel, 0.0148, 0.0148, 0.21, -0.035);
+  cylinder(rubber, FLASHLIGHT_GRIP.radius, FLASHLIGHT_GRIP.radius, 0.135, -0.004);
   for (let i = 0; i < 7; i++)
-    cylinder(rubber, 0.0165, 0.0165, 0.0035, -0.016 - i * 0.014);
+    cylinder(rubber, 0.0172, 0.0172, 0.0035, -0.059 + i * 0.019);
+  cylinder(steel, 0.018, 0.018, 0.009, 0.072);
+  cylinder(rubber, 0.012, 0.012, 0.004, 0.079);
   cylinder(steel, 0.036, 0.018, 0.045, -0.152);
   cylinder(steel, 0.038, 0.038, 0.012, -0.18);
   const lens = cylinder(

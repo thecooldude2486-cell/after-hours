@@ -188,7 +188,7 @@ test("room monsters grab immediately without warning, suppress during dialogue a
     assert.deepEqual(g.cues, ["officeMonster"]);
     assert.equal(
       document.querySelector("#ambushTitle").textContent,
-      "BREAK FREE",
+      "IT'S GOT YOU",
     );
     assert.ok(g.ambushes.monster.visible);
     assert.ok(g.player.sanity < 86);
@@ -207,13 +207,23 @@ test("holding E never counts as escape; fresh taps escape and the room stays cle
   const g = fixture();
   attack(g);
   const a = g.ambushes.active;
+  assert.equal(document.querySelector("#ambushInstruction").textContent, "SPAM E TO BREAK FREE");
+  assert.equal(document.querySelector("#struggleProgress").textContent, "0 / 16 PRESSES");
   for (let i = 0; i < 30; i++) g.ambushes.tap({ code: "KeyE", repeat: true });
   assert.equal(a.taps, 0);
+  assert.match(document.querySelector("#ambushHelp").textContent, /RELEASE E/);
+  assert.equal(document.querySelector("#ambush").classList.contains("pressed"), false);
   g.ambushes.tap({ code: "KeyF", repeat: false });
   assert.equal(a.taps, 0);
   for (let i = 0; i < a.rules.taps; i++) {
     g.ambushes.update(0.1, i / 10 + 3);
     g.ambushes.tap({ code: "KeyE", repeat: false });
+    if (i === 0) {
+      assert.ok(document.querySelector("#ambush").classList.contains("pressed"));
+      assert.equal(document.querySelector("#struggleProgress").textContent, "1 / 16 PRESSES");
+      assert.equal(document.querySelector("#struggleFill").style.width, "6.25%");
+      assert.match(document.querySelector("#ambushHelp").textContent, /Press, release/);
+    }
   }
   g.ambushes.update(0.2, 5);
   assert.equal(g.ambushes.active, null);

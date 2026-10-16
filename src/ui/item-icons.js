@@ -1,4 +1,5 @@
 const drawings = {
+  document:'<path d="M6 3h9l4 4v17H6zM15 3v5h4M9 12h7m-7 4h7m-7 4h4"/>',
   calm: '<rect x="4" y="7" width="16" height="15" rx="2"/><path d="M9 7V4h6v3m-3 5v6m-3-3h6"/>',
   flashlight:
     '<path d="m9 7 4-3 7 7-3 4-3-2-7 7-3-3 7-7z"/><path d="m13 4 7 7M7 17l3 3"/>',

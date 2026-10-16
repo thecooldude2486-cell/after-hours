@@ -1,5 +1,12 @@
 const files = (...names) => names.map((n) => "assets/sfx/" + n + ".wav");
 export const SFX = {
+  headmasterStep:{files:files('headmaster-step-v29'),volume:.65,rate:[.94,1.02]},
+  headmasterThreat:{files:files('headmaster-presence-v29'),volume:.65,bus:'scares'},
+  headmasterBell:{files:files('headmaster-bell-v29'),volume:.6},
+  chalkWrite:{files:files('chalk-writing-v29'),volume:.2,rate:[.94,1.08],refDistance:2,rolloff:1.5},
+  ashTurn:{files:files('ash-turn-v29'),volume:.35},
+  ashEmbers:{files:files('ash-embers-v29'),volume:.16,refDistance:2,rolloff:1.3},
+  eliEcho:{files:files('eli-fracture-v29'),volume:.48,bus:'scares'},
   laugh: {
     files: ["assets/audio/v11-lastVoicemail-0.wav"],
     volume: 0.28,

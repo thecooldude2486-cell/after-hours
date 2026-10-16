@@ -235,6 +235,8 @@ export class StorySystem {
         vale: "vale",
         waiting: "waiting",
         family: "phone",
+        headmaster_file: "headmaster",
+        ash_register: "emptyClass",
       }[t.id];
       if (revealAt) {
         t.enabled = index >= STAGE_ORDER.indexOf(revealAt);
@@ -278,11 +280,13 @@ export class StorySystem {
         "after-hours-save",
         JSON.stringify({
           version: 2,
+          storyRevision: 29,
           stage: this.stage,
           inventory: this.game.inventory?.snapshot(),
           resources: this.game.resources?.snapshot(),
           ambushes: this.game.ambushes?.snapshot(),
           hauntings: this.game.hauntings?.snapshot(),
+          echoes: this.game.echoes?.snapshot(),
           preset: this.game.config.preset,
         }),
       );
@@ -304,14 +308,18 @@ export class StorySystem {
       survive:
         "Break sight, hide, then unlock Classroom 08 with the key from Classroom 04.",
       fault: inv.power
-        ? "Read the electrical fault record beside the fuse box."
+        ? "Read the corrected fire record beside the fuse box."
         : "Find a fuse inside the maintenance lockers. Repair the fuse box to restore power.",
       vale: inv.has("recordsKey")
         ? "Unlock Mrs. Vale’s staff record in the archive."
         : "Escape through Classroom 08. Find the staff cabinet key in its drawers.",
       waiting: inv.has("cutters")
-        ? "Cut a gym padlock. Find Mara’s notebook."
+        ? inv.has('diaryKey') ? "Cut a gym padlock. Open Mara’s final journal page." : "Mara’s notebook has a tiny clasp. Her pencil tin is in Classroom 04."
         : "Search the archive drawers for bolt cutters. Cut the gym padlock.",
+      headmaster: inv.has('headmasterKey')
+        ? "Find the headmaster’s sealed file in the office. His broken bell sits by the entrance."
+        : "Find the headmaster’s seal case in the staff archive. His file is in the office.",
+      emptyClass: "Compare the recovered attendance roll with the register in Classroom 08.",
     }[this.stage];
     if (text) g.objectives.set(this.stage, text);
   }
@@ -324,10 +332,12 @@ export class StorySystem {
     this.game.dialogue.reset();
     this.game.audio.stopEffects?.();
     this.game.teacher.deactivate();
+    this.game.echoes?.reset();
     this.game.player.leaveHide();
     this.game.interactions.reader = false;
     this.game.interactions.hold = null;
     document.querySelector("#reader").classList.add("hidden");
+    document.querySelector("#hud").classList.remove("reading");
     const g = this.game,
       d = STAGES[stage] || STAGES.arrival;
     stage = STAGES[stage] ? stage : "arrival";
@@ -347,9 +357,16 @@ export class StorySystem {
       }
       g.ambushes?.reset(exact ? saved.ambushes : {});
       g.hauntings?.reset(exact ? saved.hauntings : {});
+      g.echoes?.reset(exact ? saved.echoes : {});
       g.inventory.reset();
       g.inventory.restore(exact ? saved.inventory : {});
       if (!exact) g.inventory.hydrateStage(stage);
+      if(exact&&saved.storyRevision!==29){
+        const at=STAGE_ORDER.indexOf(stage);
+        if(at>=STAGE_ORDER.indexOf('waiting'))g.inventory.items.add('diaryKey');
+        if(at>=STAGE_ORDER.indexOf('emptyClass'))g.inventory.items.add('attendanceRoll');
+        g.inventory.draw();
+      }
       g.resources.restore(exact ? saved.resources : {}, Boolean(options.retry));
       g.player.stamina = g.config.sprintCapacity;
       g.player.exhausted = false;

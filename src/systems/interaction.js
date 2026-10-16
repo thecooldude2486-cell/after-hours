@@ -1,4 +1,5 @@
 import {CLUES} from "../data/clues.js";
+import {MARA_PAGES} from "../data/echoes.js";
 import { SCHOOL_ART } from "../world/school-art.js";
 import * as THREE from "../../vendor/three.module.js";
 import { lineClear } from "./navigation.js";
@@ -103,6 +104,20 @@ export class InteractionSystem {
       return;
     }
     if (!target || target.enabled === false || !target.mesh.visible) return;
+    if(target.type==='schoolBell'){
+      if(!g.inventory.check(target))return;
+      g.echoes?.ringBell();return;
+    }
+    if(target.type==='evidence'){
+      if(!this.canRead()||!g.inventory.check(target))return;
+      if(target.reward){
+        g.inventory.items.add(target.reward);
+        g.inventory.draw();
+        target.open=true;
+      }
+      g.inventory.discover(target);g.audio.cue('paper',target.position);
+      this.read(target.note,()=>g.story.signal('interact',target.id));return;
+    }
     if (target.type === "container") {
       if (target.crtLocked) { this.notify("THE DESK LATCH IS WIRED TO THE MONITOR"); g.audio.cue("locked",target.position); return; }
       if (!g.inventory.check(target)) return;
@@ -218,17 +233,7 @@ export class InteractionSystem {
     }
     if (target.type === "note" || target.type === "drawer") {
       // Reading cannot freeze a pursuer at arm's length. Break contact before picking a document up.
-      if (
-        g.teacher.active &&
-        g.config.enemy !== false &&
-        !g.cheats?.freezeTeacher &&
-        !g.cheats?.invincible &&
-        (g.teacher.state === "Chase" ||
-          g.teacher.distance(g.player.position) < 6)
-      ) {
-        this.prompt.textContent = "BREAK SIGHT BEFORE READING";
-        return;
-      }
+      if(!this.canRead())return;
       if (target.id === "bracelet" && !target.open) {
         if (target.hinge) target.hinge.rotation.y = target.openAngle;
         target.open = true;
@@ -237,6 +242,8 @@ export class InteractionSystem {
       if (target.type === "drawer")
         target.mesh.position.x += target.open ? -0.18 : 0.18;
       if (target.type === "drawer") target.open = !target.open;
+      const note=typeof target.note==='string'?NOTES[target.note]:target.note;
+      if(note&&!note.image)g.inventory.discover({id:typeof target.note==='string'?target.note:target.id,note});
       this.read(target.note, () => g.story.signal("interact", target.id));
       return;
     }
@@ -288,6 +295,9 @@ export class InteractionSystem {
   }
   canRead() {
     const g=this.game;
+    if(g.echoes?.blocksReading()){
+      this.notify('THE HEADMASTER IS WATCHING');return false;
+    }
     if (g.teacher.active && g.config.enemy !== false && !g.cheats?.freezeTeacher && !g.cheats?.invincible &&
       (g.teacher.state === "Chase" || g.teacher.distance(g.player.position)<6)) {
       this.notify("BREAK SIGHT BEFORE READING"); return false;
@@ -299,8 +309,10 @@ export class InteractionSystem {
     if (!this.canRead()) return;
     const inv=this.game.inventory;
     const carried=[...inv.items].map(id=>ITEMS[id]?.name || id);
-    const found=[...inv.notes].map(id=>this.game.world.interactables.find(t=>t.id===id)?.note ||
-      CLUES[id])
+    const found=[...inv.notes].map(id=>{
+      const note=this.game.world.interactables.find(t=>t.id===id)?.note;
+      return typeof note==='string'?NOTES[note]:note || CLUES[id] || MARA_PAGES[id] || NOTES[id];
+    })
       .filter(Boolean);
     const tools=carried.join('\n') || 'Your pockets are empty.';
     const notes=found.map(n=>`${n.title.toUpperCase()}\n${n.body}`).join('\n\n');

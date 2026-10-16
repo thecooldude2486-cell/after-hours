@@ -12,7 +12,7 @@ export const PRESETS = {
     hearingRange: 11,
     sprintCapacity: 8,
     sprintRecovery: 1.1,
-    sanityDrain: 0.09,
+    sanityDrain: 0.07,
   },
   easy: {
     name: "Easy",
@@ -26,7 +26,7 @@ export const PRESETS = {
     hearingRange: 13,
     sprintCapacity: 6.5,
     sprintRecovery: 0.9,
-    sanityDrain: 0.15,
+    sanityDrain: 0.12,
   },
   normal: {
     name: "Normal",
@@ -40,7 +40,7 @@ export const PRESETS = {
     hearingRange: 16,
     sprintCapacity: 5.5,
     sprintRecovery: 0.8,
-    sanityDrain: 0.22,
+    sanityDrain: 0.18,
   },
   hard: {
     name: "Hard",
@@ -54,7 +54,7 @@ export const PRESETS = {
     hearingRange: 19,
     sprintCapacity: 4.5,
     sprintRecovery: 0.65,
-    sanityDrain: 0.3,
+    sanityDrain: 0.25,
   },
   nightmare: {
     name: "Nightmare",
@@ -68,7 +68,7 @@ export const PRESETS = {
     hearingRange: 21,
     sprintCapacity: 4.1,
     sprintRecovery: 0.55,
-    sanityDrain: 0.36,
+    sanityDrain: 0.30,
   },
 };
 export const DEFAULT_PRESET = "normal";

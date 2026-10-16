@@ -1,4 +1,8 @@
 export const ITEMS = {
+  diaryKey:{name:"Mara’s tiny diary key",type:"key",clue:"A small brass clasp"},
+  bellClapper:{name:"Office bell clapper",type:"tool",clue:"A bell with no voice"},
+  headmasterKey:{name:"Headmaster’s file key",type:"key",clue:"A seal that was never broken"},
+  attendanceRoll:{name:"Class 08 attendance roll",type:"document",clue:"Departures before the alarm"},
   secretKey:{name:"CRT service key",type:"key",clue:"Office monitor service selector"},
   clinicKey:{name:"Infirmary key",type:"key",clue:"West-wing infirmary"},
   workshopKey:{name:"Workshop key",type:"key",clue:"West-wing workshop"},

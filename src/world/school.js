@@ -1,4 +1,5 @@
 import {addWestWing} from "./west-wing.js";
+import {addSchoolEchoes} from "./school-echoes.js";
 import {addCRTSecret} from "./crt-secret.js";
 import {ageNote} from "./aged-paper.js";
 import { pushDoors, releaseDoor, updatePushDoor, doorShape, segmentBlocked } from "./push-doors.js";
@@ -861,7 +862,7 @@ export function createSchool(renderer, config) {
     -52,
     "maintenance",
     "Read the fire record",
-    "EAST WING\nELECTRICAL FAULT",
+    "EAST WING\nCORRECTED REPORT",
   );
   box(-11, 0.8, -39, 2, 0.1, 1.1, 0x494a39, "desk", "archive");
   sheet(
@@ -1109,6 +1110,7 @@ export function createSchool(renderer, config) {
   const secrets = addSecrets({scene, box, textPlane, interactables, storage, env});
   const annex=addWestWing({scene,box,textPlane,floor,gate,interactables,builders:secrets.builders});
   const crtSecret=addCRTSecret({scene,box,textPlane,interactables,crt:crtTarget,builders:secrets.builders});
+  const echoes=addSchoolEchoes({scene,box,textPlane,interactables,builders:secrets.builders,obstacles});
   const art = addSchoolArt({ scene, env, textPlane, box, interactables });
   const decay = addRoomDecay(scene, env);
   env.set("ruined", "school", true);
@@ -1134,6 +1136,7 @@ export function createSchool(renderer, config) {
     crt:crtTarget,
     setCRT,
     crtSecret,
+    echoes,
     teacher,
     rain,
     exterior,

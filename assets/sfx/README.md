@@ -31,3 +31,8 @@ teacher-impact-v10, room-impact-v10, vanish-v10, breath-v10 and heel-v10 are ori
 ## V17 apparition presence
 
 `tools/build-sound-v17.py` creates two deterministic mono 24 kHz PCM effects from the already bundled CC0 creak/cloth/metal recordings and original synthesis. Arrival combines a breath-like noise swell, two dissonant glass tones and a low hinge strain; disappearance uses a short reverse cloth sweep and falling resonance. Both are positional on the scares bus, with extended reference distances so the arrival can be heard from the apparition reveal range. No voice clone or external generation service is used. Arrival plays once per figure per encounter reset and stops when its apparition is cancelled.
+
+
+## V29 — The unheard pages
+
+Seven original synthesized mono 24 kHz PCM designs accompany the new encounters: `headmaster-step-v29` (shoe/cane double impact), `headmaster-presence-v29` (detuned low resonance), `headmaster-bell-v29` (inharmonic metal bell), `chalk-writing-v29` (rhythmic filtered scratch), `ash-turn-v29` (dry cloth/ash sweep), `ash-embers-v29` (quiet crackles) and `eli-fracture-v29` (rising breath-like noise and detuned tones). These are original procedural designs, without recordings or new voice performances. `tools/build-sound-v29.py` rebuilds them using the Python standard library. Their positional effects/scare buses obey the existing volume controls, pause and checkpoint cancellation.

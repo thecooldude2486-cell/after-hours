@@ -84,6 +84,20 @@ export const STAGES = {
     state: "burned",
     teacher: true,
   },
+  headmaster: {
+    chapter: 5,
+    name: "The Unheard Pages",
+    objective: "Find the headmaster’s sealed complaints file · Office.",
+    position: [0,-28],
+    state: "burned",
+  },
+  emptyClass: {
+    chapter: 5,
+    name: "The Empty Register",
+    objective: "Compare the attendance roll · Classroom 08.",
+    position: [0,-30],
+    state: "burned",
+  },
   waiting: {
     chapter: 5,
     name: "What Actually Happened",
@@ -321,8 +335,22 @@ export const BEATS = [
     effects: [
       { type: "teacher", enabled: false },
       say("teacherReveal"),
-      go("waiting"),
+      go("headmaster"),
     ],
+  },
+  {
+    id: "headmasterFile",
+    stage: "headmaster",
+    event: "interact",
+    target: "headmaster_file",
+    effects: [cue("headmasterThreat"),go("emptyClass")],
+  },
+  {
+    id: "emptyRegister",
+    stage: "emptyClass",
+    event: "interact",
+    target: "ash_register",
+    effects: [cue("ashTurn"),go("waiting")],
   },
   {
     id: "waiting",

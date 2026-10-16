@@ -72,6 +72,7 @@ for (const side of ["left", "right"]) {
 }
 await loadHandModels(handBytes);
 const { HauntingSystem } = await import("../src/systems/hauntings.js");
+const {EchoSystem}=await import('../src/systems/echoes.js');
 const { AmbushSystem } = await import("../src/systems/ambushes.js");
 const { InventorySystem } = await import("../src/systems/inventory.js");
 const { ResourceSystem } = await import("../src/systems/resources.js");
@@ -129,6 +130,7 @@ g.resources = new ResourceSystem(g);
 g.cheats = new CheatSystem(g);
 g.ambushes = new AmbushSystem(g);
 g.hauntings = new HauntingSystem(g);
+g.echoes=new EchoSystem(g);
 g.catchPlayer = () => {
   g.catches++;
   g.ambushes.reset();
@@ -149,6 +151,7 @@ function step(dt = 1 / 60) {
     if (!g.ambushes.blocking) g.story.update(dt, g.time);
     g.ambushes.update(dt, g.time);
     g.hauntings.update(dt, g.time);
+    g.echoes.update(dt,g.time);
     if (
       g.ambushes.blocking &&
       g.ambushes.active.elapsed - g.ambushes.active.lastTap >= 0.13
@@ -355,6 +358,9 @@ await use("bracelet", -1.5, -7.3);
 await stage("drawing");
 await pickup("classroomKey");
 await use("classroomGate", -1.6, -16.5);
+await use('mara_pencilTin',-12.5,-14.5);
+await until(()=>g.world.interactables.find(t=>t.id==='mara_pencilTin').amount>.99,'Open Mara’s pencil tin');
+await use('mara_diaryKey');
 await pickup("staffKey");
 await use("drawing", -9, -14.4);
 await stage("cassette");
@@ -414,6 +420,22 @@ if (g.config.enemy)
 g.player.leaveHide();
 await use("phoneGate", 1.5, -36.5); // Reopen the route after her retreat for the later escort.
 await use("vale", -11, -37.8);
+await stage("headmaster");
+await use('archive_sealCase',-12.7,-34.9);
+await until(()=>g.world.interactables.find(t=>t.id==='archive_sealCase').amount>.99,'Open staff seal case');
+await use('archive_headmasterKey');
+await use('annex_library',-29.4,-39);
+const hollow=g.world.interactables.find(t=>t.id==='annex_hollowBook');
+await use(hollow.id,-39,-37.7);
+await until(()=>hollow.amount>.99,'Open the hollow book');
+await use('library_bellClapper');
+await use('mara_page_4',-34,-37.6);
+await use('annex_library',-29.4,-39); // Exit the side wing through the same real door.
+await use('headmaster_bell',4.7,-14.3);
+await use('headmaster_file',12.5,-14.4);
+await stage('emptyClass');
+assert.ok(g.inventory.has('attendanceRoll'));
+await use('ash_register',6.1,-42.1);
 await stage("waiting");
 await pickup("cutters");
 await use("classDoor", 0, -60.8);

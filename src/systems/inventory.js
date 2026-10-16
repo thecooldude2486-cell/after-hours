@@ -78,6 +78,7 @@ export class InventorySystem {
     world.crtSecret?.sync(this);
     world.exitTriggered=false;
     world.annex?.sync(this.opened);
+    world.echoes?.sync(this);
     for (const target of world.interactables)
       if (target.type === "pickup") {
         if (target.fixed) {
@@ -232,7 +233,11 @@ export class InventorySystem {
       classroomKey: "cassette",
       staffKey: "phone",
       fuse: "vale",
-      recordsKey: "waiting",
+      recordsKey: "headmaster",
+      diaryKey: "reunion",
+      headmasterKey: "emptyClass",
+      bellClapper: "emptyClass",
+      attendanceRoll: "emptyClass",
       cutters: "reunion",
     };
     for (const [item, beat] of Object.entries(completed))
@@ -247,7 +252,7 @@ export class InventorySystem {
       classDoor: "reunion",
       eastGymGate: "reunion",
       bracelet: "drawing",
-      vale: "waiting",
+      vale: "headmaster",
     };
     for (const [door, beat] of Object.entries(passed))
       if (at >= STAGE_ORDER.indexOf(beat)) {

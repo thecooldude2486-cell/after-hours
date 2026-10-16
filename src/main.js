@@ -1,4 +1,5 @@
 import { EnvironmentSoundSystem } from "./systems/environment-sounds.js";
+import {EchoSystem} from "./systems/echoes.js";
 import { SchoolRenderer } from "./systems/rendering.js";
 import { AtmosphereSystem } from "./systems/atmosphere.js";
 import { loadHorrorMaterials } from "./world/horror-detail.js";
@@ -79,6 +80,7 @@ class Game {
     this.settings = new SettingsSystem(this);
     this.atmosphere = new AtmosphereSystem(this);
     this.environmentSounds = new EnvironmentSoundSystem(this);
+    this.echoes = new EchoSystem(this);
     this.player.canLook = () =>
       this.started &&
       !this.paused &&
@@ -501,6 +503,7 @@ class Game {
       this.camera.position.set(0.4, 1.68, 8);
       this.camera.rotation.set(0, -0.08 + Math.sin(this.time * 0.05) * 0.04, 0);
     }
+    this.echoes.update(live?dt:0,this.time);
     if (!this.paused) this.cinematics.update(dt);
     const speaker = this.dialogue.current?.line?.speaker || "";
     this.world.mara.userData.speaking =

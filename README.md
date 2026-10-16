@@ -1,3 +1,17 @@
+# After Hours v29 — The unheard pages
+
+Play https://thecooldude2486-cell.github.io/after-hours/?v=29.
+
+Mara’s journal now reveals daily bullying, ignored complaints and the truth behind the fire. The electrical-fault report is an initial account that has been corrected. The attendance roll establishes that the bullies found her pages and left before the fire; Mara stayed inside. Her final entry admits what she intended and regrets it. The original argument, Mrs. Vale’s rescue attempt, reunion and final voicemail remain connected to this expanded account.
+
+Two new story steps connect the staff archive, library, headmaster’s office and Classroom 08. Find Mara’s diary key, the office bell clapper and the headmaster’s file key, then recover and compare the attendance roll. The headmaster has an independent coat, face, cane, patrol, watching behavior, walk animation and positional sounds. Ringing the repaired bell creates a chance to inspect his file.
+
+Every one of the sixteen interiors has a different teacher repeatedly writing **I WILL NOT LOOK AWAY.** Ash-covered pupils turn their heads together on entry, track the player and follow slowly within their room. Their flames give a faint local glow. Distorted Eli appears along the required present-day route and dissolves after being seen and approached. These encounters stay out of warm memories, dialogue, companion sequences and the ending. Pausing and reading freeze their positions.
+
+Four new usable story items and a library aid tin support the longer route. A whole class applies one capped sanity drain, and passive drain is slightly lower across presets. Collected pages, recovered items, opened files and completed Eli sightings persist in checkpoints. Older saves receive missing completed-stage prerequisites. New sound designs are bundled and reproducible with `tools/build-sound-v29.py`.
+
+---
+
 # After Hours v28 — Found scraps and a clearer interface
 
 Play https://thecooldude2486-cell.github.io/after-hours/?v=28.

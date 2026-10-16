@@ -28,7 +28,7 @@ export const DEFAULTS = {
   triggerTiming: 1,
   footstepInterval: 0.56,
   pixelRatio: 1.4,
-  sanityDrain: 0.22,
+  sanityDrain: 0.18,
   monsterSanityDrain: 8,
   monsterRevealDuration: 0.75,
   struggleWindow: 1,

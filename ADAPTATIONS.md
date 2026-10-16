@@ -1,5 +1,9 @@
 # Approved gameplay adaptation
 
+**Current story revision: v29.** The user explicitly requested expanding the existing story so that Mara is bullied daily, leaves journal entries for Eli, starts the school fire intending to take her tormentors with her, and remains inside after the bullies discover her intent and leave. This supersedes the earlier electrical-fault account. The original source remains archived below; the playable fire record now labels that account as an initial, corrected report. Journal fragments, the headmaster’s ignored complaints and the attendance roll establish the new sequence without depicting or teaching how the fire was started. Mara’s final entry expresses fear and regret. Mrs. Vale’s attempt to return for her, Eli’s childhood abandonment, their reunion and the final voicemail remain.
+
+V29 adds two required investigation steps, four usable evidence/key items, an office-bell distraction and a separate headmaster model with patrol, cane animation and original SFX. Sixteen different classroom/room teachers repeat “I WILL NOT LOOK AWAY.” Unnamed ash-and-flame pupils and the distorted Eli are present-day manifestations, not assertions that the escaped bullies died. They do not appear during friendly memories or emotional companion scenes. A capped shared class drain, lower passive drain and an extra aid tin balance the expanded route. No existing spoken recording is repurposed with mismatched new words.
+
 The supplied story remains in `assets/STORY-SOURCE.txt`. The chapter order, emotional arc, school fire, Mrs. Vale, Mara’s waiting, return, and final voicemail remain intact. Keys, a fuse, bolt cutters, battery supplies, and difficulty presets are gameplay gates, not additional supernatural lore.
 
 The user explicitly permitted replacing reunion lines that did not make sense. The four-line exchange is now:

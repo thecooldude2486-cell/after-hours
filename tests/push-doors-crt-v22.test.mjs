@@ -131,7 +131,7 @@ test('the CRT service channel requires its powered selector, reveals a real code
  g.inventory.items.delete('secretKey');await g.interactions.use(service);assert.equal(cache.crtLocked,true);
  g.inventory.items.add('secretKey');await g.interactions.use(service);g.step();
  assert.equal(g.world.crtSecret.mode,'secret');assert.ok(crt.screen.material.map);assert.ok(cache.open);assert.equal(cache.crtLocked,false);
- assert.ok(g.inventory.notes.has(service.id));assert.match(service.note.body,/417/);
+ assert.ok(g.inventory.notes.has(service.id));assert.doesNotMatch(service.note.body,/417/,'The journal keeps a clue rather than copying the screen solution');
  assert.ok(g.target('crt_crowbar').enabled);await g.interactions.use(g.target('crt_crowbar'));assert.ok(g.inventory.has('crowbar'));
  await g.interactions.use(crt);assert.equal(crt.screen.material.map,null);
  const save=JSON.parse(JSON.stringify(g.inventory.snapshot())),refreshed=game();refreshed.inventory.restore(save);refreshed.step();

@@ -1,3 +1,4 @@
+import {CLUES} from "../data/clues.js";
 import * as THREE from '../../vendor/three.module.js';
 
 /** An optional, persistent service-channel puzzle and a physical supply latch. */
@@ -11,8 +12,7 @@ export function addCRTSecret({scene,box,textPlane,interactables,crt,builders}) {
   const key=new THREE.Mesh(new THREE.TorusGeometry(.025,.006,8,16),new THREE.MeshStandardMaterial({color:0x949b88,metalness:.7,roughness:.4}));
   key.position.set(5.30,1.21,-20.60);key.visible=false;scene.add(key);
   const target={id:'crt_service',type:'crtService',label:'Turn the CRT service selector',mesh:selector,
-    position:selector.position.clone(),enabled:true,note:{type:'CRT SERVICE FEED',title:'Record vault · 4 1 7',
-      body:'The service channel shows RECORD VAULT: 417. The electronic latch beneath the office desk releases the supply case. The vault keypad still needs maintenance power.'}};
+    position:selector.position.clone(),enabled:true,note:{type:'CRT SERVICE FEED',...CLUES.crt_service}};
   interactables.push(target);
   const cache=builders.container('cache_crt','concealed monitor supply case',5,.25,-21,.9,.32,.58);
   cache.crtLocked=true;

@@ -3,7 +3,7 @@ export const NOTES = {
   bracelet: {
     type: "MARA’S LOCKER · 17",
     title: "A bracelet made by hand",
-    body: "The bracelet Eli made for Mara as a child.\n\nHe buried it with his mother after she died.\n\nIt should not be here.",
+    body: "The same crooked knot.\nA strand worn almost through.\n\nI remember where I left this.",
   },
   drawing: {
     type: "A CHILDHOOD DRAWING",
@@ -27,21 +27,21 @@ export const NOTES = {
   family: {
     type: "CLASSROOM TELEPHONE · REMEMBERED VOICES",
     title: "Eight years",
-    body: "Mara knows their father moved away.\nShe knows their mother died.\nShe knows Eli never finished university.\n\nShe has experienced the eight years too.\n\nTheir mother repeatedly returned to this school, calling for Mara. Mara heard her, but could never answer.",
+    body: "Eight years.\n\nA voice on the other end. Familiar words, separated by long silences.\n\n…she kept coming back here…",
   },
   fault: {
     type: "EAST WING · FIRE RECORD",
     title: "Electrical fault",
-    body: "The fire began in the old east wing.\nCause: electrical fault.\n\nMara Ward never came home.\nHer body was never found.",
+    body: "EAST WING / INCIDENT COPY\n\nOrigin: old wiring…\nOccupant: M. Ward…\nRecovery: [space left blank]\n\nThe signature has bled through the fold.",
   },
   vale: {
     type: "STAFF RECORD",
     title: "Mrs. Vale",
-    body: "Mrs. Vale went back into the burning east wing to find Mara.\n\nShe died trying to save her.\n\nFind the child.\n\nThat final instinct is still walking these halls.",
+    body: "STAFF SIGN-OUT\n\nV. — returned east. Child still inside.\n\nUnder “returned”, the pen has stopped hard enough to tear the page.",
   },
   waiting: {
     type: "MARA’S NOTEBOOK",
     title: "He’ll come back",
-    body: "He’ll come back.\n\nShe kept waiting for Eli.\n\nThe building holds the fear and grief of its final moments. Most faded. Mara didn’t.\n\nHer belief could never let her go. And the school could never let the fire end.",
+    body: "He’ll come back.\n\nThe same words, across page after page.\n\nThe last line trails into the binding.",
   },
 };

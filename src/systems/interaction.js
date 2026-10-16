@@ -1,3 +1,4 @@
+import {CLUES} from "../data/clues.js";
 import { SCHOOL_ART } from "../world/school-art.js";
 import * as THREE from "../../vendor/three.module.js";
 import { lineClear } from "./navigation.js";
@@ -127,8 +128,7 @@ export class InteractionSystem {
       g.inventory.opened.add(target.id);
       target.projected.visible = true;
       target.screen.visible = false;
-      const slide = {id: "clue_slide", note:{type:"PROJECTED EVACUATION SLIDE", title:"Record vault · 4 1 7",
-        body:"The three-digit vault code is 417. Return to the SERVICE cache in east maintenance. Enter this code on the RECORD VAULT panel at the back.\n\nTake your bolt cutters: the rescue case inside is chained shut."}};
+      const slide = {id:"clue_slide",note:{type:"PROJECTED EVACUATION SLIDE",...CLUES.clue_slide}};
       g.inventory.discover(slide);
       g.audio.cue("switch", target.position);
       this.read(slide.note);
@@ -298,14 +298,22 @@ export class InteractionSystem {
     if (this.reader) { this.close(); return; }
     if (!this.canRead()) return;
     const inv=this.game.inventory;
-    const tools=[...inv.items].map(id=>ITEMS[id]?.name || id).join("\n") || "Your pockets are empty.";
-    const notes=[...inv.notes].map(id=>this.game.world.interactables.find(t=>t.id===id)?.note ||
-      (id==='clue_slide'?{title:'Record vault · 417',body:'Enter 417 on the vault keypad behind the SERVICE cache. Bring bolt cutters.'}:null))
-      .filter(Boolean).map(n=>`${n.title.toUpperCase()}\n${n.body}`).join("\n\n──────────\n\n");
-    this.read({type:"POCKET JOURNAL · J TO CLOSE",title:"The sealed wing",body:`CARRIED ITEMS\n\n${tools}\n\nDISCOVERED CLUES\n\n${notes || "No clues recorded."}`});
+    const carried=[...inv.items].map(id=>ITEMS[id]?.name || id);
+    const found=[...inv.notes].map(id=>this.game.world.interactables.find(t=>t.id===id)?.note ||
+      CLUES[id])
+      .filter(Boolean);
+    const tools=carried.join('\n') || 'Your pockets are empty.';
+    const notes=found.map(n=>`${n.title.toUpperCase()}\n${n.body}`).join('\n\n');
+    this.read({presentation:"journal",type:"AFTER HOURS / FIELD JOURNAL",title:"Field journal",body:`CARRIED ITEMS\n\n${tools}\n\nDISCOVERED CLUES\n\n${notes || "No clues recorded."}`});
+    const escape=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    document.querySelector('#journalItems').innerHTML=carried.length
+      ? carried.map(item=>`<li>${escape(item)}</li>`).join('') : '<li class="journal-empty">Your pockets are empty.</li>';
+    document.querySelector('#journalClues').innerHTML=found.length
+      ? found.map(note=>`<article class="journal-entry"><h3>${escape(note.title)}</h3><p>${escape(note.body)}</p></article>`).join('')
+      : '<p class="journal-empty">No scraps collected yet.</p>';
   }
   openKeypad(target) {
-    this.read({type:"RECORD VAULT · THREE-DIGIT LOCK",title:"Enter access code",body:"The caretaker’s projected evacuation slide carries the code."});
+    this.read({type:"RECORD VAULT · THREE-DIGIT LOCK",presentation:"keypad",title:"Record vault",body:"Three worn keys. A dark display. The metal around it is polished by old hands."});
     this.keypadTarget=target;this.pin="";
     document.querySelector("#keypad")?.classList.remove("hidden");
     this.drawPin();
@@ -333,9 +341,18 @@ export class InteractionSystem {
     document.querySelector("#keypad")?.classList.add("hidden");
     const n = typeof id === "object" ? id : NOTES[id];
     if (!n) return;
+    const paper=document.querySelector('#reader .paper');
+    for(const [name,enabled] of [
+      ['journal',n.presentation==='journal'],['keypad-view',n.presentation==='keypad'],
+      ['aged-note',!n.image&&!n.presentation],
+    ])paper.classList[enabled?'add':'remove'](name);
+    document.querySelector('#closeReader').innerHTML=n.presentation==='journal'
+      ? 'CLOSE JOURNAL <span>J / ESC</span>' : n.presentation==='keypad'
+      ? 'STEP BACK <span>E / ESC</span>' : 'PUT IT DOWN <span>E / ESC</span>';
     this.game.hauntings?.cancel();
     this.game.audio.cue("paper");
     this.reader = true;
+    document.querySelector("#hud")?.classList.add("reading");
     this.readCallback = callback;
     this.readOpened = performance.now();
     document.querySelector("#readType").textContent = n.type;
@@ -356,6 +373,7 @@ export class InteractionSystem {
   close() {
     if (!this.reader) return;
     this.reader = false;
+    document.querySelector("#hud")?.classList.remove("reading");
     this.keypadTarget=null;
     document.querySelector("#reader").classList.add("hidden");
     const cb = this.readCallback;

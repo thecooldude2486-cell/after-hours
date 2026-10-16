@@ -1,3 +1,15 @@
+# After Hours v28 — Found scraps and a clearer interface
+
+Play https://thecooldude2486-cell.github.io/after-hours/?v=28.
+
+Found sheets have stained stock, creases, curled edges and torn silhouettes, both in the school and while reading. Their incomplete wording suggests connections without supplying a walkthrough or copying puzzle codes into the journal. Powered devices still show their earned discoveries.
+
+The journal shares the main menu's serif typography and dark palette, with separate columns for carried items and collected scraps. The pause screen keeps the school sharp behind it, with controls and actions arranged in two columns. The gameplay HUD groups objectives, discoveries and resources into the corners, with a shorter controls strip.
+
+The original dialogue, story order, ending, door mechanics and CRT puzzle remain unchanged.
+
+---
+
 # After Hours v27 — CRT service puzzle and heavy panels
 
 Play https://thecooldude2486-cell.github.io/after-hours/?v=27.

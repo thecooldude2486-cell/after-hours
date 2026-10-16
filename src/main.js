@@ -364,6 +364,7 @@ class Game {
   async begin(restore) {
     $("#title").classList.add("hidden");
     $("#hud").classList.remove("hidden");
+    $("#hud").classList.remove("menu-covered");
     $("#pause").classList.add("hidden");
     this.started = true;
     this.paused = false;
@@ -416,12 +417,14 @@ class Game {
   pause() {
     this.paused = true;
     this.player.keys.clear();
+    $("#hud").classList.add("menu-covered");
     $("#pause").classList.remove("hidden");
     document.exitPointerLock?.();
     this.audio.suspend();
   }
   resume() {
     this.paused = false;
+    $("#hud").classList.remove("menu-covered");
     $("#pause").classList.add("hidden");
     $("#tuning").classList.add("hidden");
     $("#cheats").classList.add("hidden");

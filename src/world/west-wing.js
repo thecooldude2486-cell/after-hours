@@ -47,7 +47,7 @@ export function addWestWing({scene,box,textPlane,floor,gate,interactables,builde
   const deskBox=container('annex_libraryDrawer','librarian’s desk box',-34,.85,-40.5,.72,.25,.5);
   box(-34,.4,-40.5,1.7,.8,.85,0x494c3e,'desk','library',true);
   pickup('annex_workshopKey','workshopKey',deskBox);
-  clue('annex_libraryNote','Borrowed keys','The nurse left her key in the hollow book. The workshop key was returned to the librarian’s desk. Someone has been borrowing them after closing time.',-39,-40.5,'library');
+  clue('annex_libraryNote',-39,-40.5,'library');
   // Infirmary beds, curtain rail and a medicine case containing the hidden-room key.
   for(const z of [-51.5,-58.5]){
     box(-40,.48,z,3.8,.65,1.55,0x596759,'desk','infirmary',true);
@@ -58,7 +58,7 @@ export function addWestWing({scene,box,textPlane,floor,gate,interactables,builde
   box(-34,.4,-57.6,1.4,.8,.9,0x494c3e,'desk','infirmary',true);
   pickup('annex_secretKey','secretKey',medicine,[-.22,.04,0]);
   pickup('annex_calm','groundingKit',medicine,[.22,.04,0]);
-  clue('annex_nurseNote','The iron key','The iron service key belongs to the office CRT service selector. Restore the maintenance fuse, turn the monitor on, then turn the service selector. The desk has a concealed supply latch.',-34,-52,'infirmary');
+  clue('annex_nurseNote',-34,-52,'infirmary');
   grounding('ground_infirmary',-36,-54,'Rest beside the infirmary grounding card');
   // Tools are found as physical pieces in the workshop chest.
   box(-24.2,.88,-59.4,4,.16,1.15,0x514b3b,'desk','workshop',true);
@@ -66,7 +66,7 @@ export function addWestWing({scene,box,textPlane,floor,gate,interactables,builde
   pickup('annex_valveWheel','valveWheel',tools,[-.32,.04,0]);
   pickup('annex_pliers','pliers',tools,[.3,.04,0]);
   for(const z of [-54,-57])box(-21.35,1.3,z,.45,2.6,1.1,0x34443a,'locker','workshop',true);
-  clue('annex_workshopNote','Pressure warning','The boiler shutoff wheel is in the tool chest. The spare electrical fuse is sealed behind the steam line; its case is wired shut. Isolate the steam before touching it.',-25,-53.5,'workshop');
+  clue('annex_workshopNote',-25,-53.5,'workshop');
   // Steam separates the reachable shutoff from a useful fuse cache.
   const brass=new THREE.MeshStandardMaterial({color:0x8d886d,metalness:.6,roughness:.6});
   for(const z of [-44,-38,-35]){

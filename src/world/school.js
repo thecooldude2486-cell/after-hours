@@ -1,5 +1,6 @@
 import {addWestWing} from "./west-wing.js";
 import {addCRTSecret} from "./crt-secret.js";
+import {ageNote} from "./aged-paper.js";
 import { pushDoors, releaseDoor, updatePushDoor, doorShape, segmentBlocked } from "./push-doors.js";
 import { addSecrets, animateSecrets } from "./secrets.js";
 import { addRoomDecay } from "./room-decay.js";
@@ -675,6 +676,7 @@ export function createSchool(renderer, config) {
           m.material.needsUpdate = true;
         });
     }
+    if(id!=='photo'&&id!=='drawing')ageNote(m,body,x+z);
     env.register(m, "paper", room);
     target(id, label, m, "note", { note: id });
     return m;

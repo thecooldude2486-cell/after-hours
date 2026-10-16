@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>After Hours · v27</title>
-    <link rel="stylesheet" href="style.css?v=27" />
+    <title>After Hours · v28</title>
+    <link rel="stylesheet" href="style.css?v=28" />
   </head>
   <body>
     <canvas id="game" aria-label="First-person school environment"></canvas>
@@ -70,13 +70,12 @@
         <span></span><small>BREATH</small>
       </div>
       <div class="controls">
-        WASD MOVE <b>·</b> MOUSE LOOK <b>·</b> E INTERACT
-        <b>·</b> SHIFT RUN <b>·</b> SPACE JUMP <b>·</b> C CROUCH <b>·</b> H GROUNDING KIT <b>·</b> TAB POCKETS <b>·</b> J JOURNAL <b>·</b> F2 CHEATS <b>·</b> ESC PAUSE
+        WASD MOVE <b>·</b> E INTERACT <b>·</b> SHIFT RUN <b>·</b> J JOURNAL <b>·</b> ESC PAUSE
       </div>
     </div>
     <div id="title" class="overlay">
       <div class="title-top">
-        <span>A NARRATIVE HORROR PROTOTYPE · V27</span
+        <span>A NARRATIVE HORROR PROTOTYPE · V28</span
         ><span>HEADPHONES RECOMMENDED</span>
       </div>
       <div class="title-content">
@@ -111,34 +110,27 @@
       </div>
     </div>
     <div id="pause" class="overlay hidden">
-      <div class="panel">
-        <div class="eyebrow">AFTER HOURS</div>
-        <h2>A moment to breathe.</h2>
-        <p id="pauseDetail">Clues, tools, and discoveries save as you find them. J opens your journal.</p>
-        <button id="resume">RETURN TO THE SCHOOL</button
-        ><button id="restartCheckpoint" class="secondary">
-          RESTORE CHECKPOINT</button
-        ><button id="settingsButton" class="secondary">SETTINGS</button
-        ><button id="tuningButton" class="secondary">DIRECTOR / TUNING</button
-        ><button id="cheatsButton" class="secondary">CHEATS / F2</button
-        ><label class="option"
-          ><input id="voiceToggle" type="checkbox" checked /> Spoken
-          dialogue</label
-        ><label class="option"
-          >Sound
-          <input
-            id="volume"
-            type="range"
-            min="0"
-            max="1"
-            step="0.05"
-            value="0.7"
-        /></label>
-        <p class="small">
-          Tap E repeatedly to escape room ambushes. SPACE jumps; Q advances
-          subtitles. Arrow keys also turn the camera. Drag to look if pointer
-          lock is unavailable.
-        </p>
+      <div class="panel pause-panel">
+        <section class="pause-copy">
+          <div class="eyebrow">AFTER HOURS / PAUSED</div>
+          <h2>A moment<br />to breathe.</h2>
+          <p id="pauseDetail">Clues, tools, and discoveries save as you find them. J opens your journal.</p>
+          <p class="pause-controls">WASD move · E interact · Shift run<br />Space jump · C crouch · H grounding kit<br />Tab pockets · J journal · Q advance dialogue</p>
+          <p class="pause-controls">Grabbed? Press and release E repeatedly.<br />Drag to look if pointer lock is unavailable.</p>
+        </section>
+        <section class="pause-actions" aria-label="Pause actions">
+          <button id="resume">RETURN TO THE SCHOOL <span>ESC</span></button>
+          <button id="restartCheckpoint" class="secondary">RESTORE CHECKPOINT</button>
+          <button id="settingsButton" class="secondary">SETTINGS</button>
+          <div class="pause-audio">
+            <label class="option">Spoken dialogue <input id="voiceToggle" type="checkbox" checked /></label>
+            <label class="option">Sound <input id="volume" type="range" min="0" max="1" step="0.05" value="0.7" /></label>
+          </div>
+          <div class="pause-utilities">
+            <button id="tuningButton" class="secondary">DIRECTOR / TUNING</button>
+            <button id="cheatsButton" class="secondary">CHEATS / F2</button>
+          </div>
+        </section>
       </div>
     </div>
     <div id="settings" class="overlay hidden">
@@ -165,6 +157,10 @@
         <h2 id="readTitle"></h2>
         <img id="readImage" class="hidden" alt="" />
         <div id="readBody"></div>
+        <div id="journalLayout">
+          <aside class="journal-carried"><h3>Carried items</h3><ul id="journalItems"></ul></aside>
+          <section class="journal-collected"><h3>Collected scraps</h3><div id="journalClues"></div></section>
+        </div>
         <div id="keypad" class="hidden">
           <output id="pinDisplay" aria-live="polite" aria-label="Vault code">_ _ _</output>
           <div class="keypad-grid">
@@ -264,6 +260,6 @@
         <p id="errorText"></p>
       </div>
     </div>
-    <script type="module" src="src/main.js?v=27"></script>
+    <script type="module" src="src/main.js?v=28"></script>
   </body>
 </html>

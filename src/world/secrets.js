@@ -1,3 +1,5 @@
+import {CLUES} from "../data/clues.js";
+import {ageNote} from "./aged-paper.js";
 import { releaseDoor, updatePushDoor } from "./push-doors.js";
 import * as THREE from '../../vendor/three.module.js';
 import { ITEMS } from '../data/items.js';
@@ -129,23 +131,21 @@ export function addSecrets({scene, box, textPlane, interactables, storage, env})
   grounding('ground_lostProperty',-18.5,-22,'Rest at the lost-property grounding card');
 
   // Each physical clue points at the next lock; the journal keeps only what has been found.
-  function clue(id,title,body,x,z,roomId) {
+  function clue(id,x,z,roomId) {
+    const {title,body}=CLUES[id];
     const page=textPlane(title,x,.83,z,.6,.4,0,'#3c3025','#c6b996',26);
+    ageNote(page,title,id.length+x+z);
     page.rotation.x=-Math.PI/2;
     box(x,.38,z,.85,.76,.65,0x494c3e,'desk',roomId,true);
     interactables.push({id,type:'clue',label:'Read '+title,mesh:page,position:new THREE.Vector3(x,.83,z),
       note:{type:'THE SEALED WING',title,body},enabled:true});
   }
-  clue('clue_reception','A missing cupboard',
-    'The inventory lists a lost-property cupboard behind Classroom 04. There is no door on the plan. Look for the loose LOST PROPERTY panel on its west wall, near the back corner.',-5.5,3.2,'lobby');
-  clue('clue_lost','The caretaker’s key',
-    'The SERVICE panel in east maintenance has no key lock. Lean into the loose edge and push steadily; stop to catch your breath if you need to. The brass key opens the small toolbox inside the supply crate.',-18.5,-24.1,'lostProperty');
-  clue('clue_tools','Two different barriers',
-    'The screwdriver removes the MAP STORE cover on the office east wall. The crowbar lifts the boards over PROJECTION on the archive west wall. Keep the bolt cutters: the rescue case is chained shut.',24,-51.2,'serviceCache');
+  clue('clue_reception',-5.5,3.2,'lobby');
+  clue('clue_lost',-18.5,-24.1,'lostProperty');
+  clue('clue_tools',24,-51.2,'serviceCache');
   const maps=container('cache_mapCabinet','map cabinet',18.6,0,-23.4,1.2,.62,.8);
   pickup('secret_crank','crank',maps);
-  clue('clue_maps','The missing slide',
-    'Staff were told to hide the evacuation route in a projection slide. The projector crank was stored in this map cabinet. Take it to the boarded booth behind the archive, and restore school power at the maintenance fuse box. The slide carries the vault access code.',18.7,-20.6,'mapStore');
+  clue('clue_maps',18.7,-20.6,'mapStore');
   // Three-dimensional projector, hand crank socket and a screen visible from the doorway.
   const machine=box(-18.3,1.14,-40.7,.65,.42,.55,0x303b37,'desk','projection');
   box(-18.3,.45,-40.7,1.2,.9,.8,0x494c3e,'desk','projection',true);
@@ -156,13 +156,11 @@ export function addSecrets({scene, box, textPlane, interactables, storage, env})
   projected.visible=false;
   const projector={id:'puzzle_projector',type:'projector',label:'Fit the crank and project the evacuation slide',mesh:machine,position:machine.position.clone(),enabled:true,projected,screen};
   interactables.push(projector);
-  clue('clue_booth','Mrs. Vale’s instructions',
-    'A power failure sealed the record vault. The projector slide carries its three-digit code. Inside the vault, bolt cutters open the rescue case. Its red emergency key opens the fire exit. I am going back for Mara. — V.',-18.7,-42.1,'projection');
+  clue('clue_booth',-18.7,-42.1,'projection');
   const rescue=container('cache_rescueCase','chained rescue case',28.6,0,-53.7,1.25,.6,.85,null,'cutters');
   pickup('secret_rescueKey','rescueKey',rescue,[-.25,.04,0]);
   pickup('vault_calm','groundingKit',rescue,[.24,.04,0]);
-  clue('clue_truth','The last evacuation record',
-    'The hidden rooms were not a trap. They formed the school’s emergency route: lost property held the service key, the map store kept the crank, and the projector protected the vault code.\n\nMrs. Vale left the tools along this route before returning for Mara. She did not lock Mara in. She died trying to bring her out. The Teacher is still searching because that was her final promise.\n\nThe rescue case holds the red fire-exit key. You can leave with the record, or return to find Mara and finish what Vale started.',28.6,-51.1,'evidenceVault');
+  clue('clue_truth',28.6,-51.1,'evidenceVault');
   const fire=box(29.84,1.45,-52.35,.12,2.9,1.45,0x5b302c,'trim','evidenceVault');
   const fireBar=box(29.9,1.25,-52.35,.07,.08,.95,0xb99c5c);
   const fireSign=textPlane('FIRE EXIT',29.9,2.5,-52.35,1.05,.32,-Math.PI/2,'#d5d5b5','#31513b',32);

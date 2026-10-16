@@ -40,7 +40,7 @@ test('both secret rooms have real blocked entrances that become traversable afte
  assert.ok(after.x < -16.9,'Open west panel exposes a real passage');
  assert.ok(new Navigation(g.world.obstacles).path({x:-13,z:-23.6},{x:-17,z:-23.6}).length, 'Navigation can pass below the lintel into the discovered room');
  const service=g.target('secret_serviceCache');
- await g.interactions.use(service);assert.equal(service.open,false,'Service panel needs its key');
+ await g.interactions.use(service);assert.equal(service.open,false,'Heavy panel waits for physical pushing');assert.ok(service.unlatched);assert.equal(service.requires,null);
  g.inventory.items.add('serviceKey');await g.interactions.use(service);g.step();pushThrough(g,service);
  const east=new T.Vector3(19,1.65,-52.5);slide(east,3,0,g.world.obstacles.filter(o=>o.minY<1.8&&o.maxY>.05));
  assert.ok(east.x>21.9,'Open east panel has a traversable passage');

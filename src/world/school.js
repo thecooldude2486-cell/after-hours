@@ -1,4 +1,5 @@
 import {addWestWing} from "./west-wing.js";
+import {addCRTSecret} from "./crt-secret.js";
 import { pushDoors, releaseDoor, updatePushDoor, doorShape, segmentBlocked } from "./push-doors.js";
 import { addSecrets, animateSecrets } from "./secrets.js";
 import { addRoomDecay } from "./room-decay.js";
@@ -933,7 +934,16 @@ export function createSchool(renderer, config) {
       enabled: true,
     };
     obstacles.push(o);
-    const d = { id, hinge, leaf, height, obstacle: o, open: false, angle: 0, rotation, width:w, thickness:.15, amount:0, baseAxis:{x:Math.cos(rotation),z:-Math.sin(rotation)} };
+    const d = { id, hinge, leaf, height, obstacle: o, open: false, angle: 0, rotation, width:w, thickness:.15, amount:0, baseAxis:{x:Math.cos(rotation),z:-Math.sin(rotation)},position:new THREE.Vector3(x,1.3,z),handles:[] };
+    const metal = material(0x9b9984,{metalness:.65,roughness:.42});
+    if (!['classroomGate','phoneGate'].includes(id)) {
+      const lever = new THREE.Mesh(new THREE.BoxGeometry(.15,.025,.035),metal);
+      lever.position.set(w*.35,-.06,.1);leaf.add(lever);d.handles.push(lever);
+    }
+    const keyTurn = new THREE.Group();keyTurn.position.set(w*.35,-.28,.13);leaf.add(keyTurn);
+    const stem = new THREE.Mesh(new THREE.BoxGeometry(.018,.018,.07),metal);keyTurn.add(stem);
+    const bow = new THREE.Mesh(new THREE.TorusGeometry(.035,.007,8,16),metal);bow.position.z=.05;keyTurn.add(bow);
+    keyTurn.visible=false;d.keyTurn=keyTurn;
     doors.push(d);
     target(id, label, leaf, "door", {
       position: new THREE.Vector3(x, 1.4, z),
@@ -987,6 +997,7 @@ export function createSchool(renderer, config) {
       plate.position.set(.36,-.08,side*.085);door.leaf.add(plate);
       const lever=new THREE.Mesh(new THREE.BoxGeometry(.14,.025,.025),metal);
       lever.position.set(.30,-.06,side*.105);door.leaf.add(lever);
+      door.handles.push(lever);
       const frame=new THREE.Mesh(new THREE.BoxGeometry(.36,.5,.015),material(0x69766c));
       frame.position.set(0,.44,side*.084);door.leaf.add(frame);
       const glass=new THREE.Mesh(new THREE.BoxGeometry(.30,.44,.008),material(0x7c948c,{roughness:.2,metalness:.2}));
@@ -1016,6 +1027,7 @@ export function createSchool(renderer, config) {
     const padlock = box(0, 0, 0, 0.09, 0.13, 0.04, 0x9c9782);
     scene.remove(padlock);
     door.leaf.add(padlock);
+    door.lockVisual=padlock;
     padlock.position.set(
       door.leaf.geometry.parameters.width * 0.35,
       -0.28,
@@ -1026,7 +1038,7 @@ export function createSchool(renderer, config) {
   interactables.find((t) => t.id === "vale").requires = "recordsKey";
   const fuseBox = box(19.34, 1.5, -50, 0.07, 0.7, 0.55, 0x6e7460);
   target("fuseBox", "Restore school power / install fuse", fuseBox, "power");
-  textPlane("FUSE / CHARGER", 19.29, 2.05, -50, 1, 0.25, -Math.PI / 2);
+  textPlane("MAINTENANCE POWER", 19.29, 2.05, -50, 1, 0.25, -Math.PI / 2);
   for (const [x, z, y] of [
     [17.5, -52, 0.76],
     [-11, -39, 0.75],
@@ -1094,6 +1106,7 @@ export function createSchool(renderer, config) {
   const storage = addPickups({ scene, box, interactables, env });
   const secrets = addSecrets({scene, box, textPlane, interactables, storage, env});
   const annex=addWestWing({scene,box,textPlane,floor,gate,interactables,builders:secrets.builders});
+  const crtSecret=addCRTSecret({scene,box,textPlane,interactables,crt:crtTarget,builders:secrets.builders});
   const art = addSchoolArt({ scene, env, textPlane, box, interactables });
   const decay = addRoomDecay(scene, env);
   env.set("ruined", "school", true);
@@ -1118,6 +1131,7 @@ export function createSchool(renderer, config) {
     secretExit:secrets.fireExit,
     crt:crtTarget,
     setCRT,
+    crtSecret,
     teacher,
     rain,
     exterior,
@@ -1150,18 +1164,25 @@ export function createSchool(renderer, config) {
     releaseDoor(d, position) {
       releaseDoor(d, position);
     },
-    pushDoors(position, dx, dz, radius) {
-      const moved=pushDoors([...doors,...secrets,secrets.fireExit],position,dx,dz,radius);
+    pushDoors(position, dx, dz, radius, dt, player) {
+      const moved=pushDoors([...doors,...secrets,secrets.fireExit],position,dx,dz,radius,dt,player);
       for(const d of moved) if(d.open) this.onDoorPushed?.(d);
       return moved;
     },
     closeDoor(d, position, radius=.23) {
       if(segmentBlocked(position.x,position.z,doorShape({...d,angle:0}),radius)) return false;
-      this.openDoor(d,false);return true;
+      this.animateDoor(d,position,false);return true;
+    },
+    animateDoor(d, position, open=true) {
+      d.showKey=!!open && !d.unlatched && !!d.requires && d.requires!=='cutters';
+      if (open) releaseDoor(d,position);
+      d.motorTarget=open?1:0;d.motionTime=0;d.motionSound=false;
+      if(open && d.lockVisual)d.lockVisual.visible=false;
     },
     openDoor(d, value = true) {
       // Scripted scenes and checkpoint hydration can still control their own doors.
-      d.pushable=false;d.unlatched=value;d.creaked=false;d.amount=value?1:0;
+      d.motorTarget=null;d.pushable=false;d.unlatched=value;d.creaked=false;d.amount=value?1:0;
+      d.keyTurn.visible=false;for(const lever of d.handles)lever.rotation.z=0;
       d.open = value;
       d.obstacle.segment=null;
       d.obstacle.enabled = !value;
@@ -1177,12 +1198,29 @@ export function createSchool(renderer, config) {
     update(dt, time, player) {
       animateStorage(storage, dt);
       animateSecrets(secrets, dt);
+      crtSecret.update(dt,time);
       if(!this.exitTriggered && secrets.fireExit.unlatched && player?.position.x>30.45 && Math.abs(player.position.z+52.35)<1.1){
         this.exitTriggered=true;this.onSecretExit?.();
       }
       for (const actor of [mara, teacher, ...memoryFigures])
         animateCharacter(actor, dt, time);
       for (const d of doors) {
+        if (d.motorTarget != null) {
+          d.motionTime += dt;
+          const handle = -Math.sin(Math.min(1,d.motionTime/.5)*Math.PI)*.5;
+          for(const lever of d.handles)lever.rotation.z=handle;
+          d.keyTurn.visible=d.showKey && d.motionTime<.45;
+          d.keyTurn.rotation.z=Math.min(1,d.motionTime/.35)*Math.PI/2;
+          if(d.motionTime>.22){
+            if(!d.motionSound){this.onDoorSound?.(d.motorTarget?'doorOpen':'doorClose',d);d.motionSound=true;}
+            const direction=Math.sign(d.motorTarget-d.amount);
+            d.amount=THREE.MathUtils.clamp(d.amount+direction*dt*.9,0,1);
+            if(Math.abs(d.motorTarget-d.amount)<dt*.91){d.amount=d.motorTarget;d.motorTarget=null;d.keyTurn.visible=false;}
+          }
+          updatePushDoor(d);
+          continue;
+        }
+        if(d.lockVisual)d.lockVisual.visible=!d.unlatched;
         if(d.pushable){updatePushDoor(d);continue;}
         const desired = d.open ? -Math.PI / 2 : 0;
         d.angle = THREE.MathUtils.lerp(d.angle, desired, 1 - Math.exp(-dt * 4));

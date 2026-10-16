@@ -102,6 +102,7 @@ export class Player {
     this.moving = false;
     this.sprinting = false;
     this.noise = 0;
+    this.pushingDoor = null;
     if (this.exhausted && this.stamina > this.config.sprintCapacity * 0.4)
       this.exhausted = false;
     if (canMove && !this.hidden) {
@@ -145,7 +146,11 @@ export class Player {
         this.moving ? (this.crouched ? 0.12 : this.sprinting ? 1 : 0.42) : 0,
       );
     }
-    if (this.sprinting && this.moving) {
+    if (this.pushingDoor) {
+      this.sprinting = false;
+      this.noise = Math.max(this.noise,.5);
+      if (this.stamina === 0 && !this.exhausted) { this.exhausted=true; this.audio.cue("breath"); }
+    } else if (this.sprinting && this.moving) {
       this.stamina = Math.max(0, this.stamina - dt);
       if (this.stamina === 0) {
         this.exhausted = true;

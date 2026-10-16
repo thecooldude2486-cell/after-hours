@@ -49,7 +49,7 @@ function push(g,door){
  const centre={x:door.hinge.position.x+door.baseAxis.x*door.width/2,z:door.hinge.position.z+door.baseAxis.z*door.width/2};
  const side=Math.sign(g.player.position.x-centre.x)||1,p=g.player;
  p.world=g.world;p.config=g.config;p.audio=g.audio;const body=new PlayerPhysics(p);
- for(let i=0;i<150;i++){body.update(1/60,-side*2.35/60,0,false);if((p.position.x-centre.x)*side<-.9)break;}
+ for(let i=0;i<220;i++){g.world.update(1/60,i/60,p);body.update(1/60,-side*2.35/60,0,false);if((p.position.x-centre.x)*side<-.9)break;}
  g.step();assert.ok((p.position.x-centre.x)*side<-.5,'Pushed '+door.id);
 }
 async function act(g,id){await g.interactions.use(g.target(id));g.step();if(g.interactions.reader)g.interactions.close();}
@@ -74,14 +74,15 @@ test('west wing is a substantial connected expansion; its keys and tools form a 
  assert.equal(g.target('annex_spareFuse').enabled,false);
 });
 
-test('every secret-room entrance needs the iron key, while keeping its tool or code lock',async()=>{
- const g=game();for(const id of ['serviceKey','screwdriver','crowbar'])g.inventory.items.add(id);g.inventory.power=true;
- for(const t of g.world.secrets){await g.interactions.use(t);assert.equal(t.unlatched,false,t.id+' needs the iron key');assert.equal(g.interactions.reader,false);}
- g.inventory.items.add('secretKey');await g.interactions.use(g.target('secret_lostProperty'));assert.ok(g.target('secret_lostProperty').unlatched);
- g.inventory.items.delete('screwdriver');await g.interactions.use(g.target('secret_mapStore'));assert.equal(g.target('secret_mapStore').unlatched,false,'Map-store cover still needs its screwdriver');
- await g.interactions.use(g.target('secret_vault'));assert.ok(g.interactions.reader);assert.equal(g.interactions.submitCode('123'),false);assert.equal(g.interactions.submitCode('417'),true);
+test('secret entrances need no key, while physical tool barriers and the vault code still work',async()=>{
+ const g=game();
+ for(const t of g.world.secrets){assert.equal(t.secretKey,undefined);assert.ok(!['secretKey','serviceKey'].includes(t.requires));}
+ await g.interactions.use(g.target('secret_lostProperty'));assert.ok(g.target('secret_lostProperty').unlatched);
+ await g.interactions.use(g.target('secret_serviceCache'));assert.ok(g.target('secret_serviceCache').unlatched);
+ await g.interactions.use(g.target('secret_mapStore'));assert.equal(g.target('secret_mapStore').unlatched,false);
+ g.inventory.items.add('screwdriver');await g.interactions.use(g.target('secret_mapStore'));assert.ok(g.target('secret_mapStore').unlatched);
+ g.inventory.power=true;await g.interactions.use(g.target('secret_vault'));assert.ok(g.interactions.reader);assert.equal(g.interactions.submitCode('123'),false);assert.equal(g.interactions.submitCode('417'),true);
 });
-
 test('classroom blood writing swaps correctly with clean memories, and doors are human sized with matching solid frames',()=>{
  const g=game();
  for(const room of ['classroom','phone']){

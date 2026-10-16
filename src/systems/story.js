@@ -424,9 +424,10 @@ export class StorySystem {
     return true;
   }
   label(t) {
-    if (t.type === "secretDoor" && t.unlatched && !t.open) return "Unlatched panel";
+    if(t.type==='door' && t.door.motorTarget != null)return t.door.motorTarget ? 'Door opening' : 'Door closing';
+    if (t.type === "secretDoor" && t.unlatched && !t.open) return "Heavy panel";
     if (t.type === "door" && t.door?.pushable && t.door.unlatched)
-      return t.door.open ? (t.door.requires ? "Pull door closed" : "Door") : "Unlatched door";
+      return t.door.open ? (t.door.requires ? "Close door" : "Door") : "Open door";
     if (t.id === "mara") {
       if (this.stage === "embrace") return "Embrace Mara";
       if (this.stage === "return") return "Go back to her";
@@ -577,7 +578,9 @@ export class StorySystem {
           ? "add"
           : "remove"
       ]("hiding");
-    document.querySelector("#status").textContent = p.hidden
+    document.querySelector("#status").textContent = p.pushingDoor
+      ? p.stamina > 0 ? "PUSHING · STAMINA DRAINING" : "EXHAUSTED · STOP PUSHING TO CATCH YOUR BREATH"
+      : p.hidden
       ? g.teacher.witnessedHide
         ? "SHE SAW YOU · MOVE"
         : "HIDDEN · LISTEN BEFORE LEAVING"

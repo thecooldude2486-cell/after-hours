@@ -8,6 +8,7 @@ export class InventorySystem {
   constructor(game) {
     this.game = game;
     this.reset();
+    game.world.onDoorSound=(name,door)=>game.audio.cue(name,door.position);
     game.world.onSecretExit=()=>{if(this.notes.has("clue_truth"))game.finish?.("secret");};
     game.world.onDoorPushed = (door) => {
       if (this.opened.has(door.id)) return;
@@ -26,6 +27,7 @@ export class InventorySystem {
     this.game.world.setCRT?.(false);
     this.opened = new Set();
     this.notes = new Set();
+    this.panelStates = null;
   }
   has(id) {
     return this.items.has(id) || Boolean(this.game.cheats?.allKeys);
@@ -41,6 +43,7 @@ export class InventorySystem {
       crtOn: this.crtOn,
       opened: [...this.opened],
       notes: [...this.notes],
+      panelStates: Object.fromEntries((this.game.world.secrets || []).map(p=>[p.id,{amount:p.amount,swing:p.swing,unlatched:p.unlatched}])),
       preset: this.game.config.preset,
     };
   }
@@ -53,6 +56,7 @@ export class InventorySystem {
     this.setCRT(save.crtOn === true);
     this.opened = new Set(save.opened || []);
     this.notes = new Set(save.notes || []);
+    this.panelStates = save.panelStates || null;
     if(save.pushDoorRevision!==1) for(const door of this.game.world.doors||[])
       if(this.unlocked.has(door.id))this.opened.add(door.id);
     this.applyLayout();
@@ -70,7 +74,8 @@ export class InventorySystem {
       c.open = this.opened.has(c.id);
       c.amount = c.open ? 1 : 0;
     }
-    syncSecrets(world, this.opened, this.unlocked, this.notes);
+    syncSecrets(world, this.opened, this.unlocked, this.notes, this.panelStates);
+    world.crtSecret?.sync(this);
     world.exitTriggered=false;
     world.annex?.sync(this.opened);
     for (const target of world.interactables)
@@ -172,12 +177,12 @@ export class InventorySystem {
       const message = `LOCKED / NEED ${ITEMS[target.requires]?.name.toUpperCase() || target.requires}`;
       this.game.interactions.prompt.textContent = message;
       this.game.interactions.notify?.(message);
+      this.game.audio.cue("locked",target.position);
       return false;
     }
     this.unlocked.add(target.id);
     this.game.audio.cue(
-      target.kind === "drawer" ? "drawer" : "door",
-      target.position,
+      "unlock", target.position,
     );
     this.game.story.save?.();
     this.draw();

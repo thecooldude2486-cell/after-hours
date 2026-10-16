@@ -41,16 +41,20 @@ function drive(g,start,dx,dz,frames=150){
  for(let i=0;i<frames;i++){physics.update(1/60,dx/60,dz/60,false);g.world.update(1/60,i/60,p);}
  return p.position.clone();
 }
-test('unlocked classroom door stays ajar at rest and body motion pushes it away from either side',async()=>{
+test('a matching classroom key animates the lock, handle and leaf, then permits passage from either side',async()=>{
  for(const side of [-1,1]){
- const g=game(),t=g.target('classroomGate'),d=t.door;
+ const g=game(),t=g.target('classroomGate'),d=t.door,cues=[];g.audio.cue=name=>cues.push(name);
  const start=[-3+side*1.4,1.65,-16.5];g.player.position.set(...start);
+ await g.interactions.use(t);assert.equal(!!d.unlatched,false);assert.ok(cues.includes('locked'));
  g.inventory.items.add('classroomKey');await g.interactions.use(t);
- const amount=d.amount;for(let i=0;i<90;i++)g.world.update(1/60,i/60,g.player);
- assert.equal(d.amount,amount);assert.equal(d.open,false);assert.ok(d.obstacle.enabled);
+ assert.equal(d.motorTarget,1);g.world.update(.12,.12,g.player);
+ assert.ok(d.handles.some(h=>Math.abs(h.rotation.z)>.1));assert.ok(d.keyTurn.visible);assert.equal(d.lockVisual.visible,false);
+ const initial=d.amount;g.world.update(.2,.32,g.player);assert.ok(d.amount>initial&&d.amount<1,'Actual intermediate opening');
+ for(let i=0;i<90;i++)g.world.update(1/60,i/60,g.player);
+ assert.equal(d.amount,1);assert.ok(d.open);assert.ok(cues.includes('unlock'));assert.ok(cues.includes('doorOpen'));
  const end=drive(g,start,-side*2.35,0);
- assert.ok(side===1?end.x<-3.5:end.x>-2.5,'Player crosses after pushing: '+JSON.stringify({side,end:end.toArray(),angle:d.angle}));
- assert.ok(d.amount>.32);assert.ok(g.inventory.opened.has(d.id));
+ assert.ok(side===1?end.x<-3.5:end.x>-2.5,'Player crosses animated opening');
+ assert.ok(g.inventory.opened.has(d.id));
  }
 });
 test('locked doors block movement and walking parallel to an ajar leaf does not push it',async()=>{
@@ -96,13 +100,13 @@ test('exploration has no held flashlight, beam, batteries or torch controls',asy
  assert.equal(Object.hasOwn(g.inventory.snapshot(),'batteries'),false);
 });
 
-test('an unlatched save restores an ajar door, and long-frame sprint contact still opens it without tunnelling',async()=>{
+test('an unlocked opening intent survives a refresh, including long-frame sprint passage',async()=>{
  const g=game(),t=g.target('classroomGate'),d=t.door;
  g.inventory.items.add('classroomKey');g.player.position.set(-1.6,1.65,-16.5);
  await g.interactions.use(t);const ajarSave=g.inventory.snapshot();
  drive(g,[-1.6,1.65,-16.5],-2.35,0);
- assert.ok(d.open);g.inventory.restore(ajarSave);assert.equal(d.open,false);assert.ok(d.amount<.1);
- assert.ok(blocked(-3,-16.5,[d.obstacle],.23));
+ assert.ok(d.open);g.inventory.restore(ajarSave);assert.equal(d.open,true);
+ assert.equal(d.obstacle.enabled,false);
  const p=g.player,physics=new PlayerPhysics(p);p.position.set(-1.6,1.65,-16.5);
  for(let i=0;i<45;i++)physics.update(.06,-4.8*.06,0,false);
  assert.ok(p.position.x<-3.5);assert.ok(g.inventory.opened.has(d.id));
@@ -114,5 +118,45 @@ test('pulling a door closed cannot trap a body standing in its frame',async()=>{
  g.player.position.set(-1.6,1.65,-16.5);g.inventory.items.add('classroomKey');await g.interactions.use(t);
  drive(g,[-1.6,1.65,-16.5],-2.35,0);
  g.player.position.set(-3,1.65,-16.5);await g.interactions.use(t);assert.ok(d.open);
- g.player.position.set(-1.6,1.65,-16.5);await g.interactions.use(t);assert.equal(d.open,false);
+ g.player.position.set(-1.6,1.65,-16.5);await g.interactions.use(t);assert.equal(d.motorTarget,0);for(let i=0;i<100;i++)g.world.update(1/60,i/60,g.player);assert.equal(d.open,false);
+});
+
+test('the CRT service channel requires its powered selector, reveals a real code and opens a persistent physical cache',async()=>{
+ const g=game(),service=g.target('crt_service'),cache=g.target('cache_crt'),crt=g.world.crt;
+ await g.interactions.use(cache);assert.equal(cache.open,false);assert.equal(cache.crtLocked,true);
+ await g.interactions.use(service);assert.equal(g.inventory.unlocked.has(service.id),false);
+ await g.interactions.use(crt);assert.equal(g.world.crtSecret.mode,'static');
+ g.inventory.items.add('secretKey');await g.interactions.use(service);assert.equal(cache.open,false,'Key alone does not power the feed');
+ g.inventory.items.add('fuse');g.inventory.repairPower();g.step();assert.equal(g.world.crtSecret.mode,'ready');
+ g.inventory.items.delete('secretKey');await g.interactions.use(service);assert.equal(cache.crtLocked,true);
+ g.inventory.items.add('secretKey');await g.interactions.use(service);g.step();
+ assert.equal(g.world.crtSecret.mode,'secret');assert.ok(crt.screen.material.map);assert.ok(cache.open);assert.equal(cache.crtLocked,false);
+ assert.ok(g.inventory.notes.has(service.id));assert.match(service.note.body,/417/);
+ assert.ok(g.target('crt_crowbar').enabled);await g.interactions.use(g.target('crt_crowbar'));assert.ok(g.inventory.has('crowbar'));
+ await g.interactions.use(crt);assert.equal(crt.screen.material.map,null);
+ const save=JSON.parse(JSON.stringify(g.inventory.snapshot())),refreshed=game();refreshed.inventory.restore(save);refreshed.step();
+ assert.equal(refreshed.world.crt.open,false);assert.equal(refreshed.world.crtSecret.cache.crtLocked,false);
+ assert.equal(refreshed.target('crt_crowbar').enabled,false);assert.ok(refreshed.inventory.notes.has(service.id));
+ await refreshed.interactions.use(refreshed.world.crt);assert.equal(refreshed.world.crtSecret.mode,'secret');
+});
+
+test('heavy hidden panels open by sustained body pressure, consume effort, stop at exhaustion and resume after rest',()=>{
+ const g=game(),p=new Player(g.camera,g.world,g.audio,g.config);g.player=p;
+ const door=g.target('secret_lostProperty');assert.ok(door.unlatched);assert.equal(door.requires,null);
+ p.position.set(-14.55,1.65,-23.6);p.yaw=Math.PI/2;p.keys.add('KeyW');
+ const initial=door.amount,before=p.stamina;
+ for(let i=0;i<30;i++){p.update(1/60);g.world.update(1/60,i/60,p);}
+ assert.ok(door.amount>initial&&door.amount<.32,'Opening is gradual, not an instant swing');assert.ok(p.stamina<before);
+ const partial=JSON.parse(JSON.stringify(g.inventory.snapshot()));g.inventory.restore(partial);
+ assert.ok(Math.abs(door.amount-partial.panelStates[door.id].amount)<1e-8,'Partial angle survives refresh');
+ p.position.set(-14.55,1.65,-23.6);p.stamina=.05;
+ for(let i=0;i<90;i++){p.update(1/60);g.world.update(1/60,i/60,p);}
+ assert.equal(p.stamina,0);assert.ok(p.exhausted);
+ const stopped=door.amount;
+ for(let i=0;i<30;i++){p.update(1/60);g.world.update(1/60,i/60,p);}
+ assert.equal(door.amount,stopped,'Holding into the panel cannot regenerate effort or keep opening it');
+ p.keys.clear();for(let i=0;i<480;i++)p.update(1/60);
+ assert.equal(p.stamina,g.config.sprintCapacity,'Standing clear restores effort');
+ p.keys.add('KeyW');for(let i=0;i<300;i++){p.update(1/60);g.world.update(1/60,i/60,p);if(p.position.x<-15.8)break;}
+ assert.ok(p.position.x<-15.8,'The same panel remains physically passable after recovering: '+JSON.stringify({position:p.position.toArray(),amount:door.amount,stamina:p.stamina}));
 });

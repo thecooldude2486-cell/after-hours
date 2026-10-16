@@ -36,7 +36,7 @@ export function addSecrets({scene, box, textPlane, interactables, storage, env})
     // A visible screw/handle and small mismatch in the trim reward careful inspection.
     const sign=textPlane(signText||(x<0?'LOST PROPERTY':'SERVICE'),x+side*.135,1.75,z,.72,.22,side*Math.PI/2,'#a9a58a','#34433a',26);
     scene.updateMatrixWorld(true);hinge.attach(sign);
-    const target={id,type:'secretDoor',secretKey:'secretKey',label,mesh:hinge,position:new THREE.Vector3(x,1.5,z),requires,
+    const target={id,type:'secretDoor',heavy:true,pushRate:.22,staminaDrain:.85,label,mesh:hinge,position:new THREE.Vector3(x,1.5,z),requires,
       open:false,amount:0,homeZ:z,hinge,width:1.78,thickness:.22,rotation:0,baseAxis:{x:0,z:1},angle:0,obstacle:mesh.userData.obstacle,enabled:true};
     hinge.userData.obstacle=target.obstacle;
     interactables.push(target);panels.push(target);
@@ -45,7 +45,7 @@ export function addSecrets({scene, box, textPlane, interactables, storage, env})
     return target;
   }
   panel('secret_lostProperty',-15,-23.6,'Release the loose lost-property panel');
-  panel('secret_serviceCache',20,-52.5,'Unlock the concealed service panel','serviceKey');
+  panel('secret_serviceCache',20,-52.5,'Push the concealed service panel');
   const mapPanel=panel('secret_mapStore',15,-22,'Unscrew the map-store panel','screwdriver','MAP STORE');
   for(const y of [-1.25,1.25]) for(const z of [-.67,.67]) {
     const screw=new THREE.Mesh(new THREE.CylinderGeometry(.035,.035,.025,12),brass);
@@ -139,7 +139,7 @@ export function addSecrets({scene, box, textPlane, interactables, storage, env})
   clue('clue_reception','A missing cupboard',
     'The inventory lists a lost-property cupboard behind Classroom 04. There is no door on the plan. Look for the loose LOST PROPERTY panel on its west wall, near the back corner.',-5.5,3.2,'lobby');
   clue('clue_lost','The caretaker’s key',
-    'The brass key in this chest opens the SERVICE panel in east maintenance, opposite the fire-record table. Search the supply crate inside. The small toolbox uses the same key.',-18.5,-24.1,'lostProperty');
+    'The SERVICE panel in east maintenance has no key lock. Lean into the loose edge and push steadily; stop to catch your breath if you need to. The brass key opens the small toolbox inside the supply crate.',-18.5,-24.1,'lostProperty');
   clue('clue_tools','Two different barriers',
     'The screwdriver removes the MAP STORE cover on the office east wall. The crowbar lifts the boards over PROJECTION on the archive west wall. Keep the bolt cutters: the rescue case is chained shut.',24,-51.2,'serviceCache');
   const maps=container('cache_mapCabinet','map cabinet',18.6,0,-23.4,1.2,.62,.8);
@@ -182,12 +182,14 @@ export function addSecrets({scene, box, textPlane, interactables, storage, env})
   panels.builders={container,pickup,clue,grounding};
   return panels;
 }
-export function syncSecrets(world,opened,unlocked=new Set(),notes=new Set()) {
+export function syncSecrets(world,opened,unlocked=new Set(),notes=new Set(),panelStates=null) {
   const projector=world.interactables.find(t=>t.id==='puzzle_projector');
   if(projector){projector.projected.visible=opened.has(projector.id);projector.screen.visible=!projector.projected.visible;}
   for(const p of [...(world.secrets||[]),...(world.secretExit?[world.secretExit]:[])]){
-    p.pushable=(opened.has(p.id)||unlocked.has(p.id)) && (p.type!=='secretExit'||notes.has('clue_truth'));p.unlatched=p.pushable;
+    p.pushable=(opened.has(p.id)||unlocked.has(p.id)||(p.type==='secretDoor'&&!p.requires&&!p.code)) && (p.type!=='secretExit'||notes.has('clue_truth'));p.unlatched=p.pushable;
     p.amount=p.pushable ? (opened.has(p.id)?1:.065) : 0;p.swing=p.position.x<0?1:-1;
+    const saved=panelStates?.[p.id];
+    if(saved && p.pushable){p.amount=Math.max(.065,Math.min(1,Number(saved.amount)||.065));p.swing=saved.swing===-1?-1:1;}
     updatePushDoor(p);p.enabled=p.type==='secretExit'||!p.open;
     for(const b of p.barriers||[])b.visible=!p.unlatched;
   }

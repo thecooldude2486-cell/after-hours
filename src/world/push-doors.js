@@ -33,12 +33,12 @@ export function releaseDoor(door, position) {
   }
   updatePushDoor(door);
 }
-export function pushDoors(doors, position, dx, dz, radius) {
+export function pushDoors(doors, position, dx, dz, radius, dt = Math.hypot(dx,dz)/2.35, player = null) {
   const movement = Math.hypot(dx, dz);
   if (movement < 1e-8) return [];
   const moved = [];
   for (const door of doors) {
-    if (!door.pushable || !door.unlatched || door.amount >= 1) continue;
+    if (!door.pushable || !door.unlatched || door.amount >= 1 || door.motorTarget != null) continue;
     const shape = doorShape(door), vx = shape.bx-shape.ax, vz = shape.bz-shape.az;
     const t = clamp(((position.x-shape.ax)*vx+(position.z-shape.az)*vz)/(door.width*door.width),0,1);
     const qx=shape.ax+t*vx, qz=shape.az+t*vz;
@@ -52,7 +52,19 @@ export function pushDoors(doors, position, dx, dz, radius) {
       const closedSide=(position.x-shape.ax)*(-door.baseAxis.z)+(position.z-shape.az)*door.baseAxis.x;
       door.swing=closedSide>=0?1:-1;
     }
-    door.amount=Math.min(1,door.amount+movement*2.8*(.3+.7*t));
+    let effort = 1;
+    if (door.heavy && player) {
+      player.pushingDoor = door;
+      const cost = (door.staminaDrain ?? .85) * dt;
+      if (!Number.isFinite(player.stamina)) player.stamina = player.config?.sprintCapacity ?? 4.5;
+      effort = Math.min(1, player.stamina / Math.max(cost,1e-8));
+      player.stamina = Math.max(0, player.stamina - cost);
+      if (!effort) continue;
+    }
+    const progress = door.heavy
+      ? dt * (door.pushRate ?? .22) * (.55 + .45*t) * effort
+      : movement * 2.8 * (.3 + .7*t);
+    door.amount=Math.min(1,door.amount+progress);
     updatePushDoor(door);
     moved.push(door);
   }

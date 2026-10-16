@@ -1,5 +1,5 @@
 export const ITEMS = {
-  secretKey:{name:"Iron caretaker key",type:"key",clue:"Old hidden-room locks"},
+  secretKey:{name:"CRT service key",type:"key",clue:"Office monitor service selector"},
   clinicKey:{name:"Infirmary key",type:"key",clue:"West-wing infirmary"},
   workshopKey:{name:"Workshop key",type:"key",clue:"West-wing workshop"},
   valveWheel:{name:"Steam valve wheel",type:"tool",clue:"Boiler steam shutoff"},

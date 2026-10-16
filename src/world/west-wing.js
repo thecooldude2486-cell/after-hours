@@ -58,7 +58,7 @@ export function addWestWing({scene,box,textPlane,floor,gate,interactables,builde
   box(-34,.4,-57.6,1.4,.8,.9,0x494c3e,'desk','infirmary',true);
   pickup('annex_secretKey','secretKey',medicine,[-.22,.04,0]);
   pickup('annex_calm','groundingKit',medicine,[.22,.04,0]);
-  clue('annex_nurseNote','The iron key','The iron caretaker key fits the old concealed-room locks. I kept it with the medical supplies when the west wing closed. Return it before morning.',-34,-52,'infirmary');
+  clue('annex_nurseNote','The iron key','The iron service key belongs to the office CRT service selector. Restore the maintenance fuse, turn the monitor on, then turn the service selector. The desk has a concealed supply latch.',-34,-52,'infirmary');
   grounding('ground_infirmary',-36,-54,'Rest beside the infirmary grounding card');
   // Tools are found as physical pieces in the workshop chest.
   box(-24.2,.88,-59.4,4,.16,1.15,0x514b3b,'desk','workshop',true);

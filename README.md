@@ -1,3 +1,15 @@
+# After Hours v27 — CRT service puzzle and heavy panels
+
+Play https://thecooldude2486-cell.github.io/after-hours/?v=27.
+
+E now unlocks and animates keyed classroom and west-wing doors, with lock, handle and hinge feedback. Secret-room entrances do not require keys. Their screws, boards and keypad remain physical puzzles; released panels open slowly when you walk into them and consume stamina. Stop pushing to recover. Partly opened panels retain their angle in saves.
+
+The office CRT has an optional powered service-selector puzzle. The former iron caretaker key is now identified as the CRT service key, and the infirmary note describes its use. The service channel reveals a useful record and releases a physical supply case beneath the desk; its state and collected items persist. The monitor's on/off switch remains independent of the hallway lighting.
+
+Brighter school lighting, flashlight removal, the original story and the large SPAM E room-grab prompt remain.
+
+---
+
 # After Hours v26 — Brighter school, no flashlight
 
 Play https://thecooldude2486-cell.github.io/after-hours/?v=26 or preview locally at http://127.0.0.1:4173/?v=26.

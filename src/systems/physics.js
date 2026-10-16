@@ -27,6 +27,7 @@ export class PlayerPhysics {
       c = p.config,
       obstacles = p.world.obstacles,
       r = c.playerRadius ?? 0.23;
+    p.pushingDoor = null;
     const desiredHeight = crouched ? c.crouchHeight + 0.12 : c.eyeHeight + 0.12;
     // Never stand up into a shelf/desk after crouching underneath it.
     const clearance = obstacles.some(
@@ -57,9 +58,13 @@ export class PlayerPhysics {
     const steps = Math.max(1, Math.ceil(dt / (1 / 120))),
       h = dt / steps;
     for (let i = 0; i < steps; i++) {
-      const movedDoors = p.world.pushDoors?.(p.position, dx/steps, dz/steps, r) || [];
+      const movedDoors = p.world.pushDoors?.(p.position, dx/steps, dz/steps, r, h, p) || [];
       for (const door of movedDoors) {
-        if (!door.creaked) { p.audio.cue("door", p.position); door.creaked=true; }
+        if (!door.creaked) { p.audio.cue(door.heavy ? "heavyPush" : "doorOpen", p.position); door.creaked=true; }
+        if (door.heavy) {
+          door.creakTime = (door.creakTime || 0) + h;
+          if (door.creakTime > 1.1) { p.audio.cue("heavyPush", p.position); door.creakTime=0; }
+        }
       }
       const active = obstacles.filter(
         (o) =>

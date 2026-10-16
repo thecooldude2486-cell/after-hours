@@ -103,6 +103,7 @@ export class InteractionSystem {
     }
     if (!target || target.enabled === false || !target.mesh.visible) return;
     if (target.type === "container") {
+      if (target.crtLocked) { this.notify("THE DESK LATCH IS WIRED TO THE MONITOR"); g.audio.cue("locked",target.position); return; }
       if (!g.inventory.check(target)) return;
       g.inventory.toggleStorage(target);
       return;
@@ -141,9 +142,6 @@ export class InteractionSystem {
       return;
     }
     if (target.type === "secretDoor") {
-      if(target.secretKey && !g.inventory.has(target.secretKey) && !g.inventory.opened.has(target.id)) {
-        this.notify("LOCKED / NEED IRON CARETAKER KEY");return;
-      }
       if (target.code && !g.inventory.unlocked.has(target.id)) {
         if (!this.canRead()) return;
         if (!g.inventory.power) { this.notify("KEYPAD HAS NO POWER / REPAIR THE MAINTENANCE FUSE BOX"); return; }
@@ -157,6 +155,19 @@ export class InteractionSystem {
       g.inventory.draw();
       g.story.save?.();
       return;
+    }
+    if (target.type === "crtService") {
+      if (!g.world.crt.open) { this.notify("TURN THE MONITOR ON"); return; }
+      if (!g.inventory.power) { this.notify("NO SERVICE SIGNAL / REPAIR THE MAINTENANCE FUSE"); return; }
+      if (!g.inventory.has("secretKey")) { this.notify("THE SELECTOR NEEDS ITS CRT SERVICE KEY"); g.audio.cue("locked",target.position); return; }
+      if (g.inventory.unlocked.has(target.id)) return;
+      g.inventory.unlocked.add(target.id);
+      g.inventory.opened.add("cache_crt");
+      g.world.crtSecret.sync(g.inventory);
+      g.inventory.discover(target);
+      g.audio.cue("unlock",target.position);g.audio.cue("crtTune",target.position);
+      g.interactions.notify("A LATCH CLICKS UNDER THE DESK");
+      g.inventory.draw();g.story.save?.();return;
     }
     if (target.type === "grounding") {
       g.resources.beginGrounding(target);
@@ -240,12 +251,14 @@ export class InteractionSystem {
       }
       if (target.door.requires||target.manual) {
         g.inventory.unlocked.add(target.id);
-        if (target.door.open) {
+        if (target.door.open || target.door.motorTarget === 1) {
           if(!g.world.closeDoor(target.door,g.player.position,g.config.playerRadius)) {this.notify("DOORWAY BLOCKED");return;}
           g.inventory.opened.delete(target.id);
-        } else g.world.releaseDoor(target.door, g.player.position);
+        } else {
+          g.world.animateDoor(target.door, g.player.position, true);
+          g.inventory.opened.add(target.id);
+        }
         g.story.save?.();
-        g.audio.cue("door", target.position);
         return;
       }
       g.story.signal("interact", target.id);
@@ -255,6 +268,7 @@ export class InteractionSystem {
       g.audio.cue("switch", target.position);
       if (target.id === "crt") {
         g.inventory.setCRT(!target.open);
+        g.world.crtSecret?.sync(g.inventory);
         g.story.save?.();
       } else {
         target.open = !target.open;

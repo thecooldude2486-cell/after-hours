@@ -1,4 +1,6 @@
 import {addWestWing} from "./west-wing.js";
+import {addLockerInterior} from './locker-interior.js';
+import {createFusePanel} from './fuse-panel.js';
 import {addSchoolEchoes} from "./school-echoes.js";
 import {addCRTSecret} from "./crt-secret.js";
 import {ageNote} from "./aged-paper.js";
@@ -79,6 +81,7 @@ export function createSchool(renderer, config) {
     ambientLockers = [],
     doors = [],
     rain = [];
+  let powerFailure=false;
   const reflection = (friendly) => {
     const c = document.createElement("canvas");
     c.width = 256;
@@ -465,13 +468,14 @@ export function createSchool(renderer, config) {
         box(x, 1.27, z + dz, 0.62, 2.54, 0.035, 0x314944, "locker");
       for (const y of [0.04, 2.52])
         box(x, y, z, 0.62, 0.06, 0.8, 0x314944, "locker");
-      box(x - direction * 0.265,1.27,z,.018,2.4,.7,0x8d9583);
       box(x,1.02,z,.54,.025,.7,0x87907c);
     }
+    const fittings=new THREE.Group();fittings.position.set(x,0,z);fittings.rotation.y=direction*Math.PI/2;scene.add(fittings);
+    addLockerInterior(fittings,.8,2.54,.62);
     if (id !== "bracelet") {
-      const notebook=box(x + direction*.02,1.065,z+.16,.35,.06,.23,0xb8ad8c);
+      const notebook=box(x + direction*.02,1.082,z+.16,.35,.06,.23,0xb8ad8c);
       notebook.name="Forgotten locker notebook";
-      const bag=box(x-direction*.04,.26,z-.12,.32,.42,.36,0x4a5045);
+      const bag=box(x-direction*.04,.285,z-.12,.32,.42,.36,0x4a5045);
       bag.name="Old schoolbag inside locker";
     }
     if (id === "bracelet") {
@@ -570,7 +574,7 @@ export function createSchool(renderer, config) {
       for (const piece of pieces) hinge.attach(piece);
       const collider = { enabled: false, mesh: face, minY: 0.09, maxY: 2.51 };
       obstacles.push(collider);
-      ambientLockers.push({
+      const record={
         x,
         z,
         direction,
@@ -579,7 +583,11 @@ export function createSchool(renderer, config) {
         collider,
         elapsed: 0,
         playing: false,
-      });
+        manualOpen:false,
+        manualAmount:0,
+      };
+      record.target=target('inspectLocker_'+ambientLockers.length,'Open locker',face,'lockerDoor',{locker:record});
+      ambientLockers.push(record);
     }
   }
   for (let z = -4; z >= -28; z -= 1.1) {
@@ -630,12 +638,13 @@ export function createSchool(renderer, config) {
         );
         if (room === "classroom" && row === 1 && col === 1) childhoodDesk = d;
       }
-    box(cx, 1.8, cz - 5, 6, 1.65, 0.1, 0x172f2a);
+    const boardZ=room==='classroom'?-24.84:-44.84;
+    box(cx, 2.05, boardZ-.055, 6, 1.65, 0.1, 0x172f2a);
     const boardText=textPlane(
       room === "classroom" ? "Please hand in your homework." : "",
       cx,
-      1.8,
-      cz - 4.93,
+      2.05,
+      boardZ+.005,
       5.7,
       1.4,
       0,
@@ -646,7 +655,7 @@ export function createSchool(renderer, config) {
     env.register(boardText,"classroom-chalk",room,{
       normal:{visible:true},memory:{visible:true},ruined:{visible:false},burned:{visible:false},distorted:{visible:false}
     });
-    box(cx, 2.76, cz - 5, 0.4, 0.08, 0.12, 0xc4bda0);
+    box(cx, 2.9, boardZ, 0.4, 0.08, 0.12, 0xc4bda0);
     desk(cx + 2, cz - 3.5, room);
   }
   // A clock without a working hand makes the memory threshold readable.
@@ -835,19 +844,22 @@ export function createSchool(renderer, config) {
     crtSpill.intensity = on ? 0.14 : 0;
     crtTarget.label = "Switch CRT monitor " + (on ? "off" : "on");
   }
-  const drawer = box(
-    8,
-    0.65,
-    -21,
-    1,
-    1.25,
-    0.8,
-    0x575441,
-    "desk",
-    "office",
-    true,
-  );
-  target("drawer", "Open desk drawer", drawer, "drawer", { note: "photo" });
+  const drawer=new THREE.Group();drawer.position.set(8,0,-21);scene.add(drawer);
+  const drawerWood=material(0x575441),drawerMetal=material(0x93998c,{metalness:.5});
+  const dp=(w,h,d,x,y,z,parent=drawer,mat=drawerWood)=>{
+    const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);m.position.set(x,y,z);parent.add(m);return m;
+  };
+  dp(.9,.8,.035,0,.4,-.325);dp(.035,.8,.65,-.45,.4,0);dp(.035,.8,.65,.45,.4,0);
+  dp(.9,.035,.65,0,.8,0);dp(.9,.035,.65,0,.03,0);dp(.85,.36,.035,0,.22,.34);
+  dp(.85,.07,.035,0,.746,.34);
+  const drawerTray=new THREE.Group();drawerTray.position.y=.49;drawer.add(drawerTray);
+  dp(.8,.025,.59,0,0,0,drawerTray);dp(.025,.17,.59,-.4,.09,0,drawerTray);dp(.025,.17,.59,.4,.09,0,drawerTray);
+  dp(.8,.17,.025,0,.09,-.28,drawerTray);dp(.85,.22,.035,0,.08,.34,drawerTray);
+  dp(.21,.025,.04,0,.08,.375,drawerTray,drawerMetal);
+  const drawerPhoto=textPlane('FIRST DAY',8,.527,-20.92,.24,.18,0,'#3c3b30','#bab59b',25);drawerPhoto.rotation.x=-Math.PI/2;
+  scene.updateMatrixWorld(true);drawerTray.attach(drawerPhoto);
+  const drawerCollider=box(8,.4,-21,.94,.8,.7,0,null,'office',true);drawerCollider.visible=false;drawerCollider.userData.collisionOnly=true;
+  const legacyDrawer=target('drawer','Open desk drawer',drawer,'drawer',{note:'photo',drawerTray,position:new THREE.Vector3(8,.6,-20.65)});
   const switchMesh = box(3.17, 1.5, -34, 0.04, 0.18, 0.12, 0xc4c8ae);
   target("switch", "Toggle corridor lights", switchMesh, "switch");
   for (const z of [-50, -55]) {
@@ -1041,6 +1053,7 @@ export function createSchool(renderer, config) {
   interactables.find((t) => t.id === "vale").requires = "recordsKey";
   const fuseBox = box(19.34, 1.5, -50, 0.07, 0.7, 0.55, 0x6e7460);
   target("fuseBox", "Restore school power / install fuse", fuseBox, "power");
+  const fusePanel=createFusePanel(scene);
   textPlane("MAINTENANCE POWER", 19.29, 2.05, -50, 1, 0.25, -Math.PI / 2);
   for (const [x, z, y] of [
     [17.5, -52, 0.76],
@@ -1106,7 +1119,7 @@ export function createSchool(renderer, config) {
   teacher.position.set(0, 0, -34);
   teacher.visible = false;
   scene.add(teacher);
-  const storage = addPickups({ scene, box, interactables, env });
+  const storage = addPickups({ scene, box, textPlane, interactables, env });
   const secrets = addSecrets({scene, box, textPlane, interactables, storage, env});
   const annex=addWestWing({scene,box,textPlane,floor,gate,interactables,builders:secrets.builders});
   const crtSecret=addCRTSecret({scene,box,textPlane,interactables,crt:crtTarget,builders:secrets.builders});
@@ -1117,6 +1130,9 @@ export function createSchool(renderer, config) {
   return {
     scene,
     env,
+    fusePanel,
+    get powerFailure(){return powerFailure;},
+    setPowerFailure(on){powerFailure=!!on;env.powerFailure=powerFailure;env.apply();annex.setPowerFailure(powerFailure);},
     art,
     decay,
     obstacles,
@@ -1143,9 +1159,16 @@ export function createSchool(renderer, config) {
     box,
     textPlane,
     ambientLockers,
+    setAmbientLockerStates(opened){
+      for(const l of ambientLockers){
+        l.manualOpen=opened.has(l.target.id);l.manualAmount=l.manualOpen?1:0;
+        l.hinge.rotation.y=l.direction*l.manualAmount*Math.PI*.56;
+      }
+    },
     resetAmbientLockers() {
       for (const l of ambientLockers) {
         l.playing = false;
+        l.manualOpen=false;l.manualAmount=0;
         l.elapsed = 0;
         l.hinge.rotation.y = 0;
         l.collider.enabled = false;
@@ -1153,7 +1176,7 @@ export function createSchool(renderer, config) {
     },
     disturbLocker(position) {
       const candidates = ambientLockers.filter(
-        (l) => Math.hypot(l.x - position.x, l.z - position.z) < 2,
+        (l) => !l.manualOpen&&Math.hypot(l.x - position.x, l.z - position.z) < 2,
       );
       candidates.sort(
         (a, b) =>
@@ -1202,8 +1225,10 @@ export function createSchool(renderer, config) {
     },
     update(dt, time, player) {
       animateStorage(storage, dt);
+      legacyDrawer.drawerTray.position.z=THREE.MathUtils.lerp(legacyDrawer.drawerTray.position.z,legacyDrawer.open?.38:0,1-Math.exp(-dt*7));
       animateSecrets(secrets, dt);
       crtSecret.update(dt,time);
+      fusePanel.update(dt,powerFailure,Boolean(this.powered));
       if(!this.exitTriggered && secrets.fireExit.unlatched && player?.position.x>30.45 && Math.abs(player.position.z+52.35)<1.1){
         this.exitTriggered=true;this.onSecretExit?.();
       }
@@ -1233,13 +1258,15 @@ export function createSchool(renderer, config) {
       }
       const friendly = ["normal", "memory"].includes(env.state);
       for (const l of ambientLockers) {
-        if (!l.playing) continue;
+        const manual=l.manualOpen||l.manualAmount>.001;
+        if (!l.playing&&!manual) continue;
+        l.manualAmount=THREE.MathUtils.lerp(l.manualAmount,l.manualOpen?1:0,1-Math.exp(-dt*5));
         l.elapsed += dt;
         const amount =
           friendly || l.elapsed >= 2.1
             ? 0
             : Math.sin((Math.PI * l.elapsed) / 2.1) ** 2;
-        l.hinge.rotation.y = l.direction * amount * 0.32;
+        l.hinge.rotation.y = l.direction * (manual?l.manualAmount*Math.PI*.56:amount*.32);
         l.face.updateWorldMatrix(true, false);
         const b = new THREE.Box3().setFromObject(l.face);
         Object.assign(l.collider, {
@@ -1247,15 +1274,16 @@ export function createSchool(renderer, config) {
           maxX: b.max.x,
           minZ: b.min.z,
           maxZ: b.max.z,
-          enabled: amount > 0.005,
+          enabled: manual?l.manualAmount>.005:amount>0.005,
         });
-        if (!amount) {
+        l.face.getWorldPosition(l.target.position);
+        if (!amount&&!manual) {
           l.playing = false;
           l.hinge.rotation.y = 0;
         }
       }
       exterior.color.setHex(friendly ? 0xffecc3 : 0x9fb9d9);
-      exterior.intensity = friendly ? 2.1 : 0.8;
+      exterior.intensity = friendly ? 2.1 : powerFailure?.14:0.8;
       for (const r of rain) {
         r.visible = !friendly;
         r.position.y -= dt * (0.5 + (r.position.z % 1) * 0.2);
@@ -1268,7 +1296,7 @@ export function createSchool(renderer, config) {
           env.state === "distorted"
             ? 0.9 + 0.1 * Math.sin(time * 19 + f.z) * Math.sin(time * 3.7 + f.z)
             : 1;
-        const behind =
+        const behind = powerFailure&&!friendly ? 0 :
           !friendly && player?.lightsOut && f.z > player.position.z + 3
             ? 0.08
             : 1;

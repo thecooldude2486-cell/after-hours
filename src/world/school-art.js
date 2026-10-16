@@ -110,8 +110,8 @@ export function addSchoolArt({ scene, env, textPlane, box, interactables }) {
     ["YOU WENT HOME", 14.84, 1.9, -34.5, -Math.PI / 2, "phone"],
     ["SHE WAITED", -2.86, 3.12, -10.5, Math.PI / 2, "school"],
     ["YOU LEFT HER", 2.86, 1.9, -31.65, -Math.PI / 2, "school"],
-    ["YOU LEFT HER", -9, 1.8, -22.91, 0, "classroom",4.5,1.1],
-    ["YOU WENT HOME", 9, 1.8, -42.91, 0, "phone",4.5,1.1],
+    ["YOU LEFT HER", -9, 2.05, -24.82, 0, "classroom",4.5,1.1],
+    ["YOU WENT HOME", 9, 2.05, -44.82, 0, "phone",4.5,1.1],
   ]) {
     const ink = bloodTextures.get(text);
     const panel = new THREE.Mesh(

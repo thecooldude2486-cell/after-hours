@@ -23,6 +23,10 @@ export class InventorySystem {
     this.collected = new Set();
     this.unlocked = new Set();
     this.power = false;
+    this.game.world.powered=false;
+    this.powerFailure=false;
+    this.flashlightOn=false;
+    this.game.world.setPowerFailure?.(false);
     this.crtOn = false;
     this.game.world.setCRT?.(false);
     this.opened = new Set();
@@ -40,6 +44,8 @@ export class InventorySystem {
       collected: [...this.collected],
       unlocked: [...this.unlocked],
       power: this.power,
+      powerFailure:this.powerFailure,
+      flashlightOn:this.flashlightOn,
       crtOn: this.crtOn,
       opened: [...this.opened],
       notes: [...this.notes],
@@ -53,6 +59,10 @@ export class InventorySystem {
     this.collected = new Set(save.collected || []);
     this.unlocked = new Set(save.unlocked || []);
     this.power = !!save.power;
+    this.game.world.powered=this.power;
+    this.powerFailure=save.powerFailure===true&&!this.power;
+    this.flashlightOn=this.items.has('flashlight')&&save.flashlightOn!==false;
+    this.game.world.setPowerFailure?.(this.powerFailure);
     this.setCRT(save.crtOn === true);
     this.opened = new Set(save.opened || []);
     this.notes = new Set(save.notes || []);
@@ -78,6 +88,7 @@ export class InventorySystem {
     world.crtSecret?.sync(this);
     world.exitTriggered=false;
     world.annex?.sync(this.opened);
+    world.setAmbientLockerStates?.(this.opened);
     world.echoes?.sync(this);
     for (const target of world.interactables)
       if (target.type === "pickup") {
@@ -95,14 +106,15 @@ export class InventorySystem {
           target.mesh.position.set(
             0,
             0.045,
-            0,
+            -0.06,
           );
           target.mesh.rotation.set(0, 0, 0);
           target.mesh.scale.setScalar(1.2);
+          if(target.item==='cutters')target.mesh.rotation.y=Math.PI/2;
           if (container.kind === "locker") {
             if (ITEMS[target.item]?.type === "key") {
               // Hang keys at eye level on the open cavity's backboard.
-              target.mesh.position.set(0.06, 0.57, -0.18);
+              target.mesh.position.set(0.16, 0.57, -0.18);
               target.mesh.rotation.set(Math.PI / 2, 0, -0.35);
               target.mesh.scale.setScalar(1.55);
             } else {
@@ -163,6 +175,7 @@ export class InventorySystem {
     this.collected.add(target.id);
     if (target.item === "groundingKit") this.groundingKits++;
     else this.items.add(target.item);
+    if(target.item==='flashlight')this.flashlightOn=true;
     target.available = false;
     target.mesh.visible = false;
     target.enabled = false;
@@ -210,6 +223,9 @@ export class InventorySystem {
     return true;
   }
   repairPower() {
+    if(this.powerFailure&&!this.has('flashlight')){
+      this.game.interactions.notify?.('TOO DARK TO INSPECT / FIND A FLASHLIGHT');return false;
+    }
     if (!this.power && !this.has("fuse")) {
       this.game.interactions.prompt.textContent =
         "FUSE MISSING / SEARCH THE MAINTENANCE LOCKERS";
@@ -217,6 +233,10 @@ export class InventorySystem {
     }
     const firstRepair = !this.power;
     this.power = true;
+    this.game.world.powered=true;
+    this.powerFailure=false;this.game.world.setPowerFailure?.(false);
+    this.game.world.fusePanel?.repair();
+    this.game.player.lightsOut=false;
     this.items.delete("fuse");
     if (firstRepair) this.game.player.sanity = Math.min(100, this.game.player.sanity + 15);
     this.game.audio.cue("switch");
@@ -224,6 +244,11 @@ export class InventorySystem {
     this.game.story.refreshObjective?.();
     this.game.story.save?.();
     return true;
+  }
+  failPower(){
+    this.power=false;this.game.world.powered=false;this.powerFailure=true;this.game.world.setPowerFailure?.(true);
+    if(!this.has('fuse'))this.collected.delete('item_fuse');
+    this.applyLayout();this.draw();this.game.audio.cue('switch');
   }
   hydrateStage(stage) {
     // Old saves and manual checkpoint jumps receive already-completed prerequisites, never future ones.
@@ -233,6 +258,7 @@ export class InventorySystem {
       classroomKey: "cassette",
       staffKey: "phone",
       fuse: "vale",
+      flashlight:'vale',
       recordsKey: "headmaster",
       diaryKey: "reunion",
       headmasterKey: "emptyClass",
@@ -244,6 +270,8 @@ export class InventorySystem {
       if (at >= STAGE_ORDER.indexOf(beat)) this.items.add(item);
     if (at >= STAGE_ORDER.indexOf("vale")) {
       this.power = true;
+      this.game.world.powered=true;
+      this.powerFailure=false;this.game.world.setPowerFailure?.(false);
       this.items.delete("fuse");
     }
     const passed = {
@@ -258,6 +286,7 @@ export class InventorySystem {
       if (at >= STAGE_ORDER.indexOf(beat)) {
         this.unlocked.add(door);this.opened.add(door);
       }
+    if(stage==='fault'&&!this.power){this.powerFailure=true;this.game.world.setPowerFailure?.(true);}
     this.applyLayout();
     this.applyLocks();
     this.draw();
@@ -270,6 +299,8 @@ export class InventorySystem {
     this.game.story.save?.();
   }
   draw() {
+    const light=document.querySelector('#flashlightState');
+    if(light){light.textContent=this.items.has('flashlight')?(this.flashlightOn?'F · LIGHT ON':'F · LIGHT OFF'):'';}
     const progress = document.querySelector("#secretProgress");
     if (progress) {
       const count = (this.game.world.secrets || []).filter(p => this.opened.has(p.id)).length;

@@ -9,7 +9,7 @@ export class ResourceSystem {
   isDark() {
     const g = this.game;
     const memory = ['normal', 'memory'].includes(g.world.env.state) || g.story.companion;
-    return !memory && (!!g.player.lightsOut || !!g.player.hidden);
+    return !memory && (!!g.inventory?.powerFailure || !!g.player.lightsOut || !!g.player.hidden);
   }
   update(dt) {
     const g = this.game, p = g.player, cheats = g.cheats || {};

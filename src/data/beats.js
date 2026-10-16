@@ -71,8 +71,8 @@ export const STAGES = {
   fault: {
     chapter: 5,
     name: "What Actually Happened",
-    objective: "Find the fire record · East wing maintenance.",
-    position: [17.5, -44],
+    objective: "Find a flashlight in reception, then restore the maintenance fuse box.",
+    position: [0, -5.5],
     state: "burned",
   },
   vale: {
@@ -274,7 +274,6 @@ export const BEATS = [
     effects: [
       { type: "fade", seconds: 0.7 },
       mode("normal"),
-      { type: "teleport", x: 0, z: -46, yaw: Math.PI },
       mara(0, -55, 9),
       say("abandonment"),
       go("walkaway"),
@@ -310,8 +309,7 @@ export const BEATS = [
       cue("alarm"),
       mode("burned"),
       { type: "cinematic", id: "fireMemory" },
-      { type: "fade", seconds: 0.8 },
-      { type: "teleport", x: 17.5, z: -44, yaw: 0 },
+      { type: "blackout" },
       { type: "hideMara" },
       go("fault"),
     ],

@@ -88,13 +88,14 @@ test('the journal contains only carried names and found clues, with no hint syst
  const html=await readFile(new URL('../index.html',import.meta.url),'utf8');
  assert.ok(!html.includes('journalHint'));assert.ok(!html.includes('NEED A NUDGE'));
 });
-test('exploration has no held flashlight, beam, batteries or torch controls',async()=>{
+test('exploration starts without a held flashlight and the found light does not reintroduce batteries',async()=>{
  const g=game(),player=new Player(g.camera,g.world,g.audio,g.config);
  assert.equal(player.viewModel,undefined);assert.equal(player.flashlight,undefined);assert.equal(player.battery,undefined);
  assert.equal(g.world.flash,undefined);assert.equal(g.world.scene.getObjectByName('Held flashlight'),undefined);
  assert.equal(g.world.interactables.some(t=>t.item==='battery'),false);
  const html=await readFile(new URL('../index.html',import.meta.url),'utf8');
- for(const text of ['flashlightMeter','batteryCount','F LIGHT','B REPLACE'])assert.equal(html.includes(text),false,text);
+ for(const text of ['flashlightMeter','batteryCount','B REPLACE'])assert.equal(html.includes(text),false,text);
+ assert.ok(html.includes('F LIGHT'));assert.ok(g.target('item_flashlight').fixed);
  g.inventory.restore({items:['lockerKey','battery'],batteries:9});
  assert.ok(g.inventory.has('lockerKey'));assert.equal(g.inventory.has('battery'),false);
  assert.equal(Object.hasOwn(g.inventory.snapshot(),'batteries'),false);

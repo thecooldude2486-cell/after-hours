@@ -146,7 +146,7 @@ test("closed storage cannot yield hidden items; opening reveals them, collection
   const t = world.interactables.find((t) => t.id === "item_classroomKey"),
     container = t.container;
   assert.equal(world.storage.filter(c => !c.fixed).length, 30);
-  assert.equal(world.storage.filter(c => c.fixed).length, 15);
+  assert.equal(world.storage.filter(c => c.fixed).length, 16);
   assert.equal(t.mesh.visible, false);
   assert.equal(t.enabled, false);
   await g.interactions.use(t);

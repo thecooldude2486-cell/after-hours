@@ -1,3 +1,15 @@
+# After Hours v30 — Search the dark
+
+Play https://thecooldude2486-cell.github.io/after-hours/?v=30.
+
+Drawers have a fitted moving tray, separate fixed fronts, runners and a visible bottom. Items sit inside the tray; bolt cutters fit across it. Search lockers have pale metal interiors, upper and lower shelves, coat hooks, rivets, folded jambs and scuffed backing. Ordinary corridor lockers can now be opened and closed with E, revealing the books and schoolbags inside. Open states persist. Classroom boards and their surface layers are mounted against the walls so they no longer conceal the rear drawers.
+
+The memory and blackout transitions preserve the player's position. After the fire memory, the mains fail where you are standing. Find the emergency flashlight in reception, use **F** to switch its real beam, then enter maintenance through Classroom 08's warped side door. Find the ceramic fuse and repair the fuse box. The panel cover, replacement fuse, lever and indicator animate; school lighting returns. The flashlight uses the existing articulated power grip and has no battery meter or battery pickups.
+
+The failed circuit, flashlight ownership and switch state survive checkpoints. An earlier optional power repair cannot consume the only replacement fuse needed after the blackout. The expanded journal story, headmaster, pupils and ending remain.
+
+---
+
 # After Hours v29 — The unheard pages
 
 Play https://thecooldude2486-cell.github.io/after-hours/?v=29.

@@ -60,7 +60,7 @@ export function addRoomDecay(scene, env) {
         roughness: 1,
       }),
     );
-    board.position.set(cx, 1.8, cz - 4.915);
+    board.position.set(cx, 2.05, room==='classroom'?-24.825:-44.825);
     scene.add(board);
     env.register(board, "chalk-residue", room, variants);
     result.push(board);

@@ -11,10 +11,10 @@ export const MARA_PAGES={
 // Interior boundaries keep the echoes out of doorways and the friendly memories.
 export const ECHO_ROOMS=[
   {id:'lobby',x:0,z:7,w:14,d:10,count:2,boardX:-4.8,boardZ:11.75,boardYaw:Math.PI,boardWidth:3.2},
-  {id:'classroom',x:-9,z:-18.5,w:12,d:13,count:6,boardZ:-22.93},
+  {id:'classroom',x:-9,z:-18.5,w:12,d:13,count:6,boardZ:-24.84},
   {id:'office',x:9,z:-18.5,w:12,d:13,count:2,boardZ:-12.16,boardYaw:Math.PI},
   {id:'archive',x:-9,z:-38.5,w:12,d:13,count:3,boardZ:-32.16,boardYaw:Math.PI},
-  {id:'phone',x:9,z:-38.5,w:12,d:13,count:6,boardZ:-42.93},
+  {id:'phone',x:9,z:-38.5,w:12,d:13,count:6,boardZ:-44.84},
   {id:'maintenance',x:17.5,z:-44,w:5,d:36,count:2,boardZ:-26.16,boardYaw:Math.PI},
   {id:'gym',x:1.5,z:-71,w:37,d:18,count:6,boardX:-10.5},
   {id:'library',x:-37.25,z:-39,w:13.5,d:12,count:3},

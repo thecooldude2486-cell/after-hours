@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>After Hours · v29</title>
+    <title>After Hours · v30</title>
     <link rel="stylesheet" href="style.css?v=28" />
   </head>
   <body>
@@ -48,6 +48,7 @@
         <p id="line"></p>
       </div>
       <div id="status"></div>
+      <div id="flashlightState" role="status" aria-live="polite"></div>
       <div id="resources">
         <div class="meter" id="sanityMeter">
           <span>SANITY</span>
@@ -70,12 +71,12 @@
         <span></span><small>BREATH</small>
       </div>
       <div class="controls">
-        WASD MOVE <b>·</b> E INTERACT <b>·</b> SHIFT RUN <b>·</b> J JOURNAL <b>·</b> ESC PAUSE
+        WASD MOVE <b>·</b> E INTERACT <b>·</b> F LIGHT <b>·</b> SHIFT RUN <b>·</b> J JOURNAL <b>·</b> ESC PAUSE
       </div>
     </div>
     <div id="title" class="overlay">
       <div class="title-top">
-        <span>A NARRATIVE HORROR PROTOTYPE · V29</span
+        <span>A NARRATIVE HORROR PROTOTYPE · V30</span
         ><span>HEADPHONES RECOMMENDED</span>
       </div>
       <div class="title-content">
@@ -115,7 +116,7 @@
           <div class="eyebrow">AFTER HOURS / PAUSED</div>
           <h2>A moment<br />to breathe.</h2>
           <p id="pauseDetail">Clues, tools, and discoveries save as you find them. J opens your journal.</p>
-          <p class="pause-controls">WASD move · E interact · Shift run<br />Space jump · C crouch · H grounding kit<br />Tab pockets · J journal · Q advance dialogue</p>
+          <p class="pause-controls">WASD move · E interact · F flashlight · Shift run<br />Space jump · C crouch · H grounding kit<br />Tab pockets · J journal · Q advance dialogue</p>
           <p class="pause-controls">Grabbed? Press and release E repeatedly.<br />Drag to look if pointer lock is unavailable.</p>
         </section>
         <section class="pause-actions" aria-label="Pause actions">

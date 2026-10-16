@@ -83,7 +83,7 @@ export class CinematicSystem {
       )
         animateRoomMonster(shot.actor, dt, g.time || shot.elapsed);
     }
-    const aim = g.camera.clone();
+    const aim = g.camera.clone(false);
     aim.position.copy(shot.position);
     let target;
     if (["teacher", "mara", "monster"].includes(data.target)) {

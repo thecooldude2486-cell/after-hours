@@ -147,7 +147,8 @@ export class EnvironmentSystem {
         this.startIntensity,
         this.targetIntensity,
         t,
-      );
+      )*(this.powerFailure&&!['normal','memory'].includes(this.state)?.1:1);
+      if(this.powerFailure&&!['normal','memory'].includes(this.state))this.scene.environmentIntensity*=.13;
     }
   }
   update(dt, time) {

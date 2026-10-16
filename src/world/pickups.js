@@ -1,5 +1,6 @@
 import * as THREE from "../../vendor/three.module.js";
 import { ITEMS, STORAGE } from "../data/items.js";
+import {addLockerInterior} from './locker-interior.js';
 /** Supplies are real, small meshes concealed by openable school storage. No glowing beacons. */
 export function addPickups(world) {
   const metal = new THREE.MeshStandardMaterial({
@@ -192,11 +193,7 @@ export function addPickups(world) {
     if (locker) {
       panel(w - 0.07, 0.035, d - 0.04, 0, 0.88, 0);
       tray.position.set(0, 0.91, 0);
-      const lining = new THREE.MeshStandardMaterial({color:0x8d9583,roughness:0.92,emissive:0x505845,emissiveIntensity:0.12});
-      const backing=part(root,new THREE.BoxGeometry(w-.09,h-.12,.012),lining,0,h/2,-d/2+.03);
-      backing.name="Pale locker interior";
-      const shelfLiner=part(root,new THREE.BoxGeometry(w-.1,.008,d-.09),lining,0,.903,.015);
-      shelfLiner.name="Locker shelf liner";
+      addLockerInterior(root,w,h,d,{shelf:.88});
       const hook=part(root,new THREE.TorusGeometry(.035,.008,6,12),metal,.06,1.51,-.225,Math.PI/2);
       hook.name="Locker key hook";
       front.position.set(-w / 2, 0, d / 2 + 0.015);
@@ -227,8 +224,15 @@ export function addPickups(world) {
       front.position.set(0, 0.73, d / 2 + 0.025);
       panel(w - 0.06, 0.24, 0.045, 0, 0, 0, front);
       part(front, new THREE.BoxGeometry(0.21, 0.025, 0.04), metal, 0, 0, 0.039);
-      panel(w - 0.04, 0.24, 0.045, 0, 0.32, d / 2 + 0.025);
-      panel(w - 0.04, 0.47, 0.045, 0, 0.245, d / 2 + 0.025);
+      // A single moving drawer fits between a fixed top rail and the lower cupboard.
+      panel(w - 0.04, 0.18, 0.045, 0, .965, d / 2 + 0.025);
+      panel(w - 0.04, 0.52, 0.045, 0, .295, d / 2 + 0.025);
+      const liner=part(tray,new THREE.BoxGeometry(w-.15,.006,d-.12),paper,0,.037,.015);
+      liner.name='Drawer bottom liner';
+      for(const side of [-1,1]){
+        const rail=part(root,new THREE.BoxGeometry(.018,.035,d-.07),metal,side*(w/2-.055),.655,0);
+        rail.name='Drawer runner';
+      }
     }
     if (index % 2 === 0) {
       const forgotten = part(
@@ -240,6 +244,7 @@ export function addPickups(world) {
         -0.12,
       );
       forgotten.rotation.y = 0.17;
+      forgotten.name='Forgotten folded paper';
     } else {
       const pencil = part(
         tray,
@@ -294,11 +299,24 @@ export function addPickups(world) {
       .add(root.position);
     world.interactables.push(t);
     storage.push(t);
+    return t;
   }
   for (const [item, data] of Object.entries(STORAGE)) {
     for (let i = 0; i < data.slots.length; i++) container(item, data, i);
     pickup(item, "item_" + item);
   }
+  const emergency=container('flashlight',{kind:'locker',room:'lobby',rotation:Math.PI/2,slots:[[-6.15,10.3]]},0);
+  emergency.fixed=true;emergency.storageItem=null;emergency.id='storage_emergencyFlashlight';emergency.label='Open emergency equipment locker';
+  const torch=new THREE.Group();torch.name='Emergency flashlight';
+  const body=new THREE.Mesh(new THREE.CylinderGeometry(.038,.038,.23,20),new THREE.MeshStandardMaterial({color:0x263331,metalness:.55,roughness:.58}));
+  body.rotation.x=Math.PI/2;torch.add(body);
+  const head=new THREE.Mesh(new THREE.CylinderGeometry(.065,.038,.075,24),metal);head.rotation.x=Math.PI/2;head.position.z=.14;torch.add(head);
+  const lens=new THREE.Mesh(new THREE.CircleGeometry(.055,24),new THREE.MeshStandardMaterial({color:0xc8d6c9,metalness:.3,roughness:.18}));lens.position.z=.18;torch.add(lens);
+  torch.position.set(0,.08,.06);torch.rotation.y=.4;emergency.tray.add(torch);
+  world.interactables.push({id:'item_flashlight',type:'pickup',item:'flashlight',label:'Take the emergency flashlight',mesh:torch,position:new THREE.Vector3(),container:emergency,fixed:true,available:true,enabled:false});
+  const redMarker=new THREE.PointLight(0xe58c65,.12,2.8,2);redMarker.position.set(-5.7,1.9,10.3);world.scene.add(redMarker);
+  const label=world.textPlane?.('EMERGENCY\nEQUIPMENT',-5.81,1.95,10.3,.45,.28,Math.PI/2,'#bfbca9','#31413a',24);
+  if(label){world.scene.updateMatrixWorld(true);emergency.mesh.attach(label);}
   return storage;
 }
 /** Kept here so tests and the main loop use the same physical opening motion. */

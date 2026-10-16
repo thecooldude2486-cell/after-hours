@@ -1,5 +1,7 @@
 import { EnvironmentSoundSystem } from "./systems/environment-sounds.js";
 import {EchoSystem} from "./systems/echoes.js";
+import {FlashlightSystem} from './systems/flashlight.js';
+import {loadHandSurface} from './world/viewmodel.js';
 import { SchoolRenderer } from "./systems/rendering.js";
 import { AtmosphereSystem } from "./systems/atmosphere.js";
 import { loadHorrorMaterials } from "./world/horror-detail.js";
@@ -81,6 +83,7 @@ class Game {
     this.atmosphere = new AtmosphereSystem(this);
     this.environmentSounds = new EnvironmentSoundSystem(this);
     this.echoes = new EchoSystem(this);
+    this.flashlight=new FlashlightSystem(this);
     this.player.canLook = () =>
       this.started &&
       !this.paused &&
@@ -277,6 +280,7 @@ class Game {
       }
       if (e.code === "KeyH" && !this.interactions.reader)
         this.inventory.useGroundingKit();
+      if(e.code==='KeyF'&&!this.interactions.reader)this.flashlight.toggle();
       if (e.code === "KeyE") this.interactions.use();
       if (
         e.code === "Space" &&
@@ -512,6 +516,7 @@ class Game {
       live && speaker.includes("TEACHER") && this.audio.isSpeaking;
     this.world.env.update(dt, this.time);
     this.world.update(dt, this.time, this.player);
+    this.flashlight.update(live?dt:0,this.time);
     this.presentation.render(this.world, this.camera, this.time);
     $("#film").classList.toggle(
       "friendly",
@@ -525,6 +530,7 @@ try {
     loadMaraModel(),
     loadSchoolArt(),
     loadHorrorMaterials(),
+    loadHandSurface(),
   ]);
   $("#begin").disabled = false;
   const game = new Game();

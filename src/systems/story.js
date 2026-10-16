@@ -98,6 +98,7 @@ export class StorySystem {
         }
       },
       teleport: (e) => g.player.teleport(e.x, e.z, e.yaw),
+      blackout:()=>g.inventory.failPower(),
       read: (e) =>
         new Promise((resolve) => {
           g.interactions.read(e.note, resolve);
@@ -206,6 +207,7 @@ export class StorySystem {
   setStage(stage, save = true) {
     if (!STAGES[stage]) throw new Error("Unknown story stage " + stage);
     this.stage = stage;
+    if(stage==='fault')this.blackoutAnchor=[this.game.player.position.x,this.game.player.position.z,this.game.player.yaw];
     this.elapsed = 0;
     this.hiddenTime = 0;
     this.safeTime = 0;
@@ -280,7 +282,8 @@ export class StorySystem {
         "after-hours-save",
         JSON.stringify({
           version: 2,
-          storyRevision: 29,
+          storyRevision: 30,
+          blackoutAnchor:this.blackoutAnchor,
           stage: this.stage,
           inventory: this.game.inventory?.snapshot(),
           resources: this.game.resources?.snapshot(),
@@ -309,7 +312,9 @@ export class StorySystem {
         "Break sight, hide, then unlock Classroom 08 with the key from Classroom 04.",
       fault: inv.power
         ? "Read the corrected fire record beside the fuse box."
-        : "Find a fuse inside the maintenance lockers. Repair the fuse box to restore power.",
+        : !inv.has('flashlight') ? "The lights are out. Search the emergency equipment locker in reception."
+        : !inv.has('fuse') ? "Reach maintenance through Classroom 08’s warped side door. Search the lockers for a fuse."
+        : "Install the replacement fuse in the maintenance fuse box.",
       vale: inv.has("recordsKey")
         ? "Unlock Mrs. Vale’s staff record in the archive."
         : "Escape through Classroom 08. Find the staff cabinet key in its drawers.",
@@ -361,12 +366,14 @@ export class StorySystem {
       g.inventory.reset();
       g.inventory.restore(exact ? saved.inventory : {});
       if (!exact) g.inventory.hydrateStage(stage);
-      if(exact&&saved.storyRevision!==29){
+      if(exact&&saved.storyRevision!==30){
         const at=STAGE_ORDER.indexOf(stage);
         if(at>=STAGE_ORDER.indexOf('waiting'))g.inventory.items.add('diaryKey');
         if(at>=STAGE_ORDER.indexOf('emptyClass'))g.inventory.items.add('attendanceRoll');
+        if(at>=STAGE_ORDER.indexOf('vale')){g.inventory.items.add('flashlight');g.inventory.flashlightOn=true;}
         g.inventory.draw();
       }
+      if(stage==='fault')this.blackoutAnchor=exact&&saved.blackoutAnchor?.length===3?saved.blackoutAnchor:null;
       g.resources.restore(exact ? saved.resources : {}, Boolean(options.retry));
       g.player.stamina = g.config.sprintCapacity;
       g.player.exhausted = false;
@@ -381,7 +388,8 @@ export class StorySystem {
         drawer.open = false;
       }
     }
-    g.player.teleport(d.position[0], d.position[1], d.position[2] || 0);
+    const anchor=stage==='fault'&&this.blackoutAnchor?this.blackoutAnchor:d.position;
+    g.player.teleport(anchor[0],anchor[1],anchor[2]||0);
     g.world.env.set(d.state, "school", true);
     g.audio.mode(d.state);
     if (stage === "reunion" || stage === "embrace")
@@ -441,6 +449,7 @@ export class StorySystem {
     return true;
   }
   label(t) {
+    if(t.type==='lockerDoor')return t.locker.manualOpen?'Close locker':'Open locker';
     if(t.type==='door' && t.door.motorTarget != null)return t.door.motorTarget ? 'Door opening' : 'Door closing';
     if (t.type === "secretDoor" && t.unlatched && !t.open) return "Heavy panel";
     if (t.type === "door" && t.door?.pushable && t.door.unlatched)

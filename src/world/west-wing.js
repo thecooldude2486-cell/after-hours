@@ -31,9 +31,11 @@ export function addWestWing({scene,box,textPlane,floor,gate,interactables,builde
   textPlane('WEST WING',-2.82,2.7,-50,1.8,.3,Math.PI/2,'#c6c8b1','#273d34',30);
   textPlane('LIBRARY   ↑\nINFIRMARY   ↓',-29,2.9,-49,2.1,.6,Math.PI/2,'#c6c8b1','#273d34',27);
   // Recessed tubes provide only a faint pool of light in the abandoned annex.
+  const fixtures=[];
   for(const z of [-36,-44,-52,-59]){
     const tube=box(-29,3.6,z,.7,.04,.13,0x77877a,null,'westWing',false,{emissive:0x91a795,emissiveIntensity:.24});
     const light=new THREE.PointLight(0x91a795,.25,5.5,2);light.position.set(-29,3.4,z);scene.add(light);
+    fixtures.push({tube,light});
   }
   // Library stacks have a wide middle aisle, with identifiable hollow-book storage.
   for(const x of [-42.6,-35.8])for(const z of [-35,-42.8]){
@@ -97,5 +99,7 @@ export function addWestWing({scene,box,textPlane,floor,gate,interactables,builde
     valve.label=fixed?'Steam isolated':'Fit the steam shutoff wheel';
   };
   sync(new Set());
-  return {rooms,area:631,sync,steamCollider:steamCollider.userData.obstacle,clouds,wheel,valve};
+  return {rooms,area:631,sync,steamCollider:steamCollider.userData.obstacle,clouds,wheel,valve,
+    setPowerFailure(on){for(const f of fixtures){f.light.intensity=on?0:.25;f.tube.material.emissiveIntensity=on?0:.24;}}
+  };
 }

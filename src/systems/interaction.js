@@ -104,6 +104,11 @@ export class InteractionSystem {
       return;
     }
     if (!target || target.enabled === false || !target.mesh.visible) return;
+    if(target.type==='lockerDoor'){
+      const l=target.locker;l.playing=false;l.manualOpen=!l.manualOpen;
+      if(l.manualOpen)g.inventory.opened.add(target.id);else g.inventory.opened.delete(target.id);
+      g.audio.cue(l.manualOpen?'doorOpen':'doorClose',target.position);g.story.save?.();return;
+    }
     if(target.type==='schoolBell'){
       if(!g.inventory.check(target))return;
       g.echoes?.ringBell();return;
@@ -239,7 +244,7 @@ export class InteractionSystem {
         target.open = true;
         g.audio.cue("door", target.position);
       }
-      if (target.type === "drawer")
+      if (target.type === "drawer"&&!target.drawerTray)
         target.mesh.position.x += target.open ? -0.18 : 0.18;
       if (target.type === "drawer") target.open = !target.open;
       const note=typeof target.note==='string'?NOTES[target.note]:target.note;
@@ -250,7 +255,7 @@ export class InteractionSystem {
     if (target.type === "door") {
       if (target.id === "escapeDoor") {
         if (target.door.unlatched) return;
-        if (g.story.stage === "vale") {
+        if (['vale','fault'].includes(g.story.stage)) {
           this.hold = { target, elapsed: 0 };
           g.audio.cue("door", target.position);
         }
@@ -278,6 +283,7 @@ export class InteractionSystem {
         g.world.crtSecret?.sync(g.inventory);
         g.story.save?.();
       } else {
+        if(g.inventory.powerFailure){this.notify('THE MAINTENANCE FUSE HAS TRIPPED');return;}
         target.open = !target.open;
         g.player.lightsOut = !g.player.lightsOut;
       }

@@ -1,4 +1,5 @@
 export const ITEMS = {
+  flashlight:{name:'Emergency flashlight',type:'flashlight',clue:'F · switch the beam on or off'},
   diaryKey:{name:"Mara’s tiny diary key",type:"key",clue:"A small brass clasp"},
   bellClapper:{name:"Office bell clapper",type:"tool",clue:"A bell with no voice"},
   headmasterKey:{name:"Headmaster’s file key",type:"key",clue:"A seal that was never broken"},

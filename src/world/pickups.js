@@ -159,6 +159,7 @@ export function addPickups(world) {
     const [x, z] = data.slots[index],
       locker = data.kind === "locker";
     const root = new THREE.Group();
+    root.userData.staticShell=true;
     root.position.set(x, 0, z);
     root.rotation.y = data.rotation;
     world.scene.add(root);
@@ -189,6 +190,7 @@ export function addPickups(world) {
     panel(w, 0.05, d, 0, h, 0);
     const tray = new THREE.Group(),
       front = new THREE.Group();
+    tray.userData.staticShell=true;
     root.add(tray);
     root.add(front);
     if (locker) {
@@ -236,28 +238,6 @@ export function addPickups(world) {
         const rail=part(root,new THREE.BoxGeometry(.018,.035,d-.07),metal,side*(w/2-.055),.655,0);
         rail.name='Drawer runner';
       }
-    }
-    if (index % 2 === 0) {
-      const forgotten = part(
-        tray,
-        new THREE.BoxGeometry(0.12, 0.025, 0.17),
-        paper,
-        -0.23,
-        0.07,
-        -0.12,
-      );
-      forgotten.rotation.y = 0.17;
-      forgotten.name='Forgotten folded paper';
-    } else {
-      const pencil = part(
-        tray,
-        new THREE.CylinderGeometry(0.006, 0.006, 0.19, 8),
-        red,
-        -0.16,
-        0.04,
-        -0.06,
-      );
-      pencil.rotation.z = Math.PI / 2;
     }
     // The frame is solid even though it has a visual cavity; drawers extend into a clear approach aisle.
     const obstacle = world.box(
@@ -325,11 +305,11 @@ export function addPickups(world) {
 /** Kept here so tests and the main loop use the same physical opening motion. */
 export function animateStorage(storage, dt) {
   for (const t of storage) {
-    t.amount = THREE.MathUtils.lerp(
-      t.amount,
-      t.open ? 1 : 0,
-      1 - Math.exp(-dt * 8),
-    );
+    const goal=t.open?1:0;
+    t.amount=THREE.MathUtils.lerp(t.amount,goal,1-Math.exp(-dt*8));
+    if(Math.abs(t.amount-goal)<.0001)t.amount=goal;
+    if(t._animatedAmount===t.amount)continue;
+    t._animatedAmount=t.amount;
     if (t.animation === "lid") t.mesh.rotation.x = -t.amount * 1.75;
     else if (t.kind === "locker") t.mesh.rotation.y = -t.amount * Math.PI * 0.57;
     else {

@@ -51,14 +51,14 @@ test('open loot drawers and lockers expose every required item from their normal
     }
   }
 });
-test('ordinary corridor lockers open, reveal real interiors and preserve their open state',async()=>{
+test('ordinary corridor lockers open to empty metal interiors and preserve their open state',async()=>{
   const g=game(),l=g.world.ambientLockers.find(l=>l.x<0),t=l.target;
   await g.interactions.use(t);g.step();
   assert.ok(l.manualOpen);assert.ok(Math.abs(l.hinge.rotation.y)>1.5);
-  const book=g.world.scene.getObjectsByProperty('name','Forgotten locker notebook').find(m=>Math.abs(m.position.z-l.z)<.3&&Math.abs(m.position.x-l.x)<.2);
-  assert.ok(book);
-  const from=new T.Vector3(l.x+1.5,1.65,l.z+.16),point=book.position.clone();
-  assert.equal(clearView(g,{mesh:book,position:point},from).length,0,'Shelf contents are visible through the open door');
+  const interior=g.world.scene.children.find(m=>m.name==='Corridor locker interior'&&Math.abs(m.position.z-l.z)<.01&&Math.abs(m.position.x-l.x)<.01);
+  const back=interior.getObjectByName('Pale locker interior');
+  const point=back.getWorldPosition(new T.Vector3()),from=new T.Vector3(l.x+1.5,1.65,l.z);
+  assert.equal(clearView(g,{mesh:back,position:point},from).length,0,'The open locker has a visible metal back wall');
   const save=g.inventory.snapshot();g.world.resetAmbientLockers();g.inventory.restore(save);g.step();
   assert.ok(l.manualOpen&&g.inventory.opened.has(t.id));
 });

@@ -53,7 +53,7 @@ test('locker contents appear during opening, stay uncollectable until accessible
  const save=g.inventory.snapshot();g.inventory.restore(save);assert.equal(key.mesh.visible,false);
 });
 
-test('all locker cavities have an actual interior and corridor books are inside hollow collision bodies',()=>{
+test('all locker cavities have an actual metal interior and no pretend contents',()=>{
  const g=game();
  const cabinets=g.world.storage.filter(c=>c.kind==='locker');
  for(const c of cabinets){assert.ok(c.root.getObjectByName('Pale locker interior'));assert.ok(c.root.getObjectByName('Locker shelf liner'));}
@@ -61,10 +61,9 @@ test('all locker cavities have an actual interior and corridor books are inside 
   g.world.env.set(state,'school',true);
   for(const o of g.world.obstacles)if(o.mesh?.userData.collisionOnly)assert.equal(o.mesh.visible,false,'Collision-only geometry stays hidden in '+state);
  }
- const books=g.world.scene.getObjectsByProperty('name','Forgotten locker notebook');
- assert.ok(books.length>10);
- for(const b of books) {
-  const bodies=g.world.obstacles.filter(o=>o.minY===0&&o.maxY===2.54&&Math.abs(o.mesh?.position.z-b.position.z)<.3);
-  assert.ok(bodies.some(o=>!o.mesh.visible),'Opaque collision body is hidden around an interior notebook');
+ assert.equal(g.world.scene.getObjectsByProperty('name','Forgotten locker notebook').length,0);
+ assert.equal(g.world.scene.getObjectsByProperty('name','Old schoolbag inside locker').length,0);
+ for(const c of cabinets){
+  assert.equal(c.root.getObjectByName('Forgotten folded paper'),undefined);
  }
 });

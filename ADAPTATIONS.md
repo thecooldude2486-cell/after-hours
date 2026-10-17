@@ -1,3 +1,7 @@
+# v32 — User-requested empty storage and optimization
+
+The user asked for genuinely empty lockers and a faster game. Decorative placeholder contents have been removed from storage and corridor lockers, and the metal backing is darker. Rendering combines only eligible stationary opaque surfaces; moving doors, collectible props, colliders, chapter visibility and authored state changes retain their behavior. GPU instancing preserves rain and flame motion. Light culling uses the full lamp influence sphere and restores authored visibility after every render; it does not reduce the school’s lighting settings.
+
 # v31 — User-approved story and storage correction
 
 The user explicitly asked for Mara to conceal the bullying through clues for Eli and for the story and voiced dialogue to follow their fire account. This supersedes the original source wording for the twenty lines in assets/STORY-UPDATE-v31.txt. Mara’s early pages conceal events; later evidence identifies the ignored reports and early departures. Her later admission states her intent and responsibility. The ending remains connected to the original. Locker surfaces no longer use blurred procedural patches; door hardware uses explicit parentage and loose objects fit the cavity.

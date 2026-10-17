@@ -1,9 +1,11 @@
+import {LightCulling} from "./light-culling.js";
 import * as THREE from "../../vendor/three.module.js";
 import { APPARITION_LAYER } from "../world/distant-figure.js";
 /** Optional school lens effects; the live geometry blur always applies to distant apparitions. */
 export class SchoolRenderer {
   constructor(renderer, config) {
     this.renderer = renderer;
+    this.lightCulling=new LightCulling();
     this.config = config;
     this.supported =
       renderer.extensions?.has?.("EXT_color_buffer_float") !== false;
@@ -126,6 +128,11 @@ export class SchoolRenderer {
     }
   }
   render(world, camera, time) {
+    this.lightCulling.begin(world,camera);
+    try { this.renderFrame(world,camera,time); }
+    finally { this.lightCulling.end(); }
+  }
+  renderFrame(world,camera,time){
     const r = this.renderer;
     const figure = Boolean(world.apparition?.mesh.visible);
     this.uniforms.figureActive.value = figure ? 1 : 0;

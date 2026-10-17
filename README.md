@@ -1,3 +1,7 @@
+# v32 — Empty lockers and rendering performance
+
+Empty lockers contain metal fittings only: no fake paper blocks, notebooks, schoolbags or pencils. Collectible keys, fuses and the emergency flashlight remain real visible items and disappear when taken. Static scenery and stationary cabinet panels are merged in small spatial groups while interactions and collision objects are retained. Rain and pupil flames use instanced geometry. Finite lamps outside the camera’s influence range are excluded only during rendering. Settled storage no longer updates its entire transform hierarchy every frame. The same 640×360 scene views submitted 1,751 → 1,256 draws in the hallway and 1,454 → 1,064 in the classroom (scene-only renderer comparison, not a measured player FPS increase).
+
 # v31 — Concealed pages and solid lockers
 
 Locker interiors use matte enamel, explicit door hardware and fitted props. Mara conceals daily bullying in excuses and journal clues; the school records, revised recorded dialogue and later admission connect those clues to the fire. Twenty changed lines have new bundled recordings in the existing character voices. Production builds now stamp both entry URLs and the complete module graph to prevent an older cached script loading a previous release.

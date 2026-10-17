@@ -14,6 +14,7 @@ import { ResourceSystem } from "./systems/resources.js";
 import { CheatSystem } from "./systems/cheats.js";
 import { PRESETS, applyPreset } from "./data/presets.js";
 import { STAGES } from "./data/beats.js";
+import {batchStaticScenery,instanceRain} from "./world/optimize.js";
 import { createSchool } from "./world/school.js";
 import { Player } from "./systems/player.js";
 import { AudioSystem } from "./systems/audio.js";
@@ -59,6 +60,8 @@ class Game {
       90,
     );
     this.world = createSchool(this.renderer, this.config);
+    batchStaticScenery(this.world);
+    instanceRain(this.world);
     this.audio = new AudioSystem(this.config);
     this.player = new Player(this.camera, this.world, this.audio, this.config);
     this.dialogue = new DialogueSystem(this.audio, this.config);

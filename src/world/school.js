@@ -470,14 +470,8 @@ export function createSchool(renderer, config) {
         box(x, y, z, 0.62, 0.06, 0.8, 0x314944, "locker");
       box(x,1.02,z,.54,.025,.7,0x87907c);
     }
-    const fittings=new THREE.Group();fittings.position.set(x,0,z);fittings.rotation.y=direction*Math.PI/2;scene.add(fittings);
+    const fittings=new THREE.Group();fittings.name="Corridor locker interior";fittings.position.set(x,0,z);fittings.rotation.y=direction*Math.PI/2;scene.add(fittings);
     addLockerInterior(fittings,.8,2.54,.62);
-    if (id !== "bracelet") {
-      const notebook=box(x + direction*.02,1.082,z+.16,.35,.06,.23,0xb8ad8c);
-      notebook.name="Forgotten locker notebook";
-      const bag=box(x-direction*.04,.285,z-.12,.32,.42,.36,0x4a5045);
-      bag.name="Old schoolbag inside locker";
-    }
     if (id === "bracelet") {
       const ring = new THREE.Mesh(
         new THREE.TorusGeometry(0.13, 0.016, 8, 20),
@@ -1277,6 +1271,14 @@ export function createSchool(renderer, config) {
         r.visible = !friendly;
         r.position.y -= dt * (0.5 + (r.position.z % 1) * 0.2);
         if (r.position.y < 1.4) r.position.y = 2.9;
+      }
+      for(const batch of this.rainBatches||[]){
+        batch.mesh.visible=!friendly;
+        if(friendly)continue;
+        for(let i=0;i<batch.drops.length;i++){
+          batch.drops[i].updateMatrix();batch.mesh.setMatrixAt(i,batch.drops[i].matrix);
+        }
+        batch.mesh.instanceMatrix.needsUpdate=true;
       }
       for (const f of lights) {
         const flicker =

@@ -3,8 +3,8 @@ import {mergeGeometries} from '../../vendor/BufferGeometryUtils.js';
 /** Thin metal fittings leave a genuinely open cavity. Local +Z is the opening. */
 export function addLockerInterior(root,w,h,d,{shelf=1.02}={}){
   const parts=[];
-  const lining=new T.MeshStandardMaterial({color:0x899188,roughness:.96,metalness:0,envMapIntensity:0,emissive:0x38483d,emissiveIntensity:.1});
-  const metal=new T.MeshStandardMaterial({color:0x778077,metalness:.15,roughness:.9,envMapIntensity:.04});
+  const lining=new T.MeshStandardMaterial({color:0x485b50,roughness:.96,metalness:0,envMapIntensity:0,emissive:0x38483d,emissiveIntensity:.035});
+  const metal=new T.MeshStandardMaterial({color:0x596a5d,metalness:.15,roughness:.9,envMapIntensity:.04});
   const dark=new T.MeshStandardMaterial({color:0x28332f,roughness:1,envMapIntensity:0});
   const part=(name,x,y,z,a,b,c,mat=lining)=>{
     const m=new T.Mesh(new T.BoxGeometry(a,b,c),mat);m.name=name;m.position.set(x,y,z);root.add(m);parts.push(m);return m;

@@ -100,7 +100,22 @@ export function createEchoModel(kind='student',variant=0){
     flame.rotation.z=(i-1)*.2;flames.push(flame);
     part(flame,new T.ConeGeometry(.025,.18,5),mat(0xffdda0,{emissive:0xffc75c,emissiveIntensity:1.1,transparent:true,opacity:.5,depthWrite:false}),[0,-.04,-.015]);
   }
-  root.userData={...root.userData,echoKind:kind,variant,height,body,head,arms,legs,flames,forward:-1};
+  let flameInstances=null;
+  if(flames.length){
+    const outer=new T.InstancedMesh(flames[0].geometry,flames[0].material,flames.length);
+    const inner=new T.InstancedMesh(flames[0].children[0].geometry,flames[0].children[0].material,flames.length);
+    outer.name='Instanced ember flames';inner.name='Instanced flame cores';
+    outer.instanceMatrix.setUsage(T.DynamicDrawUsage);inner.instanceMatrix.setUsage(T.DynamicDrawUsage);
+    // The original flame transforms are animation controls; only two meshes draw the whole set.
+    for(let i=0;i<flames.length;i++){
+      const f=flames[i];f.updateMatrix();f.children[0].updateMatrix();
+      outer.setMatrixAt(i,f.matrix);inner.setMatrixAt(i,new T.Matrix4().multiplyMatrices(f.matrix,f.children[0].matrix));
+      body.remove(f);
+    }
+    outer.computeBoundingSphere();inner.computeBoundingSphere();body.add(outer,inner);
+    flameInstances={outer,inner,matrix:new T.Matrix4()};
+  }
+  root.userData={...root.userData,echoKind:kind,variant,height,body,head,arms,legs,flames,flameInstances,forward:-1};
   // Consolidate rigid detail on each joint; the moving pivots and flames stay independent.
   for(const joint of [body,head,...arms,...legs,root.userData.cane].filter(Boolean)){
     const batches=new Map();
@@ -141,6 +156,16 @@ export function animateEcho(root,dt,time,{writing=false,moving=false,gaze=null}=
   }
   for(let i=0;i<r.flames.length;i++){
     const f=r.flames[i];f.scale.y=.7+Math.sin(time*9+i*2.3)*.21;
-    f.rotation.z=Math.sin(time*5+i)*.16;f.material.opacity=.38+Math.sin(time*8+i)*.08;
+    f.rotation.z=Math.sin(time*5+i)*.16;
+    f.updateMatrix();
+    if(r.flameInstances){
+      const {outer,inner,matrix}=r.flameInstances;
+      outer.setMatrixAt(i,f.matrix);inner.setMatrixAt(i,matrix.multiplyMatrices(f.matrix,f.children[0].matrix));
+    }
+  }
+  if(r.flameInstances){
+    const {outer,inner}=r.flameInstances;
+    outer.material.opacity=.38+Math.sin(time*8+r.variant)*.08;
+    outer.instanceMatrix.needsUpdate=true;inner.instanceMatrix.needsUpdate=true;
   }
 }

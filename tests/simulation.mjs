@@ -79,6 +79,7 @@ const { InventorySystem } = await import("../src/systems/inventory.js");
 const { ResourceSystem } = await import("../src/systems/resources.js");
 const { CheatSystem } = await import("../src/systems/cheats.js");
 const { applyPreset } = await import("../src/data/presets.js");
+const {batchStaticScenery,instanceRain}=await import("../src/world/optimize.js");
 const { createSchool } = await import("../src/world/school.js");
 const { Player } = await import("../src/systems/player.js");
 const { AudioSystem } = await import("../src/systems/audio.js");
@@ -114,6 +115,7 @@ const preset = process.env.AFTER_HOURS_PRESET || "normal";
 applyPreset(g.config, preset);
 g.camera = new THREE.PerspectiveCamera(68, 1.6, 0.06, 90);
 g.world = createSchool({}, g.config);
+batchStaticScenery(g.world);instanceRain(g.world);
 g.audio = new AudioSystem(g.config);
 g.audio.voice = false; // This simulation stubs sound output; WAV assets are checked separately.
 g.player = new Player(g.camera, g.world, g.audio, g.config);

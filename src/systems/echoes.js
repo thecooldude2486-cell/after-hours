@@ -1,5 +1,6 @@
 import * as T from '../../vendor/three.module.js';
 import {ELI_ROOMS} from '../data/echoes.js';
+import {animateShadow} from '../world/shadow-figure.js';
 import {animateEcho} from '../world/echo-models.js';
 import {drawEchoBoard} from '../world/school-echoes.js';
 import {Navigation,slide,lineClear} from './navigation.js';
@@ -15,7 +16,7 @@ export class EchoSystem{
     this.reset();
   }
   reset(save={}){
-    this.seen=new Set(save.seen||[]);this.eliStage=null;this.eliShown=false;this.eliFade=0;
+    this.seen=new Set(save.revision===34?save.seen||[]:[]);this.eliActive=false;this.eliElapsed=0;this.eliStage=null;
     this.distraction=0;this.headmasterActive=false;this.headmasterContact=0;this.headmasterStep=0;this.chalk=0;
     this.headmasterTarget=0;this.path=[];this.pathTimer=0;this.damageRate=0;
     if(!this.world)return;
@@ -26,7 +27,7 @@ export class EchoSystem{
     this.world.eli.visible=false;this.world.headmaster.visible=false;
     this.world.headmaster.position.set(6.4,0,-18.5);
   }
-  snapshot(){return {seen:[...this.seen]};}
+  snapshot(){return {revision:34,seen:[...this.seen]};}
   eligible(){
     const g=this.game;
     return g.started!==false&&!g.paused&&!g.ended&&!g.recovering&&!g.interactions.reader&&
@@ -55,7 +56,7 @@ export class EchoSystem{
     if(!this.eligible()){
       for(const r of w.rooms)r.group.visible=false;
       w.headmaster.visible=false;w.eli.visible=false;
-      this.headmasterActive=false;return;
+      this.headmasterActive=false;this.eliActive=false;return;
     }
     let current=null;
     for(const r of w.rooms){
@@ -77,17 +78,8 @@ export class EchoSystem{
       }else if(r.entered){r.entered=false;r.elapsed=0;}
       for(const s of r.students){
         s.visible=true;
-        const d=s.position.distanceTo(p);
-        const moving=entered&&r.elapsed>1.1&&d>1.8&&!g.player.hidden;
-        if(moving){
-          const dx=p.x-s.position.x,dz=p.z-s.position.z,length=Math.hypot(dx,dz);
-          const step=Math.min(dt*.23,Math.max(0,length-1.8));
-          const old=s.position.clone();
-          slide(s.position,dx/Math.max(.01,length)*step,dz/Math.max(.01,length)*step,g.world.obstacles,.18);
-          if(!inside(s.position,r,.5))s.position.copy(old);
-          s.rotation.y=turn(s.rotation.y,Math.atan2(-dx,-dz),dt,.48);
-        }
-        animateEcho(s,dt,time,{moving,gaze:entered?p:null});
+        // Bodies stay fixed in the unfinished lesson; only their heads follow a visible visitor.
+        animateEcho(s,dt,time,{moving:false,gaze:entered&&!g.player.hidden?p:null});
       }
     }
     this.chalk-=dt;
@@ -132,23 +124,33 @@ export class EchoSystem{
   }
   updateEli(dt,time){
     const g=this.game,e=this.world.eli,spot=ELI_ROOMS[g.story.stage];
-    e.visible=false;if(!spot)return;
-    if(this.eliStage!==g.story.stage){this.eliStage=g.story.stage;this.eliShown=false;this.eliFade=0;e.scale.setScalar(1);e.position.set(spot.position[0],0,spot.position[1]);}
+    e.visible=false;
+    if(!spot){this.eliActive=false;return;}
+    if(this.eliStage!==g.story.stage){
+      this.eliStage=g.story.stage;this.eliElapsed=0;this.eliActive=false;e.scale.setScalar(1);
+      e.position.set(spot.position[0],0,spot.position[1]);this.eliOrigin=e.position.clone();
+    }
     if(this.seen.has(g.story.stage))return;
     const room=this.world.rooms.find(r=>r.id===spot.room),state=g.world.env.roomStates.get(room.id)||g.world.env.state;
     if(['normal','memory'].includes(state))return;
-    const p=g.player.position,d=Math.hypot(p.x-e.position.x,p.z-e.position.z);
-    const clear=lineClear(p,eye(e.position),this.sightObstacles);
-    e.visible=d<15&&clear;
-    if(!e.visible)return;
-    const facing=g.camera?g.camera.getWorldDirection(new T.Vector3()).dot(eye(e.position).sub(p).normalize())>.3:true;
-    if(!this.eliShown&&facing){this.eliShown=true;g.audio.cue('eliEcho',e.position);}
-    e.rotation.y=Math.atan2(-(p.x-e.position.x),-(p.z-e.position.z));
-    e.userData.body.rotation.z=-.07+Math.sin(time*2)*.015;
-    animateEcho(e,dt,time,{gaze:p});e.userData.head.rotation.z=-.33;
-    if(d<2.2&&this.eliShown){
-      this.eliFade+=dt;e.scale.y=1+this.eliFade*.35;e.scale.x=Math.max(.02,1-this.eliFade*1.5);
-      if(this.eliFade>.7){this.seen.add(g.story.stage);e.visible=false;e.scale.setScalar(1);g.story.save?.();}
+    const p=g.player.position,d=Math.hypot(p.x-this.eliOrigin.x,p.z-this.eliOrigin.z);
+    if(!this.eliActive){
+      if(g.hauntings?.active||!inside(p,room)||d<1.6||d>14||!lineClear(p,eye(this.eliOrigin),this.sightObstacles))return;
+      const facing=g.camera?g.camera.getWorldDirection(new T.Vector3()).dot(eye(this.eliOrigin).sub(g.camera.position).normalize())>.72:true;
+      if(!facing)return;
+      this.eliActive=true;this.eliElapsed=0;g.audio.cue('eliEcho',e.position);
     }
+    this.eliElapsed+=dt;
+    if(this.eliElapsed>=.58){
+      this.seen.add(g.story.stage);this.eliActive=false;e.visible=false;g.story.save?.();return;
+    }
+    e.visible=true;
+    const amount=Math.sin(Math.min(1,this.eliElapsed/.22)*Math.PI/2);
+    const toward=new T.Vector3(p.x-this.eliOrigin.x,0,p.z-this.eliOrigin.z).normalize();
+    const lunge=Math.min(.65,Math.max(0,d-1.5))*amount;
+    e.position.copy(this.eliOrigin).addScaledVector(toward,lunge);
+    e.rotation.set(-.1*amount,Math.atan2(-(p.x-e.position.x),-(p.z-e.position.z)),Math.sin(this.eliElapsed*37)*.09);
+    e.scale.set(1+amount*.17,1+amount*.08,1);
+    animateShadow(e,time,amount);
   }
 }

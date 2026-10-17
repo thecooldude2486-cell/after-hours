@@ -1,3 +1,7 @@
+# v34 — Shadows and the frozen lesson
+
+Reference-inspired jumpscares use featureless black 3D silhouettes with local blur and short motion trails. Peeking figures remain through waiting and looking away, retreating only within roughly three metres. Distorted Eli makes a single 0.58-second black rush inside each authored destination room, with positional sound and checkpoint persistence. Room grabs begin with a 0.28-second shadow impact before revealing the existing monster and escape prompt. Ash pupils have shaped uniforms, collars, ties, cuffs, sculpted faces and varied hair; their bodies and limbs remain frozen while their heads track the visitor. Their existing shared sanity limit and story exclusions remain. Models retain merged rigid details and instanced flames; silhouette blur remains enabled on Low graphics.
+
 # v33 — Automatic graphics and low-power mode
 
 Graphics now defaults to Auto. It starts at native CSS resolution instead of supersampling, then lowers only render resolution and optional lens effects when slow frames persist. It can recover quality after sustained fast play. Low power holds a 0.7 render scale and bypasses the full-screen effects pass; High quality preserves the configured upper scale and enables multisampling. Preferences save independently of difficulty. Hidden tabs skip game/render updates, and idle menus/readers draw at up to 24 fps. The apparition mask/blur path, lighting brightness, physics, AI and story rules remain available.

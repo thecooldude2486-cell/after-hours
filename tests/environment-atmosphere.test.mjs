@@ -191,7 +191,8 @@ test("all three distinct room models trigger across exploration steps in Story, 
     a.update(0.1, 1);
     assert.equal(a.active.room.id, room.id);
     assert.equal(a.monster.userData.variant, room.variant);
-    assert.equal(a.monster.visible, true);
+    assert.equal(a.shadow.visible, true);
+    assert.equal(a.monster.visible, false);
     for (let i = 0; i < 6; i++) {
       a.update(0.1, i + 2);
       a.tap({ code: "KeyE", repeat: false });

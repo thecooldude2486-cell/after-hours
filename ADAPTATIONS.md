@@ -1,3 +1,7 @@
+# v34 — User-requested shadow reference and motion
+
+The supplied reference guides the black, indistinct human silhouette and fast room appearance. Doorway apparitions no longer expire on a gaze timer, look-away timer or duration: approaching within the authored three-metre threshold starts their retreat. Eli appears briefly in the authored next-room route rather than waiting to be approached. Student pursuit has been replaced by stationary bodies with independent head tracking, and student geometry has more human facial and uniform detail. The initial grab impact shares the shadow style, then exposes the detailed monster for the existing E struggle. No story text, voice recordings, puzzle requirements or player position is changed.
+
 # v33 — Older-laptop graphics support
 
 In response to continued slow play on an older laptop, rendering receives saved Auto / Low power / High quality modes. Auto samples raw frame duration separately from the existing capped gameplay delta, ignores isolated long stalls and inactive windows, and uses sustained windows with hysteresis. Only visual workload adapts. Low power skips optional HDR lens processing except when the apparition blur needs its mask/resolve path. Background tabs and idle overlays no longer redraw continuously.

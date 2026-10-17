@@ -20,13 +20,15 @@ test('each apparition exposes only part of its head and its actual sight point s
     for (const plane of f.clipPlanes) assert.ok(plane.distanceToPoint(point) >= 0, e.id);
     const local = f.mesh.worldToLocal(point.clone());
     assert.ok(((local.x/.12)**2 + ((local.y-1.76)/.15)**2) < 1, e.id + ' sight point on visible head');
-    let visible = 0;
-    const p = f.head.geometry.attributes.position;
+    let visible = 0,total=0;
+    const body=f.mesh.userData.body,p=body.geometry.attributes.position;
     for (let i=0; i<p.count; i++) {
-      const v = f.head.localToWorld(new T.Vector3().fromBufferAttribute(p,i));
+      const localVertex=new T.Vector3().fromBufferAttribute(p,i);
+      if(localVertex.y<1.56)continue;total++;
+      const v = body.localToWorld(localVertex);
       if (f.clipPlanes.every(plane => plane.distanceToPoint(v)>=0)) visible++;
     }
-    assert.ok(visible/p.count > .15 && visible/p.count < .5, e.id + ' only a partial face is exposed');
+    assert.ok(visible/total > .15 && visible/total < .8, e.id + ' only a partial silhouette is exposed');
     assert.ok(f.clipPlanes.some(plane => plane.distanceToPoint(f.mesh.localToWorld(new T.Vector3(0, .8, 0))) < 0), 'Lower body remains hidden');
   }
 });
@@ -70,14 +72,14 @@ test('flashlight points along the view and hand remains rigidly attached to its 
   assert.ok(view.fill.intensity < lit / 20, "Hand fill does not act as a torch when switched off");
 });
 
-test('apparitions have a sculpted face, coat and hands, plus distinct arrival and retreat sound assets', async () => {
+test('apparitions are featureless black volumes with soft trails and distinct arrival and retreat sounds', async () => {
   const figure = new DistantFigure(new T.Scene());
   figure.setPeek({at:[0,-10]});
-  assert.equal(figure.mesh.getObjectsByProperty('name','Recessed eye socket').length,2);
-  assert.equal(figure.mesh.getObjectsByProperty('name','Hanging finger').length,8);
-  assert.ok(figure.mesh.getObjectByName('Hollow mouth'));
-  assert.notEqual(figure.head.material,figure.torso.material);
-  assert.ok(figure.torso.scale.x*figure.torso.geometry.parameters.points[3].x > .2);
+  assert.equal(figure.mesh.userData.shadow,true);
+  assert.equal(figure.mesh.userData.trails.length,2);
+  assert.ok(figure.mesh.userData.body.geometry.attributes.position.count>1000);
+  assert.ok(figure.material.color.getHex()<0x030303);
+  assert.ok(figure.blurRadius>=7);
   for (const material of figure.materials) assert.equal(material.clippingPlanes,figure.clipPlanes);
   const paths = ['apparitionArrival','apparitionVanish'].map(name=>SFX[name].files[0]);
   assert.notEqual(paths[0],paths[1]);

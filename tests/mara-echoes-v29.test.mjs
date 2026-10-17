@@ -47,23 +47,31 @@ test('all sixteen interiors have distinct writing teachers, repeated boards and 
   const h=g.world.echoes.headmaster,e=g.world.echoes.eli;
   assert.equal(h.userData.echoKind,'headmaster');assert.ok(h.userData.cane);
   assert.ok(h.userData.height>e.userData.height);
-  assert.equal(e.userData.echoKind,'eli');assert.ok(e.userData.arms[0].scale.y>1);
+  assert.equal(e.userData.echoKind,'eli');assert.equal(e.userData.shadowKind,'eli');assert.ok(e.userData.blurRadius>=10);
+  assert.ok(rooms.every(r=>r.students.every(s=>s.userData.head.userData.sculpted)));
   const a=createEchoModel('teacher',2),b=createEchoModel('teacher',3);
   a.visible=true;animateEcho(a,.1,1,{writing:true});
   assert.notEqual(a.userData.arms[1].rotation.x,b.userData.arms[1].rotation.x,'Independent writing poses');
 });
 
-test('pupils turn together, follow within their classroom, and apply one capped drain; memories and reading suppress them',()=>{
+test('pupils remain frozen while their heads track a walking visitor; drain, reading and memories remain safe',()=>{
   const g=game(),r=g.world.echoes.rooms.find(r=>r.id==='classroom'),s=r.students[0];
   s.position.set(-14.1,0,-17);g.player.position.set(-14.1,1.65,-13.5);
-  const initial=s.position.distanceTo(g.player.position);
+  const initial=s.position.clone(),bodyRotation=s.rotation.clone();
+  const limbs=[...s.userData.arms,...s.userData.legs].map(j=>j.rotation.clone());
   for(let i=0;i<180;i++)g.echoes.update(1/60,i/60);
   assert.ok(r.group.visible&&r.entered);
   assert.ok(Math.abs(s.userData.head.rotation.y)>1);
-  assert.ok(s.position.distanceTo(g.player.position)<initial);
+  assert.ok(s.position.equals(initial));
+  const headAngle=s.userData.head.rotation.y;
+  g.player.position.x=-10;
+  for(let i=0;i<120;i++)g.echoes.update(1/60,3+i/60);
+  assert.notEqual(s.userData.head.rotation.y,headAngle);
+  assert.ok(s.position.equals(initial));assert.ok(s.rotation.equals(bodyRotation));
+  [...s.userData.arms,...s.userData.legs].forEach((j,i)=>assert.ok(j.rotation.equals(limbs[i])));
   assert.ok(Math.abs(s.position.x-r.x)<r.w/2&&Math.abs(s.position.z-r.z)<r.d/2);
   assert.equal(g.cues.filter(c=>c==='ashTurn').length,1,'One collective head turn per entry');
-  assert.ok(Math.abs(g.player.sanity-(100-.16*3))<1e-6,'Drain does not multiply by six pupils');
+  assert.ok(Math.abs(g.player.sanity-(100-.16*5))<1e-6,'Drain does not multiply by six pupils');
   const sanity=g.player.sanity;
   const frozen=s.position.clone();g.interactions.reader=true;g.echoes.update(10,10);
   assert.ok(s.position.equals(frozen));assert.equal(g.player.sanity,sanity);
@@ -98,12 +106,15 @@ test('headmaster watching blocks the file; a fitted bell creates an opening and 
   assert.match(document.querySelector('#journalClues').innerHTML,/For Eli, when he comes back/);
 });
 
-test('distorted Eli appears on the required reality route, vanishes on approach, and never enters emotional scenes',()=>{
+test('distorted Eli flashes as a black rushing silhouette on the required route, once per save, outside emotional scenes',()=>{
   const g=game(),e=g.world.echoes.eli;g.story.stage='fault';g.world.env.set('burned','school',true);
   g.player.position.set(17.5,1.65,-45);g.echoes.update(.1,1);
-  assert.ok(e.visible);assert.equal(e.position.x,18);assert.equal(e.position.z,-49);
-  g.player.position.set(18,1.65,-47.4);
+  assert.ok(e.visible);assert.equal(g.echoes.eliOrigin.x,18);assert.equal(g.echoes.eliOrigin.z,-49);
+  assert.equal(e.userData.shadow,true);assert.equal(g.cues.filter(c=>c==='eliEcho').length,1);
+  const player=g.player.position.clone(),sanity=g.player.sanity;
   for(let i=0;i<60;i++)g.echoes.update(1/60,2+i/60);
+  assert.ok(g.player.position.equals(player),'The flash does not move the player');
+  assert.ok(g.player.sanity>=sanity-.2,'Only the existing classroom exposure applies');
   assert.ok(g.echoes.seen.has('fault'));assert.equal(e.visible,false);
   const save=g.echoes.snapshot();g.echoes.reset(save);g.echoes.update(.1,4);assert.equal(e.visible,false);
   g.story.stage='reunion';g.echoes.update(1,5);assert.equal(e.visible,false);

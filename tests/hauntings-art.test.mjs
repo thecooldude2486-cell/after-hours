@@ -80,7 +80,7 @@ test("apparitions are visible at range, disappear on approach, preserve control 
   assert.equal(h.active.elapsed, elapsed);
   g.paused = false;
   h.update(1.15, 2.5);
-  g.player.position.z = -31.5;
+  g.player.position.z = -33.3;
   h.update(0.2, 3);
   assert.equal(h.actor.visible, false);
   assert.equal(h.active, null);
@@ -139,7 +139,7 @@ test("the early figure is visible in every preset and retreats at full scale onl
     assert.deepEqual(g.audio.calls.map(c => c[0]), ["apparitionArrival"]);
     const scale = h.actor.scale.x;
     h.update(1.2, 2);
-    g.player.position.set(0, 1.65, -14.4);
+    g.player.position.set(0, 1.65, -16.2);
     g.camera.position.copy(g.player.position);
     g.camera.lookAt(-2.79, 1.8, -18.06);
     h.update(0.1, 3);

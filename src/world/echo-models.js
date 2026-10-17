@@ -28,33 +28,35 @@ function limb(root,x,y,length,radius,material){
 export function createEchoModel(kind='student',variant=0){
   const root=new T.Group();root.name=kind==='headmaster'?'The Headmaster':kind==='eli'?'Eli / reality fracture':kind==='teacher'?'Writing teacher '+(variant+1):'Ash pupil '+variant;
   const student=kind==='student',master=kind==='headmaster',eli=kind==='eli';
-  const height=master?2.12:eli?1.76:student?1.3+(variant%3)*.065:1.65+(variant%4)*.055;
+  const height=master?2.12:eli?1.76:student?1.48+(variant%5)*.045:1.65+(variant%4)*.055;
   const scale=height/1.8;
   const body=new T.Group();body.scale.set(scale,scale,scale);root.add(body);
-  const cloth=mat(master?0x30353a:eli?0x59696b:student?0x96988e:[0x6b7166,0x65686f,0x7b6d62,0x647672][variant%4],{map:ashSurface(),bumpMap:ashSurface(),bumpScale:.002});
+  const cloth=mat(master?0x30353a:eli?0x59696b:student?[0x363f48,0x424639,0x4b403b][variant%3]:[0x6b7166,0x65686f,0x7b6d62,0x647672][variant%4],{map:ashSurface(),bumpMap:ashSurface(),bumpScale:.002});
   const ash=mat(student?0xa7b0ad:[0xb2aba0,0x9c9990,0xc0b9a7][variant%3],{map:ashSurface(),bumpMap:ashSurface(),bumpScale:.001});
   const dark=mat(0x20201f),shirt=mat(0x928c7c),ember=mat(0x65231a,{emissive:0xe05217,emissiveIntensity:.65});
   // A shaped coat with shoulders, lapels and separate articulated limbs.
-  part(body,new T.CylinderGeometry(master?.24:.19,master?.3:.22,.62,12),cloth,[0,1.03,0],[1,1,.64]);
+  const torso=student?new T.LatheGeometry([new T.Vector2(.18,.70),new T.Vector2(.175,.86),new T.Vector2(.19,1.1),new T.Vector2(.235,1.27),new T.Vector2(.20,1.34),new T.Vector2(.07,1.39)],20):new T.CylinderGeometry(master?.24:.19,master?.3:.22,.62,12);
+  part(body,torso,cloth,student?[0,0,0]:[0,1.03,0],[1,1,.64]);
   for(const side of [-1,1]){
-    const lapel=part(body,box,shirt,[side*.07,1.24,-.125],[.09,.23,.022]);lapel.rotation.z=side*.26;
+    if(!student){const lapel=part(body,box,shirt,[side*.07,1.24,-.125],[.09,.23,.022]);lapel.rotation.z=side*.26;}
     part(body,sphere,cloth,[side*(master?.255:.2),1.27,0],[.065,.085,.065]);
   }
   const legs=[-1,1].map(side=>limb(body,side*.105,.77,.68,.065,dark));
-  legs.forEach(leg=>part(leg,box,dark,[0,-.665,-.045],[.13,.085,.24]));
+  legs.forEach(leg=>part(leg,student?sphere:box,dark,[0,-.665,-.045],student?[.071,.046,.13]:[.13,.085,.24]));
   const arms=[-1,1].map(side=>limb(body,side*(master?.29:.24),1.27,eli?.83:.59,.053,cloth));
   arms.forEach(arm=>{
     part(arm,sphere,ash,[0,eli?-.85:-.61,-.015],[.047,.07,.032]);
-    for(let f=0;f<4;f++)part(arm,box,ash,[(f-1.5)*.017,eli?-.91:-.67,-.02],[.012,.072,.017]);
+    for(let f=0;f<4;f++)part(arm,student?sphere:box,ash,[(f-1.5)*.017,eli?-.91:-.67,-.02],student?[.007,.036+(f%2)*.004,.009]:[.012,.072,.017]);
   });
   const head=new T.Group();head.position.set(0,1.48,0);body.add(head);
   part(body,new T.CylinderGeometry(.047,.06,.16,8),ash,[0,1.39,0]);
   part(head,sphere,ash,[0,.085,0],[master?.13:.108,.155,eli?.09:.108]);
   part(head,sphere,ash,[0,-.007,-.012],[.086,.085,.086]);
-  part(head,new T.ConeGeometry(.027,.075,5),ash,[0,.072,-.11]).rotation.x=-Math.PI/2;
+  if(student)part(head,sphere,ash,[0,.063,-.106],[.017,.032,.026]);
+  else part(head,new T.ConeGeometry(.027,.075,5),ash,[0,.072,-.11]).rotation.x=-Math.PI/2;
   for(const side of [-1,1]){
     part(head,sphere,dark,[side*.046,.1,-.094],[.026,.016,.016]);
-    part(head,sphere,mat(0x737c75,{emissive:master?0xa16a35:0x7a6d51,emissiveIntensity:.15}),[side*.045,.1,-.109],[.004,.005,.003]);
+    part(head,sphere,student?dark:mat(0x737c75,{emissive:master?0xa16a35:0x7a6d51,emissiveIntensity:.15}),[side*.045,.1,-.109],[.004,.005,.003]);
     part(head,sphere,ash,[side*.105,.08,0],[.025,.043,.025]);
     const brow=part(head,sphere,ash,[side*.047,.124,-.095],[.039,.009,.017]);brow.rotation.z=side*.025;
     part(head,sphere,ash,[side*.061,.04,-.078],[.04,.029,.025]);
@@ -87,6 +89,26 @@ export function createEchoModel(kind='student',variant=0){
     part(body,box,mat(0x283132),[0,1.03,.15],[.32,.43,.16]);
     head.rotation.z=-.28;arms[0].scale.y=1.3;arms[1].rotation.z=-.24;
     part(head,box,dark,[.01,.08,-.113],[.012,.22,.015]).rotation.z=.23;
+  }
+  if(student){
+    // Worn school uniforms and ash-stained faces retain a recognisable, human silhouette.
+    head.name='Ash-stained student head';body.name='Frozen school uniform';
+    for(const side of [-1,1]){
+      const collar=part(body,box,shirt,[side*.045,1.34,-.15],[.06,.075,.018]);collar.rotation.z=side*.47;
+      part(arms[side<0?0:1],new T.CylinderGeometry(.055,.057,.065,12),shirt,[0,-.52,0]);
+      part(legs[side<0?0:1],sphere,cloth,[0,-.32,-.02],[.067,.10,.072]);
+      part(head,sphere,hair,[side*.096,.145,.014],[.023,.085,.085]);
+      const lid=part(head,sphere,ash,[side*.046,.119,-.098],[.031,.008,.013]);lid.rotation.z=side*.12;
+    }
+    part(body,box,shirt,[0,1.27,-.15],[.10,.19,.014]);
+    const tie=part(body,box,dark,[.004,1.245,-.166],[.029,.17,.016]);tie.rotation.z=.11;
+    for(let i=0;i<3;i++)part(body,sphere,shirt,[-.025,.95+i*.09,-.13],[.008,.008,.006]);
+    part(body,box,shirt,[-.12,1.16,-.128],[.065,.055,.01]);
+    for(let i=0;i<9;i++){
+      const mark=part(head,sphere,i%3?dark:ash,[-.08+(i%4)*.05,.018+(i%3)*.053,-.088],[.009,.023+(i%2)*.009,.004]);mark.rotation.z=i*.4;
+    }
+    arms[0].rotation.z=.045;arms[1].rotation.z=-.065;
+    head.userData.sculpted=true;
   }
   // Surface ash and ember seams suggest the fire without wounds or graphic injury.
   for(let i=0;i<(student?12:6);i++){
@@ -138,14 +160,17 @@ export function createEchoModel(kind='student',variant=0){
 export function animateEcho(root,dt,time,{writing=false,moving=false,gaze=null}={}){
   const r=root.userData;if(!root.visible)return;
   const phase=time*(moving?4.2:1.1)+r.variant;
-  r.body.position.y=Math.sin(phase)*.005;
-  r.legs.forEach((leg,i)=>leg.rotation.x=moving?Math.sin(phase+i*Math.PI)*.23:0);
-  r.arms[0].rotation.x=moving?Math.sin(phase)*.16:0;
+  const frozen=r.echoKind==='student';
+  r.body.position.y=frozen?0:Math.sin(phase)*.005;
+  if(!frozen){
+    r.legs.forEach((leg,i)=>leg.rotation.x=moving?Math.sin(phase+i*Math.PI)*.23:0);
+    r.arms[0].rotation.x=moving?Math.sin(phase)*.16:0;
+  }
   if(writing){
     r.arms[1].rotation.set(2.25+Math.sin(time*3.1)*.11,0,.25+Math.sin(time*7)*.09);
     r.head.rotation.x=.13;
   }else{
-    r.arms[1].rotation.x=moving?-Math.sin(phase)*.14:0;
+    if(!frozen)r.arms[1].rotation.x=moving?-Math.sin(phase)*.14:0;
     if(gaze){
       const desired=Math.atan2(-(gaze.x-root.position.x),-(gaze.z-root.position.z))-root.rotation.y;
       const delta=Math.atan2(Math.sin(desired-r.head.rotation.y),Math.cos(desired-r.head.rotation.y));

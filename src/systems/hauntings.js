@@ -6,13 +6,9 @@ import {
   EXPLORATION_STAGES,
   APPARITION_TUNING,
 } from "../data/hauntings.js";
-import {
-  createRoomMonster,
-  animateRoomMonster,
-} from "../world/room-monster.js";
+import {createShadowFigure,animateShadow} from "../world/shadow-figure.js";
 import { scareFeedback, clearScareFeedback } from "./scare-effects.js";
 import { scareDirection } from "./ambushes.js";
-import { faceTarget } from "../world/scare-motion.js";
 import { lineClear } from "./navigation.js";
 import { schoolArtTexture } from "../world/school-art.js";
 /** One pooled actor and a screen overlay. Exploration continues during these nonlethal scares. */
@@ -23,7 +19,8 @@ export class HauntingSystem {
     this.announced = new Set();
     this.active = null;
     this.cooldown = 0;
-    this.actor = createRoomMonster("phone");
+    this.actor = createShadowFigure("rush");
+    game.world.shadowRush=this.actor;
     this.actor.name = "Pooled room rush actor";
     game.world.scene.add(this.actor);
     this.distant = new DistantFigure(game.world.scene);
@@ -49,7 +46,7 @@ export class HauntingSystem {
     const a = this.active;
     if (
       a?.event.type === "apparition" &&
-      a.observed >= (a.event.minVisible ?? 1.1) &&
+      a.fading > 0 &&
       !this.fired.has(a.event.id)
     ) {
       this.fired.add(a.event.id);
@@ -92,6 +89,7 @@ export class HauntingSystem {
       !g.story.triggers.busy &&
       !g.cinematics.active &&
       !g.ambushes?.active &&
+      !g.echoes?.eliActive &&
       !g.player.hidden &&
       !g.story.companion &&
       !(g.teacher.active && g.config.enemy && !g.cheats?.freezeTeacher) &&
@@ -236,19 +234,9 @@ export class HauntingSystem {
       );
       const visible = this.visibleAt(e);
       if (visible && !a.fading) a.observed += dt;
-      a.unseen = visible ? 0 : (a.unseen || 0) + dt;
-      const witnessed = a.observed >= (e.minVisible ?? 1.1);
-      if (!witnessed && a.unseen > 1.25) {
-        this.cancel();
-        this.cooldown = 0.5;
-        return;
-      }
-      if (
-        d <= e.vanishRange ||
-        a.elapsed >= e.duration ||
-        a.observed >= (e.maxGaze ?? APPARITION_TUNING.maxGaze) ||
-        (witnessed && !visible && a.observed >= 1.5)
-      ) {
+      const witnessed=a.observed>0;
+      // Looking away and waiting never consume a peek. Only physical approach makes it retreat.
+      if (d <= e.vanishRange || a.fading) {
         if (!a.fading) {
           a.fading = 0.001;
           g.audio.cue(e.cue, this.distant.mesh.position);
@@ -258,7 +246,6 @@ export class HauntingSystem {
           Math.min(1, a.fading / APPARITION_TUNING.retreatSeconds),
         );
       }
-      // Do not let an unseen figure obstruct another apparition indefinitely.
       this.distant.update(
         g.camera,
         0.95 * (1 - Math.min(1, a.fading / APPARITION_TUNING.retreatSeconds)),
@@ -282,9 +269,10 @@ export class HauntingSystem {
       this.actor.userData.scareAmount = Math.sin(
         Math.min(1, a.elapsed / e.duration) * Math.PI,
       );
-      animateRoomMonster(this.actor, dt, time);
-      const head = faceTarget(this.actor, 1.65);
-      this.actor.position.y += g.camera.position.y - head.y;
+      this.actor.scale.set(1.3+this.actor.userData.scareAmount*.2,1,.85);
+      this.actor.rotation.z=Math.sin(a.elapsed*39)*.1;
+      this.actor.position.y=g.camera.position.y-1.72;
+      animateShadow(this.actor,time,this.actor.userData.scareAmount);
     }
     if (e.type === "screen")
       this.screen.material.opacity =

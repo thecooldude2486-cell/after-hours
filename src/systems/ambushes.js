@@ -1,3 +1,4 @@
+import {createShadowFigure,animateShadow} from "../world/shadow-figure.js";
 import { lineClear } from "./navigation.js";
 import { faceTarget } from "../world/scare-motion.js";
 import { scareFeedback, clearScareFeedback } from "./scare-effects.js";
@@ -54,6 +55,9 @@ export class AmbushSystem {
         return [room.id, model];
       }),
     );
+    this.shadow=createShadowFigure("grab");
+    game.world.grabShadow=this.shadow;
+    game.world.scene.add(this.shadow);
     this.monster = this.monsters.values().next().value;
     game.world.monster = this.monster;
     this.light = new THREE.PointLight(0xccb398, 0, 4, 2);
@@ -67,6 +71,7 @@ export class AmbushSystem {
     return { revision: AMBUSH_REVISION, cleared: [...this.cleared] };
   }
   reset(save = {}) {
+    this.shadow.visible=false;
     this.stopVoice();
     this.active = null;
     this.cleared = new Set(
@@ -198,6 +203,14 @@ export class AmbushSystem {
       sustained: true,
       fovBase: g.config.cameraFov ?? 68,
     });
+    // A brief faceless impact gives way to the readable struggle and its escape prompt.
+    this.shadow.visible=a.elapsed<.28;
+    this.monster.visible=!this.shadow.visible;
+    if(this.shadow.visible){
+      this.shadow.position.copy(this.monster.position);this.shadow.position.y=g.camera.position.y-1.72;
+      this.shadow.rotation.set(-.12,this.monster.rotation.y,Math.sin(a.elapsed*43)*.09);
+      this.shadow.scale.set(1.4,1.1,1);animateShadow(this.shadow,time,1);
+    }
     this.draw();
     if (a.elapsed >= a.rules.seconds * g.config.struggleWindow) {
       if (!a.rules.lethal || g.cheats?.invincible) this.escape();
@@ -213,6 +226,7 @@ export class AmbushSystem {
   }
   escape() {
     if (!this.active) return;
+    this.shadow.visible=false;
     this.cleared.add(this.active.room.id);
     this.stopVoice();
     this.active = null;

@@ -91,7 +91,7 @@ test("the first partial apparition is actually seen on the ordinary central scho
   g.world = createSchool({}, DEFAULTS);
   const h = new HauntingSystem(g);
   let seen = 0;
-  for (let z = 5; z > -14.5; z -= 0.12) {
+  for (let z = 5; z > -17.5; z -= 0.12) {
     g.player.position.set(0, 1.65, z);
     g.camera.position.copy(g.player.position);
     g.camera.lookAt(0, 1.65, z - 10);

@@ -102,7 +102,7 @@ export class SchoolRenderer {
     this.camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
   }
   // Render an object-ID/depth mask of the 3D figure, preserving the gameplay camera and scene.
-  renderFigureMask(world, camera) {
+  renderFigureMask(world, camera, figure=world.apparition) {
     const r = this.renderer,
       scene = world.scene;
     const state = {
@@ -118,7 +118,7 @@ export class SchoolRenderer {
       scene.background = null;
       scene.fog = null;
       scene.overrideMaterial = this.maskMaterial;
-      this.maskMaterial.clippingPlanes = world.apparition.clipPlanes;
+      this.maskMaterial.clippingPlanes = figure.clipPlanes||[];
       r.setClearColor(0x000000, 0);
       r.setRenderTarget(this.figureTarget);
       r.clear();
@@ -139,7 +139,9 @@ export class SchoolRenderer {
   }
   renderFrame(world,camera,time){
     const r = this.renderer;
-    const figure = Boolean(world.apparition?.mesh.visible);
+    const shadow=world.grabShadow?.visible?world.grabShadow:world.echoes?.eli.visible?world.echoes.eli:world.shadowRush?.visible?world.shadowRush:null;
+    const active=shadow?{mesh:shadow,clipPlanes:[],blurRadius:shadow.userData.blurRadius}:world.apparition?.mesh.visible?world.apparition:null;
+    const figure=Boolean(active);
     this.uniforms.figureActive.value = figure ? 1 : 0;
     const effects=this.config.screenEffects!==false&&!this.lowPower;
     this.uniforms.lensOnly.value = effects ? 0 : 1;
@@ -167,8 +169,8 @@ export class SchoolRenderer {
     r.setRenderTarget(this.target);
     r.render(world.scene, camera);
     if (figure) {
-      this.uniforms.figureBlur.value = world.apparition.blurRadius;
-      this.renderFigureMask(world, camera);
+      this.uniforms.figureBlur.value = active.blurRadius;
+      this.renderFigureMask(world, camera,active);
     }
     r.setRenderTarget(null);
     r.render(this.scene, this.camera);

@@ -8,6 +8,7 @@ import {
   DistantFigure,
   APPARITION_LAYER,
 } from "../src/world/distant-figure.js";
+import {createShadowFigure} from "../src/world/shadow-figure.js";
 import { SchoolRenderer } from "../src/systems/rendering.js";
 import { HauntingSystem } from "../src/systems/hauntings.js";
 
@@ -239,7 +240,7 @@ test("a failed silhouette mask restores scene, camera layers and renderer state"
   assert.equal(r.color.getHex(), 0x263746);
   assert.equal(r.alpha, 0.7);
 });
-test("a motionless observer cannot study a distant figure indefinitely", () => {
+test("a black doorway figure waits through long observation and looking away until approached", () => {
   globalThis.document = {
     createElement: () => ({
       getContext: () => new Proxy({}, { get: () => () => {} }),
@@ -274,9 +275,37 @@ test("a motionless observer cannot study a distant figure indefinitely", () => {
     cheats: {},
   };
   const h = new HauntingSystem(g);
-  for (let i = 0; i < 280; i++) h.update(1 / 60, i / 60);
+  for (let i = 0; i < 120; i++) h.update(1, i);
+  assert.ok(h.active);
+  assert.ok(h.distant.mesh.visible);
+  camera.lookAt(0,1.65,10);
+  h.update(60,180);
+  assert.ok(h.distant.mesh.visible,"Looking away never consumes the figure");
+  assert.equal(h.fired.size,0);
+  g.player.position.set(0,1.65,-16.2);
+  h.update(.08,181);
+  assert.ok(h.active.fading>0);
+  g.player.position.z=-6;
+  h.update(.1,181.1);
   assert.equal(h.active, null);
   assert.equal(h.distant.mesh.visible, false);
   assert.ok(h.fired.has("entrance-vanishing-figure"));
   assert.equal(g.audio.calls.filter((c) => c === "apparitionVanish").length, 1);
+});
+
+
+test("Eli, rushes and grab impacts retain local blur on low-power graphics and release it afterwards",()=>{
+  for(const kind of ['eli','rush','grab']){
+    const renderer=rendererStub(),pipeline=new SchoolRenderer(renderer,{screenEffects:false}),world=worldWithPeek();
+    world.apparition.hide();pipeline.lowPower=true;
+    const actor=createShadowFigure(kind);actor.visible=true;world.scene.add(actor);
+    if(kind==='eli')world.echoes={eli:actor};
+    else world[kind==='rush'?'shadowRush':'grabShadow']=actor;
+    const camera=new T.PerspectiveCamera();pipeline.render(world,camera,.12);
+    assert.equal(renderer.calls.length,3,kind);
+    assert.equal(pipeline.uniforms.figureBlur.value,actor.userData.blurRadius);
+    assert.deepEqual(pipeline.maskMaterial.clippingPlanes,[],'Room silhouettes are not cut by old doorway planes');
+    actor.visible=false;renderer.calls=[];pipeline.render(world,camera,1);
+    assert.equal(renderer.calls.length,1,'Normal low-power rendering resumes after the flash');
+  }
 });

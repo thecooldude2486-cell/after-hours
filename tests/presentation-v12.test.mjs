@@ -49,8 +49,9 @@ test("a doorway peek is volumetric, clipped and untextured; it never faces the c
       assert.equal(o.material.clippingPlanes.length, 3);
     }
   });
-  assert.ok(count > 8);
-  assert.ok(peek.blurRadius > 0 && peek.blurRadius <= 4);
+  assert.equal(count, 3, "Merged silhouette plus two inexpensive motion trails");
+  assert.ok(peek.material.color.getHex() < 0x030303);
+  assert.ok(peek.blurRadius >= 7);
   const q = peek.mesh.quaternion.clone(),
     camera = new THREE.PerspectiveCamera();
   camera.rotation.y = 1.2;

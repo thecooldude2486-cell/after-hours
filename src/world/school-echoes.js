@@ -1,6 +1,7 @@
 import * as T from '../../vendor/three.module.js';
 import {ECHO_ROOMS,MARA_PAGES,REPEATED_SENTENCE} from '../data/echoes.js';
 import {createEchoModel} from './echo-models.js';
+import {createShadowFigure} from './shadow-figure.js';
 import {ageNote} from './aged-paper.js';
 import {blocked} from '../systems/navigation.js';
 
@@ -48,7 +49,7 @@ export function addSchoolEchoes({scene,box,textPlane,interactables,builders,obst
     drawEchoBoard(entry);return entry;
   });
   const headmaster=createEchoModel('headmaster');headmaster.position.set(6.4,0,-18.5);scene.add(headmaster);
-  const eli=createEchoModel('eli');scene.add(eli);
+  const eli=createShadowFigure('eli');scene.add(eli);
   const {container,pickup}=builders;
   const tin=container('mara_pencilTin','Mara’s pencil tin',-12.5,.84,-15.5,.42,.16,.28,null,'lockerKey');
   box(-12.5,.4,-15.5,.75,.8,.6,0x494c3e,'desk','classroom',true);

@@ -190,6 +190,10 @@ test("room monsters grab immediately without warning, suppress during dialogue a
       document.querySelector("#ambushTitle").textContent,
       "IT'S GOT YOU",
     );
+    assert.ok(g.world.grabShadow.visible);
+    assert.equal(g.ambushes.monster.visible,false);
+    g.ambushes.update(.3,.3);
+    assert.equal(g.world.grabShadow.visible,false);
     assert.ok(g.ambushes.monster.visible);
     assert.ok(g.player.sanity < 86);
     const elapsed = g.ambushes.active.elapsed,

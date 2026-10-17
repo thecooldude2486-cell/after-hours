@@ -122,6 +122,7 @@ export function createRiggedHand(side, material) {
       bone("thumb-" + p),
     ),
   ];
+  const neutralPose=joints.map(j=>[j,j.quaternion.clone()]);
   const turn = (joint, axis, angle) => {
     root.updateMatrixWorld(true);
     const worldQ = joint.getWorldQuaternion(new THREE.Quaternion());
@@ -239,6 +240,7 @@ export function createRiggedHand(side, material) {
     joints,
     pose,
     nails,
+    neutralPose,
     thumb: bone("thumb-phalanx-proximal"),
     fingers: digitNames.map((n) => bone(n + "-phalanx-proximal")),
     resetPose() {

@@ -1173,11 +1173,12 @@ export function createSchool(renderer, config) {
       }
     },
     releaseDoor(d, position) {
+      this.onDoorHand?.(d,"release");
       releaseDoor(d, position);
     },
     pushDoors(position, dx, dz, radius, dt, player) {
       const moved=pushDoors([...doors,...secrets,secrets.fireExit],position,dx,dz,radius,dt,player);
-      for(const d of moved) if(d.open) this.onDoorPushed?.(d);
+      for(const d of moved){this.onDoorHand?.(d,"push");if(d.open)this.onDoorPushed?.(d);}
       return moved;
     },
     closeDoor(d, position, radius=.23) {
@@ -1185,6 +1186,7 @@ export function createSchool(renderer, config) {
       this.animateDoor(d,position,false);return true;
     },
     animateDoor(d, position, open=true) {
+      this.onDoorHand?.(d,open?"open":"close");
       d.showKey=!!open && !d.unlatched && !!d.requires && d.requires!=='cutters';
       if (open) releaseDoor(d,position);
       d.motorTarget=open?1:0;d.motionTime=0;d.motionSound=false;
@@ -1215,8 +1217,10 @@ export function createSchool(renderer, config) {
       if(!this.exitTriggered && secrets.fireExit.unlatched && player?.position.x>30.45 && Math.abs(player.position.z+52.35)<1.1){
         this.exitTriggered=true;this.onSecretExit?.();
       }
-      for (const actor of [mara, teacher, ...memoryFigures])
+      for (const actor of [mara, teacher, ...memoryFigures]){
+        if(actor.userData.conversationHidden){actor.visible=false;continue;}
         animateCharacter(actor, dt, time);
+      }
       for (const d of doors) {
         if (d.motorTarget != null) {
           d.motionTime += dt;

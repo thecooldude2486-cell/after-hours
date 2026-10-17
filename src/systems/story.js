@@ -331,6 +331,7 @@ export class StorySystem {
   async start(stage = "arrival", options = {}) {
     this.epoch++;
     this.game.cinematics.cancel();
+    this.game.flashlight?.reset();
     this.game.hauntings?.cancel();
     this.game.environmentSounds?.reset();
     this.triggers.reset();

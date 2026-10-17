@@ -163,7 +163,14 @@ export function createFlashlightViewModel(camera, scene) {
     palm: right.palm,
     wrist: right.wrist,
     forearm: right.forearm,
-    update(player, time) {
+    update(player, time, {owned=true,door=null,amount=0,push=false}={}) {
+      torch.visible=owned;
+      for(const h of [right,left]){
+        h.resetPose();
+        if(h===right&&owned)continue;
+        const curl=push?0:(h===right?.23:1);
+        h.neutralPose.forEach(([joint,neutral],i)=>joint.quaternion.copy(neutral).slerp(h.pose[i][2],curl));
+      }
       const bob = player.moving
         ? Math.sin(player.bob)
         : Math.sin(time * 1.6) * 0.15;
@@ -177,7 +184,26 @@ export function createFlashlightViewModel(camera, scene) {
       }
       left.root.rotateX(player.sprinting ? 0.08 : 0);
       right.root.rotateX(player.sprinting ? 0.05 : 0);
-      root.visible = !player.hidden;
+      if(door&&amount>0){
+        camera.updateWorldMatrix(true,false);
+        const target=camera.worldToLocal(door.clone());
+        // Reach along the sight line without throwing a hand out of view on a distant interaction.
+        const distance=target.length();if(distance>1.15)target.multiplyScalar(1.15/distance);
+        target.z=Math.min(-.28,target.z);
+        const half=Math.tan(THREE.MathUtils.degToRad(camera.fov/2))*(-target.z);
+        target.x=THREE.MathUtils.clamp(target.x,-half*camera.aspect*.85,half*camera.aspect*.85);
+        target.y=THREE.MathUtils.clamp(target.y,-half*.9,half*.6);
+        const contacts=push&&!owned?[left,right]:[left];
+        for(const [i,h] of contacts.entries()){
+          const contact=target.clone();if(contacts.length===2)contact.x+=(i===0?-.1:.1);
+          const up=new THREE.Vector3(push?-.08:.2,1,.05).normalize();
+          const rotation=frame(new THREE.Vector3(1,0,0),up);
+          h.root.quaternion.slerp(rotation,amount);
+          const palmOffset=new THREE.Vector3(0,.055,0).applyQuaternion(h.root.quaternion);
+          h.root.position.lerp(contact.sub(palmOffset),amount);
+        }
+      }
+      root.visible = true;
       fill.intensity = player.flashlight && player.battery > 0 && !player.hidden
         ? 0.1 * player.lightFactor : 0.004;
       lens.material.emissiveIntensity =

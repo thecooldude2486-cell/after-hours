@@ -41,6 +41,10 @@ export function createMara() {
     actions[clip.name] = mixer.clipAction(clip);
   const idle = actions.Idle_Neutral || actions.Idle;
   idle?.play();
+  const head=model.getObjectByName("Head");
+  const speechMouth=new THREE.Mesh(new THREE.SphereGeometry(1,16,10),new THREE.MeshBasicMaterial({color:0x39201f}));
+  speechMouth.name="Mara speaking mouth";speechMouth.position.set(.012,1.438,-.187);speechMouth.scale.set(.022,.006,.004);speechMouth.visible=false;
+  root.add(speechMouth);root.updateMatrixWorld(true);head?.attach(speechMouth);
   root.userData = {
     authored: true,
     model,
@@ -48,7 +52,7 @@ export function createMara() {
     mixer,
     actions,
     current: idle,
-    head: model.getObjectByName("Head"),
+    head, speechMouth,
     lastPosition: new THREE.Vector3(),
     speaking: false,
   };
@@ -56,8 +60,10 @@ export function createMara() {
 }
 export function animateMara(root, dt, time) {
   if (!root.visible) return;
-  const r = root.userData,
-    dist = root.position.distanceTo(r.lastPosition);
+  const r = root.userData;
+  for(const [bone,q] of r.conversationPose||[])bone.quaternion.copy(q);
+  r.conversationPose=[];
+  const dist = root.position.distanceTo(r.lastPosition);
   r.lastPosition.copy(root.position);
   r.motionSpeed = dt > 0 && dist < 0.6 ? dist / dt : 0;
   const walking = dt > 0 && dist / dt > 0.18 && dist < 0.6,
@@ -70,4 +76,12 @@ export function animateMara(root, dt, time) {
   r.mixer.update(dt);
   // Quiet conversation gesture; child dialogue uses the same coherent rig with age-specific proportions.
   if (r.speaking && r.head) r.head.rotateZ(Math.sin(time * 3.4) * 0.013);
+  r.speechMouth.visible=Boolean(r.conversation&&r.speaking);
+  r.speechMouth.scale.y=.005+Math.abs(Math.sin(time*13))*.007;
+  if(r.conversation){
+    const arm=r.model.getObjectByName('UpperArmL'),forearm=r.model.getObjectByName('LowerArmL');
+    r.conversationPose=[r.head,arm,forearm].filter(Boolean).map(b=>[b,b.quaternion.clone()]);
+    r.head?.rotateX(.08);
+    if(r.speaking){arm?.rotateX(-.2-Math.sin(time*3.3)*.05);forearm?.rotateX(-.3);}
+  }
 }

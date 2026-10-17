@@ -1,3 +1,7 @@
+# Dialogue audio v35
+
+All twenty Eli dialogue assignments now use Microsoft `en-US-GuyNeural`, a native American English male synthetic voice, including his memory and voicemail lines. Mara’s newly worded opening question uses her existing `en-US-AnaNeural` voice. Files are local mono 48 kHz 16-bit PCM WAV, with only excess silence removed; no pitch shifting or time stretching is applied. No voice cloning or external voice service is used at game runtime. The manifest includes exact text, durations and voice IDs. Earlier versions are documented below.
+
 # Dialogue audio v31
 
 Twenty revised story lines have new local WAV recordings matching `assets/STORY-UPDATE-v31.txt`. Mara still uses the same native `en-US-AnaNeural` voice. The four revised Mrs Vale lines and three present-day Eli lines use the existing Helena and Dylan Seed Audio preset voices. Files are mono 48 kHz 16-bit PCM; only excess leading and trailing silence was removed. No voice cloning, pitch shifting or time stretching was used. All unchanged lines retain their earlier recordings. The runtime manifest holds exact text, durations and generation provenance.

@@ -80,7 +80,7 @@ test('the blackout keeps the same position and can only be repaired after findin
 });
 test('the emergency flashlight is physically found, held with a real beam, toggled and saved without batteries',async()=>{
   const g=game(),t=g.target('item_flashlight');g.inventory.failPower();
-  g.flashlight.update(0,0);assert.equal(g.flashlight.view,null);assert.equal(t.enabled,false);
+  g.flashlight.update(0,0);assert.ok(g.flashlight.view.root.visible);assert.equal(g.flashlight.view.torch.visible,false);assert.equal(g.flashlight.beam,null);assert.equal(t.enabled,false);
   await g.interactions.use(t.container);g.step();
   assert.ok(t.enabled);const from=t.container.approach.clone();from.y=1.65;assert.equal(clearView(g,t,from).length,0);
   await g.interactions.use(t);g.flashlight.update(.1,1);

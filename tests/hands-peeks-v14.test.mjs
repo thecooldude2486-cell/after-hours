@@ -142,7 +142,7 @@ test("the flashlight stays inside the cylindrical grip and bob never drifts the 
   assert.ok(view.muzzle().toArray().every(Number.isFinite));
   player.hidden = true;
   view.update(player, 6);
-  assert.equal(view.root.visible, false);
+  assert.equal(view.root.visible, true,"Hands remain visible in hiding");
 });
 
 function rendererStub({ float = true, failMask = false } = {}) {

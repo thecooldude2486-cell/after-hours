@@ -1,5 +1,6 @@
-// Camera shots are brief punctuation around existing story beats; they add no dialogue or lore.
+// Camera beats and a dialogue-driven memory scene preserve the existing story route.
 export const CINEMATICS = {
+  argument: {conversation:true,dialogue:"argument",duration:Infinity,fov:51},
   teacherArrival: {
     duration: 1.7,
     target: "teacher",

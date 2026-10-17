@@ -13,10 +13,10 @@ export const DIALOGUE = {
     l("MARA · CASSETTE", "Do you remember where we used to hide? I still leave things there.", 4.5),
   ],
   argument: [
-    l("YOUNG MARA", "Can you wait after school today? Just by the stairs."),
+    l("YOUNG MARA", "Can you walk home with me today?"),
     l("YOUNG ELI", "I've got things to do.", 3),
     l("YOUNG MARA", "It's nothing. I just don't like going that way alone.", 2.5),
-    l("YOUNG ELI", "Mara, stop.", 3),
+    l("YOUNG ELI", "I've got to go, Mara. I'll meet you back home.", 4.5),
     l("", "", 3),
   ],
   teacher: [l("THE TEACHER", "The same excuse. Every morning.", 3), l("THE TEACHER", "We should have listened.", 3)],
@@ -100,6 +100,7 @@ for (const [group, lines] of Object.entries(DIALOGUE))
     const clip = VOICES[group + ":" + i];
     if (clip && clip.text === lines[i].text) {
       lines[i].audio = clip.audio;
+      lines[i].speechDuration = clip.duration;
       lines[i].voiceProfile =
         lines[i].speaker.includes("MARA") &&
         /INTERCOM|VOICEMAIL/.test(lines[i].speaker)

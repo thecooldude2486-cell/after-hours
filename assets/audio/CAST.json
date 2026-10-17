@@ -1,6 +1,6 @@
 {
-  "revision": 12,
-  "engine": "Microsoft Ana Neural for all Mara speech; Seed Audio for Eli and Mrs Vale",
+  "revision": 35,
+  "engine": "Microsoft Ana Neural for Mara; Microsoft Guy Neural for Eli; Seed Audio for Mrs Vale",
   "format": "48kHz mono, 16-bit PCM WAV",
   "casting": {
     "mara-child": {
@@ -18,14 +18,18 @@
       "source": "https://learn.microsoft.com/en-us/azure/ai-services/speech-service/language-support"
     },
     "eli-young": {
-      "name": "Evan",
-      "voice_id": "f7a46aa0-183a-5327-b554-e71d8c0071bb",
-      "voice_type": "preset"
+      "name": "Guy",
+      "voice_id": "en-US-GuyNeural",
+      "voice_type": "native-english",
+      "engine": "Microsoft Neural",
+      "language": "en-US"
     },
     "eli": {
-      "name": "Dylan",
-      "voice_id": "b847bc29-f184-583a-8ad9-d1f1e16d1a60",
-      "voice_type": "preset"
+      "name": "Guy",
+      "voice_id": "en-US-GuyNeural",
+      "voice_type": "native-english",
+      "engine": "Microsoft Neural",
+      "language": "en-US"
     },
     "teacher": {
       "name": "Helena",
@@ -33,7 +37,7 @@
       "voice_type": "preset"
     }
   },
-  "performance_note": "Mara is a native synthetic female child voice, used for all her lines at the user’s request. Other character casting remains unchanged. Speech is not a recording of a human child actor. No pitch shifting, time stretching or cloned child voice. Device effects are separate.",
+  "performance_note": "Mara retains her native synthetic female child voice. All Eli lines use one native American English synthetic male voice. No pitch shifting, time stretching or voice cloning is applied. Device processing is separate.",
   "nonverbal": {
     "file": "v11-lastVoicemail-0.wav",
     "author": "ashjenx",

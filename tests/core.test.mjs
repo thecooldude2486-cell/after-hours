@@ -40,7 +40,8 @@ test("spoken dialogue follows the original story plus the user-approved conceale
   const normalize = (s) =>
     s.replace(/[’‘]/g, "'").replace(/[“”]/g, "").replace(/\s+/g, " ");
   const revision = await readFile(new URL('../assets/STORY-UPDATE-v31.txt', import.meta.url),'utf8');
-  const all = normalize(source+'\n'+revision);
+  const opening = await readFile(new URL('../assets/STORY-UPDATE-v35.txt',import.meta.url),'utf8');
+  const all = normalize(source+'\n'+revision+'\n'+opening);
   const approved = new Set([
     "Mara… is it really you?",
     "It’s me, Eli.",

@@ -241,7 +241,7 @@ export const BEATS = [
       say("hideMemory"),
       mode("memory"),
       mara(...MARA_ARGUMENT_POSITION, 9),
-      say("argument"),
+      { type: "cinematic", id: "argument" },
       mode("ruined"),
       { type: "hideMara" },
       { type: "cinematic", id: "teacherArrival" },

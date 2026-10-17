@@ -105,7 +105,7 @@ export class InteractionSystem {
     }
     if (!target || target.enabled === false || !target.mesh.visible) return;
     if(target.type==='lockerDoor'){
-      const l=target.locker;l.playing=false;l.manualOpen=!l.manualOpen;
+      const l=target.locker;g.flashlight?.reachDoor(l,'open');l.playing=false;l.manualOpen=!l.manualOpen;
       if(l.manualOpen)g.inventory.opened.add(target.id);else g.inventory.opened.delete(target.id);
       g.audio.cue(l.manualOpen?'doorOpen':'doorClose',target.position);g.story.save?.();return;
     }
@@ -126,6 +126,7 @@ export class InteractionSystem {
     if (target.type === "container") {
       if (target.crtLocked) { this.notify("THE DESK LATCH IS WIRED TO THE MONITOR"); g.audio.cue("locked",target.position); return; }
       if (!g.inventory.check(target)) return;
+      g.flashlight?.reachDoor(target,"open");
       g.inventory.toggleStorage(target);
       return;
     }

@@ -1,3 +1,7 @@
+# v35 — User-approved opening exchange and visible hands
+
+The user explicitly replaces the first Mara/Eli conversation with “Can you walk home with me today?”, “I’ve got things to do”, Mara’s concealed “it’s nothing” explanation, and “I’ve got to go, Mara. I’ll meet you back home.” Exact corrected wording is in assets/STORY-UPDATE-v35.txt. A dialogue-driven classroom cutscene shows both young characters speaking and restores camera ownership on completion or retry. The story order and subsequent memories remain. Eli’s existing speech assignments have been regenerated with one native American English synthetic voice; no subtitle is paired with an older mismatched recording. Both hands now exist independently of flashlight ownership and animate for handle use and physical door pushes.
+
 # v34 — User-requested shadow reference and motion
 
 The supplied reference guides the black, indistinct human silhouette and fast room appearance. Doorway apparitions no longer expire on a gaze timer, look-away timer or duration: approaching within the authored three-metre threshold starts their retreat. Eli appears briefly in the authored next-room route rather than waiting to be approached. Student pursuit has been replaced by stationary bodies with independent head tracking, and student geometry has more human facial and uniform detail. The initial grab impact shares the shadow style, then exposes the detailed monster for the existing E struggle. No story text, voice recordings, puzzle requirements or player position is changed.

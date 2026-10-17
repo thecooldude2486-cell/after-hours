@@ -89,6 +89,7 @@ class Game {
     this.environmentSounds = new EnvironmentSoundSystem(this);
     this.echoes = new EchoSystem(this);
     this.flashlight=new FlashlightSystem(this);
+    this.world.onDoorHand=(door,mode)=>this.flashlight.reachDoor(door,mode);
     this.player.canLook = () =>
       this.started &&
       !this.paused &&
@@ -524,7 +525,7 @@ class Game {
     if (!this.paused) this.cinematics.update(dt);
     const speaker = this.dialogue.current?.line?.speaker || "";
     this.world.mara.userData.speaking =
-      live && speaker.includes("MARA") && this.audio.isSpeaking;
+      live && speaker.includes("MARA") && (this.audio.isSpeaking || (this.cinematics.active?.data.conversation && this.dialogue.current.time < this.dialogue.current.line.speechDuration));
     this.world.teacher.userData.speaking =
       live && speaker.includes("TEACHER") && this.audio.isSpeaking;
     this.world.env.update(dt, this.time);

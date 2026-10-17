@@ -1,3 +1,7 @@
+# v33 — Older-laptop graphics support
+
+In response to continued slow play on an older laptop, rendering receives saved Auto / Low power / High quality modes. Auto samples raw frame duration separately from the existing capped gameplay delta, ignores isolated long stalls and inactive windows, and uses sustained windows with hysteresis. Only visual workload adapts. Low power skips optional HDR lens processing except when the apparition blur needs its mask/resolve path. Background tabs and idle overlays no longer redraw continuously.
+
 # v32 — User-requested empty storage and optimization
 
 The user asked for genuinely empty lockers and a faster game. Decorative placeholder contents have been removed from storage and corridor lockers, and the metal backing is darker. Rendering combines only eligible stationary opaque surfaces; moving doors, collectible props, colliders, chapter visibility and authored state changes retain their behavior. GPU instancing preserves rain and flame motion. Light culling uses the full lamp influence sphere and restores authored visibility after every render; it does not reduce the school’s lighting settings.

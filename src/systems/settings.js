@@ -36,6 +36,7 @@ export function readSettings(storage = globalThis.localStorage) {
       : fallback;
   for (const [key, [label, fallback]] of Object.entries(SETTINGS_SWITCHES))
     values[key] = typeof saved[key] === "boolean" ? saved[key] : fallback;
+  values.performanceMode=["auto","low","high"].includes(saved.performanceMode)?saved.performanceMode:"auto";
   return values;
 }
 /** Player-facing preferences persist independently of difficulty and Director tuning. */
@@ -50,6 +51,7 @@ export class SettingsSystem {
     Object.assign(this.game.config, this.values);
     this.game.audio.voice = this.values.spokenDialogue;
     this.game.audio.applyMix();
+    this.game.performance?.configure();
     if (this.game.camera && !this.game.cinematics.active) {
       this.game.camera.fov = this.values.cameraFov;
       this.game.camera.updateProjectionMatrix();
@@ -59,6 +61,7 @@ export class SettingsSystem {
     for (const key of [
       ...Object.keys(SETTINGS_FIELDS),
       ...Object.keys(SETTINGS_SWITCHES),
+      "performanceMode",
     ])
       this.values[key] = this.game.config[key];
     try {
@@ -70,6 +73,14 @@ export class SettingsSystem {
   build() {
     const fields = document.querySelector("#settingsFields");
     fields.replaceChildren();
+    const graphics=document.createElement('label');graphics.className='setting-row quality-row';
+    const title=document.createElement('span');title.textContent='Graphics';
+    const quality=document.createElement('select');quality.id='setting_performanceMode';
+    for(const [value,label] of [['auto','Auto · adjusts to your laptop'],['low','Low power · smoother play'],['high','High quality']]){
+      const option=document.createElement('option');option.value=value;option.textContent=label;quality.append(option);
+    }
+    quality.onchange=()=>{this.game.config.performanceMode=quality.value;this.save();};
+    graphics.append(title,quality);fields.append(graphics);
     for (const [key, [min, max, step, label]] of Object.entries(
       SETTINGS_FIELDS,
     )) {
@@ -122,6 +133,7 @@ export class SettingsSystem {
     this.sync();
   }
   sync() {
+    const quality=document.querySelector("#setting_performanceMode");if(quality)quality.value=this.values.performanceMode;
     for (const key of Object.keys(SETTINGS_FIELDS)) {
       const input = document.querySelector("#setting_" + key);
       if (input) input.value = this.values[key];

@@ -928,13 +928,13 @@ button:disabled {
 }
 #settingsFields {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 14px 28px;
   margin: 20px 0;
 }
 .setting-row {
   display: grid;
-  grid-template-columns: 1fr 42px;
+  grid-template-columns: minmax(0, 1fr) 42px;
   gap: 8px;
   font-size: 12px;
   text-align: left;
@@ -1134,3 +1134,10 @@ h1, #readTitle, .pause-copy h2 { font-family: var(--display-face); }
   #subtitles { bottom: 108px; width: 90vw; }
   #itemNotice { bottom: 185px; }
 }
+
+.quality-row { grid-column: 1/-1; }
+.quality-row select { grid-column: 1/-1; width: 100%; padding: 10px; }
+
+.setting-row { min-width: 0; }
+.setting-row input, .quality-row select { min-width: 0; box-sizing: border-box; }
+.settings-tests { flex-wrap: wrap; }

@@ -24,14 +24,15 @@ import { TeacherAI } from "./systems/teacher.js";
 import { StorySystem } from "./systems/story.js";
 import { ObjectiveSystem } from "./systems/objectives.js";
 import { CinematicSystem } from "./systems/cinematics.js";
-import { SettingsSystem } from "./systems/settings.js";
+import {AdaptivePerformance} from "./systems/performance.js";
+import { SettingsSystem, readSettings } from "./systems/settings.js";
 import { HauntingSystem } from "./systems/hauntings.js";
 import { AmbushSystem } from "./systems/ambushes.js";
 import { CaptureSystem } from "./systems/capture.js";
 const $ = (s) => document.querySelector(s);
 class Game {
   constructor() {
-    this.config = loadConfig();
+    this.config = {...loadConfig(),...readSettings()};
     this.configurePreset(this.config.preset || "normal");
     this.started = false;
     this.paused = false;
@@ -41,7 +42,7 @@ class Game {
     this.time = 0;
     this.renderer = new THREE.WebGLRenderer({
       canvas: $("#game"),
-      antialias: true,
+      antialias: this.config.performanceMode==='high',
       powerPreference: "high-performance",
     });
     this.renderer.setPixelRatio(
@@ -53,6 +54,7 @@ class Game {
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.25;
     this.presentation = new SchoolRenderer(this.renderer, this.config);
+    this.performance=new AdaptivePerformance(this.renderer,this.presentation,this.config);
     this.camera = new THREE.PerspectiveCamera(
       68,
       innerWidth / innerHeight,
@@ -474,7 +476,8 @@ class Game {
   }
   tick() {
     requestAnimationFrame(this.tick);
-    const dt = Math.min(this.clock.getDelta(), 0.06);
+    const frameSeconds=this.clock.getDelta();
+    const dt = Math.min(frameSeconds, 0.06);
     this.time += dt;
     const live =
       this.started &&
@@ -482,6 +485,13 @@ class Game {
       !this.ended &&
       !this.interactions.reader &&
       !this.recovering;
+    this.performance.update(frameSeconds,live&&!document.hidden);
+    if(document.hidden)return;
+    if(!live&&!this.cinematics.active){
+      this.idleDrawElapsed=(this.idleDrawElapsed||0)+frameSeconds;
+      if(this.idleDrawElapsed<1/24)return;
+      this.idleDrawElapsed=0;
+    }else this.idleDrawElapsed=0;
     if (live) {
       this.player.update(
         dt,

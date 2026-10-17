@@ -18,7 +18,7 @@ export class SchoolRenderer {
       1,
       THREE.UnsignedIntType,
     );
-    this.target.samples = Math.min(2, renderer.capabilities?.maxSamples ?? 2);
+    this.target.samples = config.performanceMode==='high'?Math.min(2, renderer.capabilities?.maxSamples ?? 2):0;
     renderer.localClippingEnabled = true;
     this.figureTarget = new THREE.WebGLRenderTarget(1, 1, {
       depthBuffer: true,
@@ -66,12 +66,15 @@ export class SchoolRenderer {
     }
     void main(){
       vec3 color=texture2D(sceneColor,vUv).rgb;
-      float center=distanceAt(vUv),occlusion=0.0;vec2 texel=1.0/size;
+      vec2 texel=1.0/size;
+      if(lensOnly<.5){
+      float center=distanceAt(vUv),occlusion=0.0;
       for(int i=0;i<8;i++){float a=float(i)*.785398;vec2 p=vUv+vec2(cos(a),sin(a))*texel*(3.0+mod(float(i),2.0)*3.0);float gap=center-distanceAt(p);occlusion+=smoothstep(.025,.16,gap)*(1.0-smoothstep(.3,1.1,gap));}
       color*=1.0-occlusion*.045*(1.0-friendly*.65)*(1.0-lensOnly);
       vec3 bloom=vec3(0.0);
       for(int i=0;i<4;i++){float a=float(i)*1.570796;bloom+=max(vec3(0.0),texture2D(sceneColor,vUv+vec2(cos(a),sin(a))*texel*4.0).rgb-vec3(1.0));}
       color+=bloom*.025*(1.0-lensOnly);
+      }
       if(figureActive>.5){
         vec3 softened=vec3(0.0);float footprint=visibleFigure(vUv);
         for(int i=0;i<16;i++){
@@ -82,9 +85,11 @@ export class SchoolRenderer {
         }
         color=mix(color,softened,clamp(footprint,0.0,1.0));
       }
+      if(lensOnly<.5){
       float grain=fract(sin(dot(vUv*size,vec2(12.9898,78.233))+floor(time*24.0))*43758.5453)-.5;
       color+=grain*.009*(1.0-friendly*.8)*(1.0-lensOnly);
       float vignette=smoothstep(.26,.75,length(vUv-.5));color*=1.0-vignette*.11*(1.0-friendly*.85)*(1.0-lensOnly);
+      }
       gl_FragColor=vec4(max(color,vec3(0.0)),1.0);
       #include <tonemapping_fragment>
       #include <colorspace_fragment>
@@ -136,8 +141,9 @@ export class SchoolRenderer {
     const r = this.renderer;
     const figure = Boolean(world.apparition?.mesh.visible);
     this.uniforms.figureActive.value = figure ? 1 : 0;
-    this.uniforms.lensOnly.value = this.config.screenEffects === false ? 1 : 0;
-    if ((!this.supported || this.config.screenEffects === false) && !figure) {
+    const effects=this.config.screenEffects!==false&&!this.lowPower;
+    this.uniforms.lensOnly.value = effects ? 0 : 1;
+    if ((!this.supported || !effects) && !figure) {
       r.setRenderTarget(null);
       r.render(world.scene, camera);
       return;

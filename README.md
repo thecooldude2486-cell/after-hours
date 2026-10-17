@@ -1,3 +1,7 @@
+# v33 — Automatic graphics and low-power mode
+
+Graphics now defaults to Auto. It starts at native CSS resolution instead of supersampling, then lowers only render resolution and optional lens effects when slow frames persist. It can recover quality after sustained fast play. Low power holds a 0.7 render scale and bypasses the full-screen effects pass; High quality preserves the configured upper scale and enables multisampling. Preferences save independently of difficulty. Hidden tabs skip game/render updates, and idle menus/readers draw at up to 24 fps. The apparition mask/blur path, lighting brightness, physics, AI and story rules remain available.
+
 # v32 — Empty lockers and rendering performance
 
 Empty lockers contain metal fittings only: no fake paper blocks, notebooks, schoolbags or pencils. Collectible keys, fuses and the emergency flashlight remain real visible items and disappear when taken. Static scenery and stationary cabinet panels are merged in small spatial groups while interactions and collision objects are retained. Rain and pupil flames use instanced geometry. Finite lamps outside the camera’s influence range are excluded only during rendering. Settled storage no longer updates its entire transform hierarchy every frame. The same 640×360 scene views submitted 1,751 → 1,256 draws in the hallway and 1,454 → 1,064 in the classroom (scene-only renderer comparison, not a measured player FPS increase).

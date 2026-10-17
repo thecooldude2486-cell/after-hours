@@ -229,6 +229,9 @@ test("title and pause settings controls save preferences and close without start
       },
     };
     const settings = new SettingsSystem(game);
+    const quality=elements.get('#setting_performanceMode');
+    quality.value='low';quality.onchange();
+    assert.equal(JSON.parse(data.get('after-hours-settings')).performanceMode,'low');
     const input = elements.get("#setting_intercomVolume");
     input.value = "2.1";
     input.oninput();

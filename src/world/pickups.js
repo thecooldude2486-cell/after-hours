@@ -173,12 +173,13 @@ export function addPickups(world) {
       const mesh = part(
         parent,
         new THREE.BoxGeometry(width, height, depth),
-        paint,
+        paint.clone(),
         x,
         y,
         z,
       );
-      world.env?.register(mesh, locker ? "locker" : "desk", data.room);
+      const variants=locker?Object.fromEntries(['ruined','normal','memory','burned','distorted'].map(state=>[state,{material:{map:null,bumpMap:null,roughness:.94,metalness:.06,envMapIntensity:.04}}])):null;
+      world.env?.register(mesh, locker ? "locker" : "desk", data.room,variants);
       return mesh;
     }
     panel(w, h, 0.04, 0, h / 2, -d / 2);
@@ -194,7 +195,9 @@ export function addPickups(world) {
       panel(w - 0.07, 0.035, d - 0.04, 0, 0.88, 0);
       tray.position.set(0, 0.91, 0);
       addLockerInterior(root,w,h,d,{shelf:.88});
-      const hook=part(root,new THREE.TorusGeometry(.035,.008,6,12),metal,.06,1.51,-.225,Math.PI/2);
+      const hook=part(root,new THREE.CylinderGeometry(.006,.006,.09,8),metal,.06,1.51,-.221,Math.PI/2);
+      const lip=part(root,new THREE.CylinderGeometry(.006,.006,.034,8),metal,.06,1.526,-.177);
+      lip.name="Upturned key hook";
       hook.name="Locker key hook";
       front.position.set(-w / 2, 0, d / 2 + 0.015);
       panel(w - 0.03, h - 0.08, 0.035, w / 2, h / 2, 0, front);
@@ -250,8 +253,8 @@ export function addPickups(world) {
         tray,
         new THREE.CylinderGeometry(0.006, 0.006, 0.19, 8),
         red,
-        -0.24,
-        0.06,
+        -0.16,
+        0.04,
         -0.06,
       );
       pencil.rotation.z = Math.PI / 2;

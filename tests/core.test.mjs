@@ -32,14 +32,15 @@ test("the full narrative is a connected chain ending in the supplied voicemail",
   assert.equal(seen.size, STAGE_ORDER.length - 1);
   assert.equal(DIALOGUE.lastVoicemail.at(-1).text, "I am.");
 });
-test("spoken dialogue keeps source wording and excludes new exposition", async () => {
+test("spoken dialogue follows the original story plus the user-approved concealed-bullying revision", async () => {
   const source = await readFile(
     new URL("../assets/STORY-SOURCE.txt", import.meta.url),
     "utf8",
   );
   const normalize = (s) =>
     s.replace(/[’‘]/g, "'").replace(/[“”]/g, "").replace(/\s+/g, " ");
-  const all = normalize(source);
+  const revision = await readFile(new URL('../assets/STORY-UPDATE-v31.txt', import.meta.url),'utf8');
+  const all = normalize(source+'\n'+revision);
   const approved = new Set([
     "Mara… is it really you?",
     "It’s me, Eli.",

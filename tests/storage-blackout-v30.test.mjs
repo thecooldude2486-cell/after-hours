@@ -97,3 +97,40 @@ test('an earlier power repair cannot consume the only replacement fuse for the l
   g.inventory.failPower();assert.ok(g.target('item_fuse').available);
   assert.equal(g.inventory.collected.has('item_fuse'),false);
 });
+
+test('loose locker props and loot stay inside the metal cavity across every layout and opening angle',()=>{
+  const g=game();
+  function boundsIn(object,root){
+    root.updateWorldMatrix(true,true);const inv=root.matrixWorld.clone().invert(),result=new T.Box3();
+    object.traverse(m=>{if(!m.isMesh)return;m.geometry.computeBoundingBox();result.union(m.geometry.boundingBox.clone().applyMatrix4(new T.Matrix4().multiplyMatrices(inv,m.matrixWorld)));});
+    return result;
+  }
+  for(const preset of ['story','easy','normal','hard','nightmare']){
+    g.config.preset=preset;g.inventory.restore({});
+    for(const c of g.world.storage.filter(c=>c.kind==='locker')){
+      for(const angle of [0,.3,1]){
+        c.open=angle>0;c.amount=angle;c.mesh.rotation.y=-angle*Math.PI*.57;
+        const b=boundsIn(c.tray,c.root);
+        assert.ok(b.min.x>=-.31&&b.max.x<=.31&&b.min.z>=-.26&&b.max.z<=.28,c.id+' fitted tray contents: '+JSON.stringify(b));
+        assert.ok(b.min.y>.89&&b.max.y<1.74,c.id+' contents stay between shelves');
+      }
+    }
+  }
+});
+
+test('all painted locker surfaces remain matte and untextured after each environment transition',()=>{
+  const g=game();
+  for(const state of ['normal','burned','distorted','ruined','memory']){
+    g.world.env.set(state,'school',true);
+    for(const e of g.world.env.entries.filter(e=>e.role==='locker')){
+      assert.equal(e.mesh.material.map,null,state+' locker has no blurred stain map');
+      assert.equal(e.mesh.material.bumpMap,null);
+      assert.ok(e.mesh.material.roughness>=.9);
+      assert.ok(e.mesh.material.envMapIntensity<=.05);
+    }
+    for(const c of g.world.storage.filter(c=>c.kind==='locker')){
+      const back=c.root.getObjectByName('Pale locker interior');
+      assert.equal(back.material.map,null);assert.equal(back.material.envMapIntensity,0);
+    }
+  }
+});

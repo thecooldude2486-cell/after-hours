@@ -114,11 +114,11 @@ export class InventorySystem {
           if (container.kind === "locker") {
             if (ITEMS[target.item]?.type === "key") {
               // Hang keys at eye level on the open cavity's backboard.
-              target.mesh.position.set(0.16, 0.57, -0.18);
-              target.mesh.rotation.set(Math.PI / 2, 0, -0.35);
-              target.mesh.scale.setScalar(1.55);
+              target.mesh.position.set(0.06, 0.50, -0.22);
+              target.mesh.rotation.set(Math.PI / 2, -Math.PI / 2, 0);
+              target.mesh.scale.setScalar(1.05);
             } else {
-              target.mesh.position.set(-0.04, 0.045, 0.13);
+              target.mesh.position.set(-0.04, 0.045, 0);
               target.mesh.scale.setScalar(1.45);
             }
           }

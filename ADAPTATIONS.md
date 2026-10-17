@@ -1,3 +1,7 @@
+# v31 — User-approved story and storage correction
+
+The user explicitly asked for Mara to conceal the bullying through clues for Eli and for the story and voiced dialogue to follow their fire account. This supersedes the original source wording for the twenty lines in assets/STORY-UPDATE-v31.txt. Mara’s early pages conceal events; later evidence identifies the ignored reports and early departures. Her later admission states her intent and responsibility. The ending remains connected to the original. Locker surfaces no longer use blurred procedural patches; door hardware uses explicit parentage and loose objects fit the cavity.
+
 # Approved gameplay adaptation
 
 V30 follows the explicit request to bring back a findable flashlight, keep the player in place when the lights fail, and make fuse repair a physical journey. The clock memory and fire-memory transition no longer teleport Eli. The blackout trips the school circuit; the player searches reception for the light, opens the warped classroom side door and reaches maintenance to replace the fuse. The existing authored flashlight grip is reused without batteries. Its switch and the failed circuit persist. Locker/drawer presentation and inspection change without altering the v29 fire account, journal wording, cast or ending.

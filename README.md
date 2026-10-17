@@ -1,3 +1,7 @@
+# v31 — Concealed pages and solid lockers
+
+Locker interiors use matte enamel, explicit door hardware and fitted props. Mara conceals daily bullying in excuses and journal clues; the school records, revised recorded dialogue and later admission connect those clues to the fire. Twenty changed lines have new bundled recordings in the existing character voices. Production builds now stamp both entry URLs and the complete module graph to prevent an older cached script loading a previous release.
+
 # After Hours v30 — Search the dark
 
 Play https://thecooldude2486-cell.github.io/after-hours/?v=30.

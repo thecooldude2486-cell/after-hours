@@ -56,7 +56,7 @@ test("every spoken source line has a non-silent bundled WAV with enough subtitle
       assert.equal(take.text, line.text, "Audio script matches subtitle");
       assert.equal(
         take.revision,
-        take.character.startsWith("mara") ? 12 : 11,
+        take.audio.includes("/v31-") ? 31 : take.character.startsWith("mara") ? 12 : 11,
         "Every spoken assignment uses the correct revised take",
       );
     }

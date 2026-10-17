@@ -1,3 +1,9 @@
+# Dialogue audio v31
+
+Twenty revised story lines have new local WAV recordings matching `assets/STORY-UPDATE-v31.txt`. Mara still uses the same native `en-US-AnaNeural` voice. The four revised Mrs Vale lines and three present-day Eli lines use the existing Helena and Dylan Seed Audio preset voices. Files are mono 48 kHz 16-bit PCM; only excess leading and trailing silence was removed. No voice cloning, pitch shifting or time stretching was used. All unchanged lines retain their earlier recordings. The runtime manifest holds exact text, durations and generation provenance.
+
+The early performances conceal the bullying through evasions; the later evidence and confession reveal the fire account supplied by the user. No earlier recording is attached to changed subtitle text.
+
 # Dialogue audio v12
 
 All Mara speech now uses Microsoft `en-US-AnaNeural`, a native female child synthetic voice. Microsoft's voice list explicitly marks it **Female, Child**: https://learn.microsoft.com/en-us/azure/ai-services/speech-service/language-support . The user's request applies this casting to all Mara dialogue, including older-appearance scenes, the intercom and voicemail. These are synthetic performances, not recordings of a real child actor. No pitch shifting, artificial age transformation or time stretching is applied.

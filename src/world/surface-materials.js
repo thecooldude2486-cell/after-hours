@@ -119,6 +119,10 @@ function maps(kind, clean = false, burned = false) {
 export function surfaceVariants(role) {
   const kind = roleKinds[role];
   if (!kind) return null;
+  if (role === 'locker') {
+    const enamel = {map:null,bumpMap:null,bumpScale:0,roughness:.93,metalness:.08,envMapIntensity:.04};
+    return Object.fromEntries(['ruined','normal','memory','burned','distorted'].map(state=>[state,{material:enamel}]));
+  }
   const dirty = maps(kind),
     clean = maps(kind, true),
     burned = maps(kind, false, true);

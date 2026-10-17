@@ -510,10 +510,11 @@ export function createSchool(renderer, config) {
       0x3b5149,
       "locker",
     );
+    const doorParts=[face];
     for (const y of [1.93, 2.02, 2.11])
-      box(x + direction * 0.35, y, z, 0.02, 0.022, 0.38, 0x132925);
-    box(x + direction * 0.365, 1.17, z - 0.22, 0.045, 0.15, 0.045, 0x88928c);
-    textPlane(
+      doorParts.push(box(x + direction * 0.35, y, z, 0.02, 0.022, 0.38, 0x132925));
+    doorParts.push(box(x + direction * 0.365, 1.17, z - 0.22, 0.045, 0.15, 0.045, 0x88928c));
+    doorParts.push(textPlane(
       id === "bracelet" ? "17" : String(10 + Math.floor(Math.abs(z))),
       x + direction * 0.355,
       1.65,
@@ -524,7 +525,7 @@ export function createSchool(renderer, config) {
       "#c3c4a9",
       "#394b43",
       50,
-    );
+    ));
     if (id) {
       const obj = target(
         id,
@@ -534,13 +535,7 @@ export function createSchool(renderer, config) {
         { note: id === "bracelet" ? "bracelet" : null },
       );
       if (id === "bracelet") {
-        const pieces = scene.children.filter(
-          (m) =>
-            Math.abs(m.position.x - (x + direction * 0.35)) < 0.055 &&
-            Math.abs(m.position.z - z) < 0.39 &&
-            m.position.y > 0.9 &&
-            m.position.y < 2.3,
-        );
+        const pieces = doorParts;
         const hinge = new THREE.Group();
         hinge.position.set(x + direction * 0.325, 0, z - 0.37);
         scene.add(hinge);
@@ -560,13 +555,7 @@ export function createSchool(renderer, config) {
       }
     }
     if (!id) {
-      const pieces = scene.children.filter(
-        (m) =>
-          Math.abs(m.position.x - (x + direction * 0.35)) < 0.055 &&
-          Math.abs(m.position.z - z) < 0.39 &&
-          m.position.y > 0.9 &&
-          m.position.y < 2.3,
-      );
+      const pieces = doorParts;
       const hinge = new THREE.Group();
       hinge.position.set(x + direction * 0.325, 0, z - 0.37);
       scene.add(hinge);

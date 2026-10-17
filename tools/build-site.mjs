@@ -28,6 +28,13 @@ async function versionModules(directory) {
   }
 }
 for (const directory of ['src', 'vendor']) await versionModules(join(output, directory));
+// Stamp the entry URLs too: a fresh document must never load an older cached import graph.
+const htmlPath = join(output, 'index.html');
+const html = await readFile(htmlPath, 'utf8');
+await writeFile(htmlPath, html.replace(
+  /((?:href|src)=["'])(style\.css|src\/main\.js)(?:\?[^"']*)?(["'])/g,
+  (_, prefix, asset, quote) => `${prefix}${asset}?v=${encodeURIComponent(version)}${quote}`,
+));
 await writeFile(join(output, '.nojekyll'), '');
 let count = 0, bytes = 0;
 async function check(directory) {

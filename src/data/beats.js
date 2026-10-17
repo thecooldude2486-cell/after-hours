@@ -25,21 +25,21 @@ export const STAGES = {
   },
   drawing: {
     chapter: 2,
-    name: "Don’t Leave Me",
+    name: "Between the Lines",
     objective: "Find the drawing · Classroom 04.",
     position: [0, -11],
     state: "ruined",
   },
   cassette: {
     chapter: 2,
-    name: "Don’t Leave Me",
+    name: "Between the Lines",
     objective: "Play the cassette · Classroom 04.",
     position: [-8, -18],
     state: "ruined",
   },
   survive: {
     chapter: 2,
-    name: "Don’t Leave Me",
+    name: "Between the Lines",
     objective:
       "Reach Classroom 08 unseen. Break sight before hiding. Save your breath.",
     position: [-5.2, -20.5],

@@ -3,7 +3,7 @@ export const NOTES = {
   bracelet: {
     type: "MARA’S LOCKER · JOURNAL / 1",
     title: "For Eli, when he comes back",
-    body: "Eli,\n\nThey did it again today. It happens every day. I tried to tell someone, but they only listened when I stopped talking.\n\nI tied this page to our bracelet so you would know it was mine. The little key is safe in my pencil tin. The last pages have a clasp.\n\nPlease read them. Even if I cannot say it out loud.",
+    body: "Eli,\n\nSchool was fine. If Mum asks about the sleeve, tell her I caught it on the fence. It is easier that way.\n\nI kept the drawing where the rain cannot reach it. You remember the room.\n\nI tied this page to our bracelet so you would know it was mine. You used to borrow things from my pencil tin. There is one thing left in it I need you to keep.\n\nI have been writing the bits I cannot say. Look at what I cross out.",
   },
   drawing: {
     type: "A CHILDHOOD DRAWING",
@@ -15,7 +15,7 @@ export const NOTES = {
   note: {
     type: "TEACHER’S NOTE",
     title: "Mara Ward",
-    body: "“Mara seems highly dependent on her older brother.”",
+    body: "M. WARD / CLASS OBSERVATION\n\nSleeve torn again. Pupil says fence.\nBooks water-damaged. Pupil says rain.\n\n“Please do not telephone home.”\n\nA second hand has written: refer to headmaster. No meeting date follows.",
   },
   photo: {
     type: "FIRST DAY AT SCHOOL",
@@ -27,7 +27,7 @@ export const NOTES = {
   family: {
     type: "CLASSROOM TELEPHONE · REMEMBERED VOICES",
     title: "Eight years",
-    body: "Eight years.\n\nA voice on the other end. Familiar words, separated by long silences.\n\n…she kept coming back here…",
+    body: "Eight years.\n\nA voice on the other end. Familiar words, separated by long silences.\n\n“Still here.”\n\nThen the old answer again: “It was nothing.”\n\nUnder the receiver, a scrap reads: Not the words. The gaps between them.",
   },
   fault: {
     type: "EAST WING · FIRE RECORD",
@@ -37,11 +37,11 @@ export const NOTES = {
   vale: {
     type: "STAFF RECORD",
     title: "Mrs. Vale",
-    body: "STAFF SIGN-OUT\n\nV. — returned east. Child still inside.\n\nI sent her complaints to the headmaster. Every one. The seal case is still in this archive; he never asked for it back.\n\nUnder “returned”, the pen has stopped hard enough to tear the page.",
+    body: "STAFF SIGN-OUT\n\nV. — returned east. Child still inside.\n\nHer explanations changed. The same names stayed at the edge of every page. I sent the pages upstairs. The sealed case came back without a reply.\n\nI heard her after the others had gone.\n\nUnder “returned”, the pen has stopped hard enough to tear the page.",
   },
   waiting: {
     type: "MARA’S JOURNAL / FINAL PAGE",
     title: "I was still inside",
-    body: "Eli,\n\nI started the fire.\n\nI thought I could end the bullying by taking them with me. That was what I meant to do. I wanted them to hurt, and then I was frightened of what I had done.\n\nThey found my pages. They knew. They all left before it happened.\n\nI did not leave.\n\nMrs. Vale came back for me. I heard her calling.\n\nI wish I had told you. I wish none of this had happened.\n\nHe’ll come back.\nHe’ll come back.",
+    body: "Eli,\n\n[You can still read the words beneath the crossings-out.]\n\nIt was an accident.\nNo. It was mine.\n\nI thought if the doors stayed shut, they would have to feel it too.\n\nThe places beside their names are empty. Mine is not.\n\nMrs. Vale is calling. I cannot see the door now.\n\nI wanted it all to stop. I did not know how to stop what I had started.\n\nHe’ll come back.\nHe’ll come back.",
   },
 };

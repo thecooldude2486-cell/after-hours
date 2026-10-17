@@ -1,0 +1,27 @@
+AFTER HOURS — v31 STORY REVISION
+
+User-authorized update: Mara is bullied every school day but conceals it with excuses and hidden journal clues for Eli. Her books, sleeve, lunch and falls connect to the later sealed complaints. The headmaster received her reports without acting. Mara started the school fire intending to take her bullies with her; they discovered her pages and left before the fire. Mara remained inside; Mrs Vale returned for her. The fire is Mara’s harmful choice, not an accident or Eli’s responsibility. The original reunion, final classroom and voicemail ending remain.
+
+Mara’s early pages use evasions and contradictions; the school evidence and late spoken admission complete the account.
+
+REVISED SPOKEN LINES
+hideMemory:0 — Do you remember where we used to hide? I still leave things there.
+argument:0 — Can you wait after school today? Just by the stairs.
+argument:2 — It's nothing. I just don't like going that way alone.
+phone:4 — It was nothing. That's what I always said.
+phone:6 — You didn't know. I made sure you didn't.
+phone:8 — I wrote different words when nobody was looking.
+phone:9 — The pages remember what I crossed out.
+reunion:3 — You found the things I couldn't tell you.
+companion1:2 — Did anyone ask about the pages?
+companion2:0 — I started the fire, Eli. I wanted them to burn with me.
+companion2:1 — I read the pages.
+companion2:2 — They found them first. They knew, and they left. I stayed inside.
+companion2:3 — What they did to you was wrong.
+companion2:5 — The fire was wrong too.
+return:3 — You couldn't have known. I hid it from you.
+return:6 — The fire was my choice. I'm sorry, Eli.
+teacher:0 — The same excuse. Every morning.
+teacher:1 — We should have listened.
+teacherReveal:0 — Her pages reached the headmaster.
+teacherReveal:1 — I went back. She was still inside.
